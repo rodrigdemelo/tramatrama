@@ -1870,9 +1870,9 @@
     if (!wasAutoRotate) window.Trama3D.setAutoRotate(true);
     btn.disabled = true;
     const original = btn.textContent;
-    btn.textContent = '⏺️ 5s';
+    btn.textContent = '⏺️ 15s';
     try {
-      const blob = await window.Trama3D.recordVideo(5000);
+      const blob = await window.Trama3D.recordVideo(15000);
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
