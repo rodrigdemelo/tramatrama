@@ -1,0 +1,3296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+  <title>Trama Trama 0.9.23 / Trama Xequerê</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --font-main: 'Manrope', system-ui, -apple-system, sans-serif;
+      --bg-app: #B5651D;
+      --bg-surface: rgba(255, 255, 255, 0.94);
+      --bg-surface-sub: rgba(250, 246, 240, 0.96);
+      --primary: #c2410c; 
+      --primary-hover: #9a3412;
+      --header-bg: #7c2d12;
+      --text-main: #292524;
+      --text-muted: #78716c;
+      --border-color: rgba(231, 229, 228, 0.9);
+      --border-dark: rgba(214, 211, 209, 0.9);
+      --shadow-float: 0 16px 36px -4px rgba(0, 0, 0, 0.22), 0 6px 16px -2px rgba(0, 0, 0, 0.12);
+      --sidebar-width: 66px;
+    }
+    
+    * { box-sizing: border-box; font-family: var(--font-main) !important; }
+    
+    html, body { 
+      height: 100%; width: 100%; margin: 0; padding: 0; 
+      background: var(--bg-app); color: var(--text-main); 
+      overflow: hidden;
+      position: fixed;
+    }
+    
+    button, input, select {
+      font-size: 13px; padding: 7px; border-radius: 6px;
+      border: 1px solid var(--border-dark);
+      background: #ffffff; color: var(--text-main);
+      transition: all 0.15s ease;
+    }
+    
+    button { cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-weight: 600; }
+    button:hover { background: #fff7ed; border-color: var(--primary); color: var(--primary-hover); }
+    button:active { background: #ffedd5; }
+    button.active { background: var(--primary); color: #ffffff; border-color: var(--primary); }
+    button.active:hover { background: var(--primary-hover); }
+    button.btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); font-weight: 700; }
+    button.btn-primary:hover { background: var(--primary-hover); }
+    button.btn-danger { background: #ef4444; color: #fff; border-color: #ef4444; }
+    button.btn-danger:hover { background: #dc2626; }
+    button:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+    
+    .app-shell {
+      position: relative;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+    }
+    
+    /* CANVAS EM TELA CHEIA COMO PLANO DE FUNDO HOMOGÊNEO */
+    .canvas-area {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+      z-index: 1;
+    }
+    #canvasWrap {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+    canvas#gridCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* BADGE DE MODO FLUTUANTE */
+    .canvas-mode-badge {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      background: rgba(41, 37, 36, 0.88);
+      color: #ffffff;
+      padding: 7px 16px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      pointer-events: none;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      z-index: 30;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    /* BARRA FLUTUANTE (DOCK) SOBRE O CANVAS */
+    .sidebar {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      bottom: 16px;
+      display: flex;
+      flex-direction: row;
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.7);
+      box-shadow: var(--shadow-float);
+      z-index: 40;
+      overflow: hidden;
+      max-height: calc(100vh - 32px);
+      transition: width 0.2s ease;
+    }
+
+    .icon-rail, .side-panel {
+      width: var(--sidebar-width);
+      flex: 0 0 var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 5px;
+      gap: 6px;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+    .icon-rail::-webkit-scrollbar, .side-panel::-webkit-scrollbar { display: none; }
+    
+    .icon-rail {
+      background: rgba(253, 251, 249, 0.75);
+      border-right: 1px solid var(--border-color);
+    }
+    .side-panel {
+      background: rgba(255, 255, 255, 0.9);
+      transition: width 0.18s ease, flex-basis 0.18s ease;
+    }
+
+    .rail-sep {
+      width: 60%;
+      height: 1px;
+      background: var(--border-dark);
+      margin: 4px auto;
+      flex-shrink: 0;
+    }
+    
+    .rail-btn {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      font-size: 20px;
+      border-radius: 12px;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .rail-btn-small {
+      width: 48px;
+      height: 48px;
+      padding: 0;
+      font-size: 18px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+    .btn-text-icon { font-size: 14px; font-weight: 800; color: #44403c; }
+    .icon-rotate-45 { display: inline-block; transform: rotate(45deg); }
+    #recentColorsSection { display: contents; }
+    #recentColorsSection[hidden] { display: none; }
+
+    /* BADGE DE SALVO INTEGRADO NA BARRA FLUTUANTE */
+    .save-badge-rail {
+      width: 48px;
+      font-size: 10px;
+      padding: 5px 2px;
+      border-radius: 9px;
+      background: rgba(34, 197, 94, 0.15);
+      color: #15803d;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-shrink: 0;
+      user-select: none;
+      transition: all 0.2s ease;
+      line-height: 1.15;
+    }
+    .save-badge-rail.saving {
+      background: rgba(245, 158, 11, 0.18);
+      color: #b45309;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .panel-section { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+    .panel-section[hidden] { display: none !important; }
+
+    .color-grid, .tool-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      width: 100%;
+      align-items: center;
+      padding: 0;
+    }
+    
+    .swatch { 
+      width: 48px; height: 48px; border-radius: 12px; 
+      border: 1px solid rgba(0,0,0,0.18); cursor: pointer; padding: 0; 
+      box-shadow: inset 0 0 2px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+    }
+    .swatch.selected { outline: 2.5px solid var(--primary); outline-offset: 2px; transform: scale(1.05); }
+
+    .clip-preview {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #B5651D;
+      width: 48px;
+      height: 48px;
+      margin: 0 auto;
+      flex-shrink: 0;
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(41, 37, 36, 0.6); backdrop-filter: blur(4px);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .modal-card {
+      background: #ffffff; border-radius: 16px; padding: 22px;
+      max-width: 500px; width: 92%; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 24px 38px -5px rgba(0,0,0,0.25);
+      transform: translateY(12px); transition: transform 0.2s;
+    }
+    .modal-overlay.active .modal-card { transform: translateY(0); }
+
+    /* 3D WRAP */
+    #trama3dCanvasWrap {
+      position: absolute; inset: 0; display: none;
+      background: #ffffff;
+      z-index: 2;
+    }
+    #trama3dCanvasWrap.active { display: block; }
+    #trama3dCanvasWrap canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+    #trama3dEmptyState {
+      position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px; color: #292524; text-align: center; padding: 24px; z-index: 2;
+      background: rgba(255, 255, 255, 0.92);
+    }
+    .modal-title { margin: 0 0 16px 0; font-size: 16px; color: #7c2d12; font-weight: 800; display:flex; align-items:center; gap:8px;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    
+    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; width: 100%; }
+    .form-group label { font-size: 12px; font-weight: 700; color: #57534e; }
+    .form-group input, .form-group select { width: 100%; min-width: 0; }
+    .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .form-row > * { flex: 1; min-width: 0; }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    #toastContainer { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 200; pointer-events: none; }
+    .toast { background: #7c2d12; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: auto; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* ESTILOS ESPECÍFICOS DO ACCORDION DO GUIA DE AJUDA */
+    .help-modal-card {
+      max-width: 680px !important;
+      width: 94%;
+      height: 85vh;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      padding: 22px 24px;
+      overflow: hidden !important;
+    }
+    .help-search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+    .help-search-box input {
+      flex: 1;
+      padding: 9px 12px;
+      font-size: 13px;
+      border: 1px solid var(--border-dark);
+      border-radius: 8px;
+      outline: none;
+      background: #faf6f0;
+    }
+    .help-search-box input:focus {
+      background: #ffffff;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(194, 65, 12, 0.15);
+    }
+    .help-accordion-container {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 6px;
+      scrollbar-width: thin;
+      scrollbar-color: #c2410c #f5f5f4;
+    }
+    .help-accordion-container::-webkit-scrollbar {
+      width: 6px;
+    }
+    .help-accordion-container::-webkit-scrollbar-track {
+      background: #f5f5f4;
+      border-radius: 4px;
+    }
+    .help-accordion-container::-webkit-scrollbar-thumb {
+      background: #c2410c;
+      border-radius: 4px;
+    }
+    .help-accordion-item {
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      background: #faf6f0;
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      width: 100%;
+    }
+    .help-accordion-item:hover {
+      border-color: #fed7aa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    }
+    .help-accordion-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 13px 16px;
+      text-align: left;
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #44403c;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      min-height: 48px;
+    }
+    .help-accordion-header:hover {
+      background: rgba(194, 65, 12, 0.05);
+      color: var(--primary);
+    }
+    .help-accordion-header .chevron {
+      font-size: 12px;
+      transition: transform 0.2s ease;
+      color: #a8a29e;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+    .help-accordion-item.open .help-accordion-header .chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+    .help-accordion-content {
+      display: none;
+      padding: 4px 16px 16px 16px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #44403c;
+      border-top: 1px solid rgba(231, 229, 228, 0.7);
+      background: #ffffff;
+    }
+    .help-accordion-item.open .help-accordion-content {
+      display: block;
+    }
+    .help-accordion-content ul {
+      margin: 8px 0 0 0;
+      padding-left: 20px;
+    }
+    .help-accordion-content li {
+      margin-bottom: 8px;
+    }
+    .help-accordion-content kbd {
+      background: #f5f5f4;
+      border: 1px solid #d6d3d1;
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 11px;
+      font-family: monospace !important;
+      color: #292524;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+    }
+    .help-badge-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+      background: #ffedd5;
+      color: #c2410c;
+      margin-left: 6px;
+    }
+    .help-table-shortcuts {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 12.5px;
+    }
+    .help-table-shortcuts th, .help-table-shortcuts td {
+      padding: 7px 10px;
+      border-bottom: 1px solid #f0ede8;
+      text-align: left;
+    }
+    .help-table-shortcuts th {
+      color: #78716c;
+      font-weight: 700;
+      background: #faf6f0;
+    }
+
+    /* RESPONSIVIDADE: MODO MOBILE */
+    @media (max-width: 860px) {
+      .sidebar { 
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: auto;
+        width: auto;
+        max-width: calc(100vw - 20px);
+        flex-direction: column;
+        border-radius: 16px;
+        box-shadow: 0 10px 28px -4px rgba(0,0,0,0.28);
+      }
+      .icon-rail, .side-panel { 
+        width: 100%;
+        flex: 0 0 auto;
+        flex-direction: row; 
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 7px 8px; 
+        height: auto;
+        align-items: center;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+      }
+      .icon-rail { border-right: none; border-bottom: 1px solid var(--border-color); }
+      
+      .rail-sep { width: 1px; height: 30px; margin: 0 6px; flex-shrink: 0; }
+      .color-grid, .tool-grid { display: flex; flex-direction: row; width: max-content; gap: 6px; padding: 0; flex-wrap: nowrap; flex-shrink: 0; }
+      .swatch, .rail-btn, .rail-btn-small { width: 42px; height: 42px; font-size: 17px; border-radius: 10px; flex-shrink: 0; }
+      .save-badge-rail { width: auto; height: 42px; padding: 0 10px; font-size: 11px; white-space: nowrap; }
+      .panel-section { flex-direction: row; width: max-content; min-width: max-content; justify-content: flex-start; flex-wrap: nowrap; flex-shrink: 0; gap: 6px; }
+      .clip-preview { width: 42px; height: 42px; flex-shrink: 0; margin: 0; }
+      
+      .canvas-mode-badge { 
+        top: auto;
+        bottom: 16px;
+        right: 16px;
+        padding: 0;
+        border-radius: 50%; 
+        width: 40px;
+        height: 40px;
+        justify-content: center;
+        font-size: 18px;
+      }
+      .canvas-mode-badge #badgeText { display: none !important; }
+      .help-modal-card { 
+        max-width: 96% !important; 
+        width: 96%;
+        height: 90vh;
+        max-height: 90vh;
+        padding: 16px; 
+      }
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module">
+    // ============================================================
+    // Trama 3D — motor Three.js com suporte exclusivo ao modo Esfera
+    // ============================================================
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    let renderer, scene, camera, controls, rafId = null;
+    let beadMesh = null, sphereMesh = null, seamLine = null;
+    let ambientLight = null, keyLight = null, fillLight = null;
+    let ghostMode = false, seamVisible = true;
+    let lastRadius = 10;
+    let container = null;
+    const dummy = new THREE.Object3D();
+
+    function buildSphereGeometry(radius) {
+      return new THREE.SphereGeometry(radius * 0.985, 48, 32);
+    }
+
+    function ensureScene(wrapEl) {
+      if (renderer) return;
+      container = wrapEl;
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+
+      camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+      camera.position.set(0, 0, 4.2);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1) * 2, 4));
+      container.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.minDistance = 1.2;
+      controls.maxDistance = 12;
+      controls.autoRotate = false;
+      controls.autoRotateSpeed = 2.2;
+
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
+      scene.add(ambientLight);
+
+      keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+      keyLight.position.set(4, 5, 4);
+      scene.add(keyLight);
+
+      fillLight = new THREE.DirectionalLight(0xf0f4ff, 0.6);
+      fillLight.position.set(-4, -2, -3);
+      scene.add(fillLight);
+
+      window.addEventListener('resize', onResize);
+      animate();
+    }
+
+    function onResize() {
+      if (!renderer || !container) return;
+      const w = container.clientWidth || 1, h = container.clientHeight || 1;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    function animate() {
+      rafId = requestAnimationFrame(animate);
+      onResize();
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function build(payload) {
+      const { radius, cells, rows, cols, uMin, uSpan, vMin, vSpan, beadDiameterCm } = payload;
+      const radiusChanged = Math.abs(radius - lastRadius) > 1e-6;
+      const isFirstBuild = !beadMesh;
+      lastRadius = radius;
+
+      // Esfera Virtual (Base)
+      if (sphereMesh) { sphereMesh.geometry.dispose(); sphereMesh.material.dispose(); scene.remove(sphereMesh); }
+      const sphereGeo = buildSphereGeometry(radius);
+      const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0xB5651D,
+        roughness: 0.55,
+        metalness: 0.04,
+        transparent: true,
+        opacity: ghostMode ? 0 : 1,
+        depthWrite: !ghostMode
+      });
+      sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      sphereMesh.visible = !ghostMode;
+      scene.add(sphereMesh);
+
+      // Malha Instanciada de Miçangas
+      if (beadMesh) { beadMesh.geometry.dispose(); beadMesh.material.dispose(); scene.remove(beadMesh); }
+      const beadGeo = new THREE.SphereGeometry((beadDiameterCm || 1) / 2, 14, 12);
+      const beadMat = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.08, vertexColors: true });
+      const count = Math.max(cells.length, 1);
+      beadMesh = new THREE.InstancedMesh(beadGeo, beadMat, count);
+      const colorArr = new Float32Array(count * 3);
+      const tmpColor = new THREE.Color();
+
+      cells.forEach((cell, i) => {
+        const u_norm = (cell.u - uMin) / uSpan;
+        const theta = u_norm * Math.PI * 2;
+        const v_norm = (cell.v - vMin) / vSpan;
+        const phiDeg = 60 - v_norm * 120;
+        const phi = phiDeg * Math.PI / 180;
+        const rr = radius * 1.01;
+        const x = rr * Math.cos(phi) * Math.sin(theta);
+        const y = rr * Math.sin(phi);
+        const z = rr * Math.cos(phi) * Math.cos(theta);
+
+        dummy.position.set(x, y, z);
+        dummy.lookAt(0, y, 0);
+        dummy.updateMatrix();
+        beadMesh.setMatrixAt(i, dummy.matrix);
+        tmpColor.set(cell.color);
+        tmpColor.toArray(colorArr, i * 3);
+      });
+
+      if (cells.length === 0) {
+        dummy.position.set(0, 9999, 0); dummy.updateMatrix(); beadMesh.setMatrixAt(0, dummy.matrix);
+      }
+      beadMesh.geometry.setAttribute('color', new THREE.InstancedBufferAttribute(colorArr, 3));
+      beadMesh.instanceMatrix.needsUpdate = true;
+      scene.add(beadMesh);
+
+      // Linha de Emenda
+      if (seamLine) { seamLine.geometry.dispose(); seamLine.material.dispose(); scene.remove(seamLine); }
+      const seamPts = [];
+      for (let i = 0; i <= 40; i++) {
+        const phiDeg = 60 - (i / 40) * 120;
+        const phi = phiDeg * Math.PI / 180;
+        const rr = radius * 1.015;
+        seamPts.push(new THREE.Vector3(rr * Math.cos(phi) * Math.sin(0), rr * Math.sin(phi), rr * Math.cos(phi) * Math.cos(0)));
+      }
+      const seamGeo = new THREE.BufferGeometry().setFromPoints(seamPts);
+      const seamMat = new THREE.LineBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.9, linewidth: 2 });
+      seamLine = new THREE.Line(seamGeo, seamMat);
+      seamLine.visible = seamVisible;
+      scene.add(seamLine);
+
+      // Só reposiciona a câmera e redefine os limites de zoom na primeira
+      // construção ou quando o raio da esfera realmente mudar (ex: número
+      // de colunas alterado). Em rebuilds normais (repintar miçangas),
+      // preserva o zoom/pan que o usuário já ajustou manualmente.
+      camera.near = Math.max(radius * 0.01, 0.05);
+      camera.far = radius * 50;
+      camera.updateProjectionMatrix();
+      controls.minDistance = radius * 1.15;
+      controls.maxDistance = radius * 10;
+      if (isFirstBuild || radiusChanged) {
+        camera.position.set(0, radius * 0.3, radius * 3.1);
+        controls.target.set(0, 0, 0);
+      }
+      controls.update();
+    }
+
+    function setGhost(val) {
+      ghostMode = val;
+      if (sphereMesh) {
+        sphereMesh.material.opacity = ghostMode ? 0 : 1;
+        sphereMesh.material.depthWrite = !ghostMode;
+        sphereMesh.visible = !ghostMode;
+      }
+    }
+
+    function setSeamVisible(val) {
+      seamVisible = val;
+      if (seamLine) seamLine.visible = val;
+    }
+
+    function setAutoRotate(val) {
+      if (controls) controls.autoRotate = val;
+    }
+
+    function setBackground(hexStr) {
+      if (scene) scene.background = new THREE.Color(hexStr);
+    }
+
+    function resetCamera() {
+      if (!camera || !controls) return;
+      camera.position.set(0, lastRadius * 0.3, lastRadius * 3.1);
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+
+    function setCameraPreset(name) {
+      if (!camera || !controls) return;
+      const r = lastRadius;
+      if (name === 'topo') {
+        camera.position.set(0.001, r * 3.1, 0.001);
+      } else if (name === 'baixo') {
+        camera.position.set(0.001, -r * 3.1, 0.001);
+      } else if (name === 'frontal') {
+        camera.position.set(0, 0, r * 3.1);
+      } else if (name === 'perfil') {
+        camera.position.set(r * 3.1, 0, 0);
+      } else {
+        resetCamera();
+        return;
+      }
+      controls.target.set(0, 0, 0);
+      controls.update();
+    }
+
+    function capture() {
+      if (!renderer) return null;
+      const basePR = renderer.getPixelRatio();
+      renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1) * 2, 4));
+      onResize();
+      renderer.render(scene, camera);
+      const dataUrl = renderer.domElement.toDataURL('image/png');
+      renderer.setPixelRatio(basePR);
+      onResize();
+      renderer.render(scene, camera);
+      return dataUrl;
+    }
+
+    function recordVideo(durationMs) {
+      return new Promise((resolve, reject) => {
+        if (!renderer || !renderer.domElement.captureStream || typeof MediaRecorder === 'undefined') {
+          reject(new Error('Gravação de vídeo não suportada neste navegador.'));
+          return;
+        }
+        try {
+          const stream = renderer.domElement.captureStream(30);
+          const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp9') ? 'video/webm;codecs=vp9'
+            : (MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : '');
+          const recorder = mime ? new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 5000000 }) : new MediaRecorder(stream);
+          const chunks = [];
+          recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+          recorder.onerror = (e) => reject(e.error || new Error('Erro ao gravar.'));
+          recorder.onstop = () => resolve(new Blob(chunks, { type: mime || 'video/webm' }));
+          recorder.start();
+          setTimeout(() => { try { recorder.stop(); } catch (e) { reject(e); } }, durationMs || 5000);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function dispose() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    function pause() { dispose(); }
+    function resume() { if (!rafId && renderer) animate(); }
+
+    window.Trama3D = {
+      ensureScene, build, setGhost, setSeamVisible, setAutoRotate, capture, onResize,
+      setBackground, resetCamera, setCameraPreset, recordVideo, pause, resume
+    };
+  </script>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- CANVAS 100% COMO PLANO DE FUNDO IMERSIVO -->
+  <main class="canvas-area">
+    <div id="canvasWrap">
+      <div id="canvasModeBadge" class="canvas-mode-badge" title="Ferramenta Ativa">
+        <span id="badgeIcon">🖌️</span>
+        <span id="badgeText">Pincel</span>
+      </div>
+      <canvas id="gridCanvas"></canvas>
+      <div id="trama3dCanvasWrap">
+        <div id="trama3dEmptyState">
+          <div style="font-size:34px;">📏🌐</div>
+          <div style="font-weight:800; font-size:14px; color:#292524;">Defina a moldura em "Dimensionar Trama" primeiro</div>
+          <div style="font-size:12px; max-width:360px; color:#57534e;">
+            A ferramenta Trama 3D usa a <b>Altura</b> e a <b>Circunferência</b> informadas em <b>📏 Dimensionar Trama</b>
+            para recortar a trama e projetá-la na esfera virtual. Informe os valores e gere a moldura para continuar.
+          </div>
+          <button id="trama3dGoToDimBtn" class="btn-primary" style="margin-top:6px;">Ir para Dimensionar Trama</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- BARRA DE FERRAMENTAS FLUTUANTE (DOCK) -->
+  <aside class="sidebar">
+    <!-- MENU PRINCIPAL VERTICAL / HORIZONTAL -->
+    <div class="icon-rail">
+      <button class="rail-btn panel-toggle active" data-panel="colorPanel" title="Painel de Pintura e Cores">🎨</button>
+      <button class="rail-btn panel-toggle" data-panel="selectPanel" title="Painel de Seleção (Atalho: 4)">⬚</button>
+      <button class="rail-btn" id="sizeModalBtn" title="Dimensionar Trama">📏</button>
+      <button class="rail-btn panel-toggle" data-panel="trama3dPanel" id="trama3dModalBtn" title="Trama 3D">🌐</button>
+      <button class="rail-btn" id="imageModalBtn" title="Converter Imagem em Trama">🖼️</button>
+      <button class="rail-btn panel-toggle" data-panel="viewPanel" title="Painel de Visualização">👁️</button>
+      <button class="rail-btn" id="fileModalBtn" title="Painel de Arquivo e Exportação">📁</button>
+      <button class="rail-btn" id="countModalBtn" title="Painel Contagem & Dimensões">📦</button>
+      
+      <div class="rail-sep"></div>
+      <button id="undoBtn" class="rail-btn" title="Desfazer">↶</button>
+      <button id="redoBtn" class="rail-btn" title="Refazer">↷</button>
+      
+      <div class="rail-sep"></div>
+      <button id="newFileRailBtn" class="rail-btn" title="Nova Trama">📄</button>
+      <button id="clearBtn" class="rail-btn btn-danger" title="Apagar Toda a trama">🗑️</button>
+      
+      <div class="rail-sep"></div>
+      <!-- ITENS RELOCADOS DO HEADER: SALVO, SOBRE E AJUDA -->
+      <div id="saveBadge" class="save-badge-rail" title="Salvamento automático contínuo">✓ Salvo</div>
+      <button id="helpBtn" class="rail-btn-small" title="Instruções e Guia">?</button>
+      <button id="aboutBtn" class="rail-btn-small" title="Sobre o Trama Trama">!</button>
+    </div>
+
+    <!-- SUBPAINEL DE FERRAMENTAS DO MODO ATIVO -->
+    <div class="side-panel">
+      
+      <!-- PAINEL DE PINTURA E CORES -->
+      <div class="panel-section" id="colorPanel">
+        <div class="tool-grid">
+          <button id="brushBtn" class="rail-btn-small active" title="Pincel (Atalho: 1)">🖌️</button>
+          <button id="eraserBtn" class="rail-btn-small" title="Borracha (Atalho: 2)">🧹</button>
+          <button id="handBtnColor" class="rail-btn-small hand-btn" title="Mão / Mover Tela (Atalho: 7 ou H, ou segure Espaço)">✋</button>
+          <button id="bucketBtn" class="rail-btn-small" title="Balde de Tinta / Preencher Seleção (Atalho: 5)">🪣</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div id="recentColorsSection" hidden>
+          <div id="recentColors" class="color-grid" title="Cores Recentes"></div>
+          <div class="rail-sep"></div>
+        </div>
+        <div class="tool-grid">
+          <button id="replaceBtn" class="rail-btn-small" title="Substituir Cor Global (Atalho: 6)">🔀</button>
+          <button id="pipetteBtn" class="rail-btn-small" title="Pipeta (Atalho: 3)">🧪</button>
+          <button class="swatch" id="customColorBtn" title="Cor Personalizada">
+            <span style="font-size: 16px; font-weight:800; color:#78716c;">+</span>
+          </button>
+        </div>
+        <div class="rail-sep"></div>
+        <div id="colorPalette" class="color-grid" title="Paleta Básica"></div>
+        <input id="colorPicker" type="color" value="#ffffff" style="display:none;">
+      </div>
+
+      <!-- PAINEL DE SELEÇÃO -->
+      <div class="panel-section" id="selectPanel" hidden>
+        <div class="tool-grid">
+          <button id="pinSelectBtn" class="rail-btn-small" title="Fixar seleção múltipla (substitui Shift+Clique)">📌</button>
+          <button id="copyBtn" class="rail-btn-small" disabled title="Copiar (Ctrl+C)">📄</button>
+          <button id="pasteBtn" class="rail-btn-small" disabled title="Colar (Ctrl+V)">📋</button>
+          <button id="cutBtn" class="rail-btn-small" disabled title="Recortar (Ctrl+X)">✂️</button>
+          <button id="deleteSelBtn" class="rail-btn-small" disabled title="Apagar (Del)">🗑️</button>
+          <button id="cancelSelectBtn" class="rail-btn-small" title="Cancelar Seleção (Esc)">❌</button>
+        </div>
+        <div class="rail-sep"></div>
+        <canvas id="clipPreviewCanvas" width="48" height="48" class="clip-preview"></canvas>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="rotateClipBtn" class="rail-btn-small" disabled title="Girar 90°">🔄</button>
+          <button id="mirrorHClipBtn" class="rail-btn-small" disabled title="Espelhar Horizontalmente">↔️</button>
+          <button id="mirrorVClipBtn" class="rail-btn-small" disabled title="Espelhar Verticalmente">↕️</button>
+        </div>
+      </div>
+
+      <!-- PAINEL DE VISUALIZAÇÃO -->
+      <div class="panel-section" id="viewPanel" hidden>
+        <div class="tool-grid">
+          <button id="handBtn" class="rail-btn-small hand-btn" title="Mão / Mover Tela (Atalho: 7 ou H, ou segure Espaço)">✋</button>
+          <button id="zoomIn" class="rail-btn-small" title="Ampliar">➕</button>
+          <button id="zoomOut" class="rail-btn-small" title="Reduzir">➖</button>
+          <button id="fitScreenBtn" class="rail-btn-small" title="Ajustar à Tela">⤢</button>
+          <button id="centerBtn" class="rail-btn-small" title="Centralizar">◎</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="panUp" class="rail-btn-small" title="Mover Cima">▲</button>
+          <button id="panDown" class="rail-btn-small" title="Mover Baixo">▼</button>
+          <button id="panLeft" class="rail-btn-small" title="Mover Esquerda">◀</button>
+          <button id="panRight" class="rail-btn-small" title="Mover Direita">▶</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="gridToggleBtn" class="rail-btn-small active" title="Mostrar/Ocultar Grade"><span class="icon-rotate-45">⊞</span></button>
+          <button id="renderToggleBtn" class="rail-btn-small btn-text-icon" title="Alternar 2D/3D">2D</button>
+          <button id="bgToggleBtn" class="rail-btn-small" title="Alternar Fundo (Terracota/Branco)">🟠</button>
+        </div>
+      </div>
+
+      <!-- PAINEL TRAMA 3D (REORDENADO E SIMPLIFICADO) -->
+      <div class="panel-section" id="trama3dPanel" hidden>
+        <div class="tool-grid">
+          <button id="trama3dRotateBtn" class="rail-btn-small" title="Girar automaticamente">🔁</button>
+          <button id="trama3dGhostBtn" class="rail-btn-small" title="Modo Fantasma (esfera totalmente transparente)">👻</button>
+          <button id="trama3dSeamBtn" class="rail-btn-small active" title="Mostrar linha de emenda">🧵</button>
+          <button id="trama3dRefreshBtn" class="rail-btn-small" title="Atualizar com o desenho atual">🔄</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="trama3dCaptureBtn" class="rail-btn-small" title="Baixar imagem HD do ângulo atual">📸</button>
+          <button id="trama3dRecordBtn" class="rail-btn-small" title="Gravar 5s do giro em vídeo HD">🎥</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- Modal: Dimensionar Trama -->
+<div id="dimModal" class="modal-overlay">
+  <div class="modal-card" style="max-width: 400px;">
+    <h3 class="modal-title">📏 Dimensionar Trama</h3>
+    <div style="font-size:13px; color:#57534e; margin-bottom:16px;">
+      Informe as medidas reais da cabaça para que o sistema estime a estrutura necessária. Uma moldura guia será projetada no canvas.
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Altura da trama (cm):</label>
+        <input id="dimHeight" type="number" step="0.1" min="1" placeholder="Ex: 30">
+      </div>
+      <div class="form-group">
+        <label>Circunferência (cm):</label>
+        <input id="dimCirc" type="number" step="0.1" min="1" placeholder="Ex: 90">
+      </div>
+    </div>
+    <button id="calcDimBtn" class="btn-primary" style="width:100%; margin-bottom:12px;">Calcular Estimativa</button>
+    
+    <div id="dimResultContainer" style="display: none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+      <div style="font-weight:700; color:#9a3412; margin-bottom:4px;">Área Recomendada:</div>
+      <div id="dimResultText" style="font-size:14px; font-weight:800; color:#c2410c;">-- fileiras × -- colunas</div>
+      <div style="font-size:11px; color:#78716c; margin-top:4px;">A moldura foi projetada como guia (fator utilizado: ~1.50 cm). O canvas permanece livre para criações além da área.</div>
+    </div>
+
+    <div class="modal-actions" style="justify-content: space-between;">
+      <button id="clearDimBtn">Remover Guia</button>
+      <button class="btn-primary closeModalBtn">Voltar ao Canvas</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Converter Imagem em Trama -->
+<div id="imageModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="modal-title">🖼️ Imagem para Trama</h3>
+    <div style="font-size:13px; color:#57534e; margin-bottom:16px;">
+      Selecione uma imagem (ex: uma padronagem, foto ou logo) e o app converte automaticamente cada ponto para uma miçanga na grade em losango.
+    </div>
+
+    <div class="form-group">
+      <label>1. Selecione uma imagem:</label>
+      <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
+      <div id="imagePreviewWrap" style="display:none; max-height: 180px; overflow: hidden; align-items: center; justify-content: center; border-radius: 8px; margin-top: 8px; background:#faf6f0; border:1px solid var(--border-color); padding:8px;">
+          <canvas id="imagePreview" style="max-width: 100%; max-height: 164px; display:block;"></canvas>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>2. Tamanho da trama:</label>
+      <p style="font-size:11px; color: var(--text-muted); margin: 0 0 8px 0; line-height: 1.3;">
+        Escolha se prefere definir a <b>largura (colunas)</b> ou a <b>altura (fileiras)</b> — o app calcula a outra medida automaticamente, mantendo as proporções da imagem.
+      </p>
+      <div class="form-row" style="margin-bottom:8px;">
+        <button type="button" id="dimModeCols" class="active">↔️ Definir Largura</button>
+        <button type="button" id="dimModeRows">↕️ Definir Altura</button>
+      </div>
+      <div class="form-row" style="margin-bottom:0; align-items:flex-end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label id="imageDimLabel">Largura (em colunas):</label>
+          <input type="number" id="imageSizeBeads" value="40" min="5" max="200">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Resultado estimado:</label>
+          <div id="imageDimEstimate" style="font-size:13px; font-weight:800; color:#c2410c; padding:7px 0;">-- colunas × -- fileiras</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+       <label>3. Redução de cores:</label>
+       <select id="imageColorMode" style="width: 100%;">
+         <option value="basic">Paleta Básica do App (16 cores)</option>
+         <option value="custom">Detectar Cores Predominantes (K-Means)</option>
+         <option value="bw">Preto e Branco (alto contraste)</option>
+       </select>
+    </div>
+
+    <div class="form-group" id="customColorCountDiv" style="display: none; background: #faf6f0; padding: 12px; border-radius: 8px; border: 1px solid #e7e5e4;">
+        <label>Quantidade máxima de cores:</label>
+        <p style="font-size:11px; color: var(--text-muted); margin: 0 0 8px 0; line-height: 1.3;">
+            O app agrupa as cores mais parecidas da imagem em uma paleta reduzida, pronta para tecer. Imagens grandes podem levar alguns instantes para processar.
+        </p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+           <input type="range" id="customColorSlider" min="2" max="32" value="5" style="flex: 1;">
+           <input type="number" id="customColorCount" value="5" min="2" max="32" style="width: 60px;">
+        </div>
+    </div>
+
+    <div style="font-size:11px; color:#9a3412; background:#fff7ed; border:1px solid #fed7aa; padding:8px 10px; border-radius:8px; margin-bottom:4px;">
+      ⚠️ A trama gerada é centralizada no canvas e substitui o que já estiver pintado nessa mesma área.
+    </div>
+
+    <div class="modal-actions">
+        <button class="closeModalBtn">Cancelar</button>
+        <button id="generateImageBtn" class="btn-primary" disabled>🔄 Gerar Trama da Imagem</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Contagem e Dimensões -->
+<div id="countModal" class="modal-overlay">
+  <div class="modal-card" style="max-width: 400px;">
+    <h3 class="modal-title">📦 Contagem & Dimensões</h3>
+    <div id="dimSummaryContainer" style="display:none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size:13px; color:#57534e;"></div>
+    <div id="colorCountsContainer" style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#44403c;"></div>
+    <div class="modal-actions"><button class="btn-primary closeModalBtn">Fechar</button></div>
+  </div>
+</div>
+
+<!-- Modal: Arquivo e Exportação -->
+<div id="fileModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="modal-title">📁 Arquivo & Exportação</h3>
+    
+    <div class="form-group">
+      <label>Nome da Trama:</label>
+      <input id="tramaName" type="text" placeholder="Minha trama">
+    </div>
+    <div class="form-group">
+      <label>Autoria:</label>
+      <input id="tramaAuthor" type="text" placeholder="Seu nome">
+    </div>
+    <div class="form-row">
+      <button id="newTramaBtn">📄 Nova Trama</button>
+      <button id="saveTramaBtn" class="btn-primary">💾 Salvar Local</button>
+    </div>
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <div class="form-group">
+      <label>Tramas Salvas no Navegador:</label>
+      <select id="savedTramasSelect"><option value="">— nenhuma salva —</option></select>
+    </div>
+    <div class="form-row">
+      <button id="loadSelectedBtn">📂 Carregar</button>
+      <button id="deleteSelectedBtn" class="btn-danger">🗑️ Excluir</button>
+    </div>
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <div class="form-group">
+      <label>Arquivos (.json)</label>
+      <div class="form-row" style="margin:0;">
+        <button id="importTramaBtn">📥 Importar .json</button>
+        <button id="exportTramaBtn">📤 Exportar .json</button>
+        <input id="loadTramaFile" type="file" accept="application/json,.json" style="display:none">
+      </div>
+    </div>
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <div class="form-group">
+      <label>Exportar Imagem / PDF</label>
+      <select id="exportFormat" style="margin-bottom:8px;">
+        <option value="jpeg">JPG (com fundo)</option>
+        <option value="png">PNG (fundo transparente)</option>
+      </select>
+      <div class="form-row" style="margin:0;">
+        <button id="exportImgBtn" class="btn-primary">📷 Baixar Imagem</button>
+        <button id="exportPdfBtn" class="btn-primary">📄 Baixar PDF</button>
+      </div>
+    </div>
+    <div class="modal-actions"><button class="closeModalBtn">Voltar ao Canvas</button></div>
+  </div>
+</div>
+
+<div id="aboutModal" class="modal-overlay">
+  <div class="modal-card">
+    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:11px; background:#fff7ed; color:#c2410c; padding:2px 6px; border-radius:8px; border:1px solid #fed7aa;">v0.9.23</span></h3>
+    <div style="font-size:13px; line-height:1.5; color:#57534e;">
+      <p><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
+      <p><b>🪘 Trama Xequerê:</b> Ciclo de oficinas de confecção do instrumento, articulando reflexões históricas e ritmos afro-brasileiros.</p>
+      <p><b>🎨 Autoria:</b> Idealizado por <b>Rodrig Melo</b>, artista visual, pesquisadora e presidenta da Associação Cultural Aroeira.</p>
+    </div>
+    <div class="modal-actions"><button class="btn-primary closeModalBtn">Entendi</button></div>
+  </div>
+</div>
+
+<!-- Modal: Ajuda & Instruções Expandido (Accordion) -->
+<div id="helpModal" class="modal-overlay">
+  <div class="modal-card help-modal-card">
+    <h3 class="modal-title" style="justify-content: space-between;">
+      <span>📖 Guia Completo do Trama Trama</span>
+      <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.23</span>
+    </h3>
+
+    <div class="help-search-box">
+      <input type="text" id="helpSearchInput" placeholder="🔍 Filtrar ferramenta, função ou atalho...">
+    </div>
+
+    <div class="help-accordion-container" id="helpAccordion">
+
+      <!-- Item 1: Visão Geral e Filosofia -->
+      <div class="help-accordion-item open">
+        <button class="help-accordion-header">
+          <span>🌿 1. Visão Geral &amp; Geometria em Losango</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 8px 0 6px 0;">O <b>Trama Trama</b> foi criado especificamente para confeccionar redes de miçangas para xequerês (agbês). Diferente de softwares gráficos comuns que utilizam matrizes quadradas de 90°, o Trama Trama adota uma <b>grade rotacionada a 45°</b>.</p>
+          <ul>
+            <li><b>Fidelidade aos nós:</b> Modela com precisão o comportamento físico do entrelaçamento de fios na cabaça real.</li>
+            <li><b>Canvas Infinito:</b> Você pode navegar livremente em qualquer direção sem limitações de folha ou bordas rígidas.</li>
+            <li><b>Sincronização 2D/3D:</b> O desenho na malha plana projeta-se instantaneamente na esfera virtual para conferência de encaixe.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 2: Pintura e Cores -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🎨 2. Ferramentas de Pintura &amp; Paleta</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>🖌️ Pincel <kbd>1</kbd>:</b> Pinta as células da grade. Clique individualmente ou mantenha o cursor/dedo pressionado para desenhar traços contínuos.</li>
+            <li><b>🧹 Borracha <kbd>2</kbd>:</b> Limpa a miçanga da célula. <br><i>Dica de Mestre:</i> O clique com o <b>botão direito do mouse</b> funciona como borracha instantânea em qualquer ferramenta.</li>
+            <li><b>✋ Mão / Pan <kbd>7</kbd> ou <kbd>H</kbd> ou <kbd>Espaço</kbd>:</b> Permite arrastar o campo visual sem correr nenhum risco de pintar ou apagar células. Ao soltar a barra de espaço, o aplicativo retorna automaticamente à ferramenta que estava ativa.</li>
+            <li><b>🪣 Balde de Tinta <kbd>5</kbd>:</b>
+              <br>• <i>Sem seleção:</i> Preenche regiões contíguas de mesma cor ou preenche fundos vazios contíguos (Flood Fill).
+              <br>• <i>Com seleção ativa (⬚):</i> Pinta de uma só vez <b>todas</b> as células selecionadas com a cor atual da paleta.
+            </li>
+            <li><b>🔀 Substituir Cor Global <kbd>6</kbd>:</b> Clique sobre qualquer miçanga já desenhada para substituir todas as miçangas daquela mesma cor no canvas inteiro pela cor ativa da sua paleta.</li>
+            <li><b>🧪 Pipeta <kbd>3</kbd>:</b> Clica em uma miçanga já pintada para capturar seu tom exato para a paleta ativa.</li>
+            <li><b>Paleta Básica &amp; Botão +:</b> Conta com 16 cores calibradas com nomes em português e botão <b>+</b> para escolher qualquer código hexadecimal RGB. O sistema memoriza automaticamente suas 5 cores mais recentes.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 3: Seleção e Transformações -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>⬚ 3. Painel de Seleção &amp; Transformações Geométricas</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Atalho <kbd>4</kbd>:</b> Ativa o modo de seleção por área. Clique/toque e arraste para desenhar uma caixa retangular pontilhada sobre a trama.</li>
+            <li><b>📌 Fixar Seleção:</b> Permite selecionar células individuais ou adicionar novas áreas à seleção apenas clicando nelas, dispensando o uso de teclas modificadoras. Excelente para tablets e celulares!</li>
+            <li><b>Operações de Transferência:</b>
+              <br>• <b>Copiar (<kbd>Ctrl+C</kbd>):</b> Salva a estampa selecionada na memória temporária. Uma miniatura translúcida aparece no subpainel.
+              <br>• <b>Recortar (<kbd>Ctrl+X</kbd>):</b> Copia e limpa os losangos selecionados do canvas.
+              <br>• <b>Colar (<kbd>Ctrl+V</kbd>):</b> Projeta a estampa copiada sobre o cursor. Mova para a posição desejada e clique para fixar as miçangas.
+              <br>• <b>Apagar (<kbd>Del</kbd> ou <kbd>Backspace</kbd>):</b> Exclui de uma só vez todas as miçangas contidas na seleção.
+              <br>• <b>Cancelar (<kbd>Esc</kbd>):</b> Desmarca as células selecionadas e retorna ao Pincel.
+            </li>
+            <li><b>Transformações da Estampa:</b>
+              <br>• <b>🔄 Girar 90°:</b> Rotaciona a estampa em 90 graus no sentido horário.
+              <br>• <b>↔️ Espelhar Horizontal:</b> Inverte os eixos mantendo a calibragem da grade losangular.
+              <br>• <b>↕️ Espelhar Vertical:</b> Inverte verticalmente a composição antes de colar.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 4: Dimensionar Trama -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📏 4. Dimensionar Trama &amp; Moldura Guia</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 8px 0 6px 0;">Calcula a grade exata da cabaça vegetal com base em suas medidas em centímetros:</p>
+          <ul>
+            <li><b>Entrada:</b> Digite a <b>Altura útil da trama</b> (comprimento vertical a cobrir) e a <b>Circunferência</b> (perímetro da parte mais larga/bojo).</li>
+            <li><b>Equação de Proporção:</b> O software utiliza a constante média de tecelagem artesanal de $\approx 1{,}50\text{ cm}$ por nó/miçanga:
+              <br>$$\text{Fileiras} = \text{round}\left(\frac{\text{Altura}}{1{,}5}\right), \quad \text{Colunas} = \text{round}\left(\frac{\text{Circunferência}}{1{,}5}\right)$$
+            </li>
+            <li><b>Moldura Guia:</b> Uma linha perimetral laranja delimita o enquadramento no canvas. O espaço continua infinito para desenho livre, mas esta moldura é o limite obrigatório utilizado pelo módulo 3D e ficha técnica.</li>
+            <li><b>Remover Guia:</b> Limpa a moldura para quem prefere compor sem referencial prévio de cabaça.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 5: Trama 3D -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🌐 5. Visualizador Esférico Trama 3D</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 8px 0 6px 0;">Permite inspecionar o fechamento da rede ao redor de uma esfera 3D antes de cortar os fios reais na oficina. <i>(Requer dimensionamento prévio em 📏)</i>.</p>
+          <ul>
+            <li><b>🔁 Girar:</b> Aciona a rotação automática contínua em $2{,}2\text{ rad/s}$ para apreciação da peça.</li>
+            <li><b>👻 Fantasma:</b> Torna a esfera virtual de apoio <b>100% invisível</b>. Permite enxergar a trama de ambos os lados simultaneamente, facilitando conferir a simetria de grafismos opostos.</li>
+            <li><b>🧵 Emenda:</b> Exibe a linha meridiana vertical laranja ($\theta = 0$). Mostra exatamente o ponto onde a primeira e a última coluna se encontram e se fecham na cabaça real.</li>
+            <li><b>🔄 Atualizar:</b> Reconstrói a malha esférica, trazendo instantaneamente novas alterações desenhadas no canvas 2D.</li>
+            <li><b>📸 Imagem HD:</b> Exporta um arquivo <code>.png</code> nítido com resolução dobrada do ângulo atual da cena.</li>
+            <li><b>🎥 Vídeo HD:</b> Grava um clipe de rotação completa de 5 segundos em vídeo <code>.webm</code> de alta definição.</li>
+            <li><b>Navegação Tridimensional:</b> Clique/toque e arraste em qualquer lugar para orbitar o modelo; use a roda do mouse ou gesto de pinça para aproximar (zoom).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 6: Conversor de Imagem -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🖼️ 6. Conversor Matricial (Imagem para Trama)</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 8px 0 6px 0;">Transforma qualquer foto, ilustração ou logotipo em miçangas sobre a malha de 45°:</p>
+          <ul>
+            <li><b>Formatos Suportados:</b> Arquivos <code>.png</code>, <code>.jpg</code> ou <code>.webp</code>.</li>
+            <li><b>Dimensionamento Proporcional:</b> Escolha entre travar a <b>Largura (colunas)</b> ou a <b>Altura (fileiras)</b> — a outra dimensão será calculada mantendo o formato original da imagem.</li>
+            <li><b>Modos de Cor:</b>
+              <br>• <i>Paleta Básica:</i> Encaixa os pixels nas 16 cores fundamentais do app.
+              <br>• <i>Detectar Cores (K-Means):</i> Agrupa a imagem em uma quantidade reduzida de tons (ajustável de 2 a 32 através de slider).
+              <br>• <i>Preto e Branco:</i> Alto contraste por luminosidade para grafismos marcados.
+            </li>
+            <li><i>Dica de Segurança:</i> A trama gerada é centralizada no canvas. Caso queira desfazer, pressione <kbd>Ctrl+Z</kbd>.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 7: Visualização e Tela -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>👁️ 7. Painel de Visualização &amp; Estilos</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Zoom:</b> Use os botões ➕ / ➖ ou a roda do mouse (zoom contínuo de $0{,}2\times$ a $10\times$).</li>
+            <li><b>⤢ Ajustar à Tela:</b> Enquadra automaticamente todo o desenho e a moldura visível no centro da tela.</li>
+            <li><b>◎ Centralizar:</b> Reposiciona a visão na origem $(0,0)$ preservando o zoom atual.</li>
+            <li><b>Deslocamento Contínuo (▲ ▼ ◀ ▶):</b> Clique ou mantenha pressionadas as setas para deslizar o campo de visão.</li>
+            <li><b>Estilo de Miçanga (2D / 3D):</b> Alterne entre a renderização plana em losango de alto contraste e a renderização volumétrica com brilho especular e luz esférica.</li>
+            <li><b>Grade (<span class="icon-rotate-45">⊞</span>) e Fundo:</b> Ligue/desligue as linhas da malha e alterne o fundo entre a cor Terracota tradicional do xequerê (<code>#B5651D</code>) e Branco puro (<code>#FFFFFF</code>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 8: Contagem e Materiais -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📦 8. Contagem, Medidas &amp; Estimativa de Peso</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Total Geral:</b> Soma consolidada de todas as miçangas presentes no desenho.</li>
+            <li><b>Tabela Detalhada:</b> Apresenta cada cor utilizada, o nome catalogado e a quantidade precisa de unidades.</li>
+            <li><b>Cálculo de Massa:</b> Estima o peso final da rede com base no padrão artesanal de <b>$0{,}32\text{ g}$ por miçanga</b>:
+              <br>$$\text{Peso (g)} = \text{Miçangas} \times 0{,}32$$
+              Essencial para planejar a compra dos pacotinhos e avaliar o equilíbrio do instrumento ao tocar!
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 9: Arquivo, Backup e PDF -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📁 9. Salvamento, Backup &amp; Ficha Técnica PDF</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Salvamento Automático:</b> Qualquer pincelada é salva no seu navegador (<code>localStorage</code>). O selo <b>✓ Salvo</b> confirma a gravação contínua.</li>
+            <li><b>Gerenciador Local:</b> Permite salvar e carregar versões nomeadas para múltiplos projetos no mesmo aparelho.</li>
+            <li><b>Backup .json:</b> Baixe o arquivo do projeto com coordenadas e medidas ou importe tramas de outros computadores com total fidelidade.</li>
+            <li><b>Exportação Gráfica:</b> Exporte imagens em <code>.png</code> (com fundo transparente) ou <code>.jpg</code> (com fundo).</li>
+            <li><b>📄 Ficha Técnica em PDF (A4):</b> Gera um documento técnico completo para impressão, contendo título, autoria, data/hora, dimensões da cabaça, visualização gráfica protegida e a tabela de insumos com pesos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 10: Tabela de Atalhos Rápidos -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>⌨️ 10. Tabela de Atalhos Rápidos de Teclado</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <table class="help-table-shortcuts">
+            <thead>
+              <tr><th>Atalho</th><th>Função</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><kbd>1</kbd></td><td>Ferramenta Pincel</td></tr>
+              <tr><td><kbd>2</kbd></td><td>Ferramenta Borracha (ou Botão Direito do mouse)</td></tr>
+              <tr><td><kbd>3</kbd></td><td>Ferramenta Pipeta (capturar cor)</td></tr>
+              <tr><td><kbd>4</kbd></td><td>Ferramenta de Seleção Retangular</td></tr>
+              <tr><td><kbd>5</kbd></td><td>Balde de Tinta / Preencher Seleção</td></tr>
+              <tr><td><kbd>6</kbd></td><td>Substituir Cor Global</td></tr>
+              <tr><td><kbd>7</kbd> ou <kbd>H</kbd></td><td>Ferramenta Mão (arrastar a tela)</td></tr>
+              <tr><td><kbd>Espaço</kbd> (segurar)</td><td>Mão temporária (ao soltar, volta à ferramenta anterior)</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td><td>Desfazer ação</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Z</kbd></td><td>Refazer ação</td></tr>
+              <tr><td><kbd>Ctrl</kbd> + <kbd>C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></td><td>Copiar / Recortar / Colar seleção</td></tr>
+              <tr><td><kbd>Del</kbd> ou <kbd>Backspace</kbd></td><td>Apagar miçangas da seleção ativa</td></tr>
+              <tr><td><kbd>Esc</kbd></td><td>Cancelar seleção ativa / fechar telas modais</td></tr>
+              <tr><td><kbd>Setas</kbd> ($\uparrow \downarrow \leftarrow \rightarrow$)</td><td>Deslocar a visão do canvas</td></tr>
+              <tr><td><kbd>Roda do Mouse</kbd></td><td>Zoom aproximar / afastar</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-actions" style="justify-content: space-between;">
+      <button id="helpExpandAllBtn" style="font-size:12px;">Expandir Todos</button>
+      <button class="btn-primary closeModalBtn">Entendido, Vamos Desenhar!</button>
+    </div>
+  </div>
+</div>
+
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal-card" style="max-width:400px;">
+    <h3 class="modal-title" id="confirmModalTitle">Confirmação</h3>
+    <p id="confirmModalMessage" style="font-size:13px; color:#57534e; margin-bottom:16px;">Tem certeza?</p>
+    <div class="modal-actions">
+      <button id="confirmCancelBtn">Cancelar</button>
+      <button id="confirmOkBtn" class="btn-primary">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+(() => {
+  // DOM Elements
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const colorPicker = document.getElementById('colorPicker');
+  const customColorBtn = document.getElementById('customColorBtn');
+  
+  // Tools
+  const brushBtn = document.getElementById('brushBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const pipetteBtn = document.getElementById('pipetteBtn');
+  const bucketBtn = document.getElementById('bucketBtn');
+  const replaceBtn = document.getElementById('replaceBtn');
+  const handBtns = document.querySelectorAll('.hand-btn');
+  
+  // Selection Panel Buttons
+  const selectBtn = document.querySelector('[data-panel="selectPanel"]');
+  const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+  const pinSelectBtn = document.getElementById('pinSelectBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const cutBtn = document.getElementById('cutBtn');
+  const deleteSelBtn = document.getElementById('deleteSelBtn');
+  const pasteBtn = document.getElementById('pasteBtn');
+  
+  // Badges & Preview
+  const canvasModeBadge = document.getElementById('canvasModeBadge');
+  const badgeIcon = document.getElementById('badgeIcon');
+  const badgeText = document.getElementById('badgeText');
+  const saveBadge = document.getElementById('saveBadge');
+  const clipPreviewCanvas = document.getElementById('clipPreviewCanvas');
+
+  // View Controls
+  const zoomInBtn = document.getElementById('zoomIn');
+  const zoomOutBtn = document.getElementById('zoomOut');
+  const fitScreenBtn = document.getElementById('fitScreenBtn');
+  const centerBtn = document.getElementById('centerBtn');
+  const gridToggleBtn = document.getElementById('gridToggleBtn');
+  const renderToggleBtn = document.getElementById('renderToggleBtn');
+  const bgToggleBtn = document.getElementById('bgToggleBtn');
+  const panUpBtn = document.getElementById('panUp'), panDownBtn = document.getElementById('panDown');
+  const panLeftBtn = document.getElementById('panLeft'), panRightBtn = document.getElementById('panRight');
+
+  // Colors & Data
+  const colorPaletteEl = document.getElementById('colorPalette');
+  const recentColorsEl = document.getElementById('recentColors');
+  const recentColorsSection = document.getElementById('recentColorsSection');
+  const colorCountsContainer = document.getElementById('colorCountsContainer');
+  const dimSummaryContainer = document.getElementById('dimSummaryContainer');
+
+  // State Variables
+  const angle = Math.PI / 4;       
+  const baseCellSize = 40;         
+  let zoom = 1;
+  let pan = { x: 0, y: 0 };
+  let dpr = window.devicePixelRatio || 1;
+  const painted = new Map();       
+
+  let currentToolMode = 'brush';
+  let renderStyle = '2d';
+  let backgroundColor = '#B5651D';
+  let gridVisible = true;
+  
+  let isSelecting = false;
+  let selectedCells = new Set();
+  let screenSelectionStart = null;
+  let screenSelectionCurrent = null;
+
+  let clipboard = null, pastePreviewCell = null;
+  let pinMultiSelectMode = false;
+  let isSpacePanning = false;
+  let toolBeforeSpace = null;
+
+  // Dimensões recomendadas (funcionalidade Dimensionar Trama)
+  let recommendedRows = null;
+  let recommendedCols = null;
+  let savedTramaHeight = null;
+  let savedTramaCircum = null;
+
+  // Touch state
+  const touchPointers = new Map();
+  const pendingTouchPaint = new Map();
+  const TOUCH_PAINT_DELAY = 120;
+
+  const COLOR_NAMES = [
+    ['#FFFFFF', 'Branco'], ['#FF0000', 'Vermelho'], ['#FF4000', 'Vermelho-alaranjado'],
+    ['#FF8000', 'Laranja'], ['#FFC000', 'Amarelo-alaranjado'], ['#FFFF00', 'Amarelo'],
+    ['#00FF00', 'Amarelo-esverdeado (Lima)'], ['#008000', 'Verde'], ['#808000', 'Verde Oliva'],
+    ['#00FFFF', 'Azul-esverdeado (Ciano)'], ['#0000FF', 'Azul'], ['#000080', 'Azul Marinho (Navy)'],
+    ['#4000FF', 'Azul-arroxeado'], ['#8000FF', 'Violeta'], ['#FF00FF', 'Magenta'], ['#000000', 'Preto']
+  ];
+
+  const BASIC_COLORS = [
+    '#ffffff', '#ff0000', '#ff4000', '#ff8000', '#ffc000', '#ffff00', '#00ff00', '#008000',
+    '#808000', '#00ffff', '#0000ff', '#000080', '#4000ff', '#8000ff', '#ff00ff', '#000000'
+  ];
+  let recentColors = [];
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast'; toast.textContent = message;
+    document.getElementById('toastContainer').appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 300);
+    }, 2800);
+  }
+
+  // Modals & Overlay Handling
+  const modals = document.querySelectorAll('.modal-overlay');
+  
+  function handleModalClose(modal) {
+    modal.classList.remove('active');
+    if (modal.id === 'dimModal' && recommendedRows !== null && recommendedCols !== null) {
+      fitScreenBtn.click();
+    }
+  }
+
+  document.querySelectorAll('.closeModalBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      handleModalClose(e.target.closest('.modal-overlay'));
+    });
+  });
+
+  modals.forEach(modal => {
+    modal.addEventListener('click', (e) => { 
+      if(e.target === modal) {
+        handleModalClose(modal);
+      } 
+    });
+  });
+
+  document.getElementById('sizeModalBtn').addEventListener('click', () => {
+    if (savedTramaHeight !== null) document.getElementById('dimHeight').value = savedTramaHeight;
+    if (savedTramaCircum !== null) document.getElementById('dimCirc').value = savedTramaCircum;
+    document.getElementById('dimModal').classList.add('active');
+  });
+  
+  document.getElementById('imageModalBtn').addEventListener('click', () => document.getElementById('imageModal').classList.add('active'));
+  document.getElementById('fileModalBtn').addEventListener('click', () => document.getElementById('fileModal').classList.add('active'));
+  document.getElementById('countModalBtn').addEventListener('click', () => { updateDimSummary(); updateColorCounts(); document.getElementById('countModal').classList.add('active'); });
+  document.getElementById('aboutBtn').addEventListener('click', () => document.getElementById('aboutModal').classList.add('active'));
+  document.getElementById('helpBtn').addEventListener('click', () => document.getElementById('helpModal').classList.add('active'));
+
+  // Lógica Interativa do Accordion de Ajuda
+  const accordionItems = document.querySelectorAll('.help-accordion-item');
+  accordionItems.forEach(item => {
+    const header = item.querySelector('.help-accordion-header');
+    header.addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      item.classList.toggle('open', !isOpen);
+    });
+  });
+
+  const helpExpandAllBtn = document.getElementById('helpExpandAllBtn');
+  let allExpanded = false;
+  helpExpandAllBtn.addEventListener('click', () => {
+    allExpanded = !allExpanded;
+    accordionItems.forEach(item => item.classList.toggle('open', allExpanded));
+    helpExpandAllBtn.textContent = allExpanded ? 'Recolher Todos' : 'Expandir Todos';
+  });
+
+  const helpSearchInput = document.getElementById('helpSearchInput');
+  helpSearchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    accordionItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!term || text.includes(term)) {
+        item.style.display = 'block';
+        if (term) item.classList.add('open');
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  let onConfirmCallback = null;
+  function showConfirm(title, message, callback) {
+    document.getElementById('confirmModalTitle').textContent = title;
+    document.getElementById('confirmModalMessage').textContent = message;
+    onConfirmCallback = callback;
+    document.getElementById('confirmModal').classList.add('active');
+  }
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+  document.getElementById('confirmOkBtn').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('active');
+    if (onConfirmCallback) onConfirmCallback();
+  });
+
+  const sidebarEl = document.querySelector('.sidebar');
+  const panelToggles = document.querySelectorAll('.panel-toggle');
+  const panelSections = document.querySelectorAll('.side-panel .panel-section');
+  
+  function switchPanel(targetId, autoSetTool = true) {
+    const wasTrama3d = !document.getElementById('trama3dPanel').hidden;
+    panelSections.forEach(sec => sec.hidden = (sec.id !== targetId));
+    panelToggles.forEach(t => t.classList.toggle('active', t.dataset.panel === targetId));
+
+    if (targetId === 'trama3dPanel') {
+      trama3dActivate();
+    } else if (wasTrama3d) {
+      trama3dDeactivate();
+    }
+
+    if (autoSetTool) {
+      if(targetId === 'colorPanel') {
+         if(!['brush', 'eraser', 'pipette', 'bucket', 'replace'].includes(currentToolMode)) setToolMode('brush');
+      }
+      else if(targetId === 'selectPanel') {
+         if (currentToolMode !== 'paste') setToolMode('select');
+      }
+    }
+  }
+
+  panelToggles.forEach(btn => {
+    btn.addEventListener('click', () => switchPanel(btn.dataset.panel, true));
+  });
+
+  function hexToRgb(hex) {
+    let h = (hex || '#000').replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c+c).join('');
+    const num = parseInt(h, 16);
+    return { r: (num>>16)&255, g: (num>>8)&255, b: num&255 };
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
+  }
+  
+  function nearestColorName(hex) {
+    const target = hexToRgb(hex);
+    if (isNaN(target.r) || isNaN(target.g) || isNaN(target.b)) return hex;
+    let best = null, bestDist = Infinity;
+    for (const [refHex, name] of COLOR_NAMES) {
+      const ref = hexToRgb(refHex);
+      const dist = (ref.r - target.r) ** 2 + (ref.g - target.g) ** 2 + (ref.b - target.b) ** 2;
+      if (dist < bestDist) { bestDist = dist; best = name; }
+    }
+    return best || hex;
+  }
+
+  function buildColorPalette() {
+    colorPaletteEl.innerHTML = '';
+    BASIC_COLORS.forEach(hex => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch'; btn.style.background = hex; btn.dataset.hex = hex;
+      btn.title = nearestColorName(hex);
+      btn.addEventListener('click', () => selectColor(hex));
+      colorPaletteEl.appendChild(btn);
+    });
+  }
+
+  function selectColor(hex) {
+    colorPicker.value = hex;
+    registerRecentColor(hex);
+    highlightPaletteSelection();
+    if(currentToolMode !== 'brush') setToolMode('brush');
+  }
+
+  customColorBtn.addEventListener('click', () => colorPicker.click());
+  colorPicker.addEventListener('change', () => selectColor(colorPicker.value));
+
+  function registerRecentColor(hex) {
+    recentColors = recentColors.filter(c => c.toLowerCase() !== hex.toLowerCase());
+    recentColors.unshift(hex);
+    if (recentColors.length > 5) recentColors.length = 5;
+    renderRecentColors();
+  }
+
+  function renderRecentColors() {
+    recentColorsEl.innerHTML = '';
+    recentColorsSection.hidden = recentColors.length === 0;
+    recentColors.forEach(hex => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch'; btn.style.background = hex; btn.dataset.hex = hex;
+      btn.title = nearestColorName(hex);
+      btn.addEventListener('click', () => selectColor(hex));
+      recentColorsEl.appendChild(btn);
+    });
+  }
+
+  function highlightPaletteSelection() {
+    const cur = colorPicker.value.toLowerCase();
+    document.querySelectorAll('.swatch[data-hex]').forEach(el => {
+      el.classList.toggle('selected', el.dataset.hex.toLowerCase() === cur);
+    });
+  }
+
+  const BEAD_AVG_WEIGHT_G = 0.32;
+  function estimateWeightLabel(totalBeads) {
+    const grams = totalBeads * BEAD_AVG_WEIGHT_G;
+    if (grams < 1) return '<1g';
+    const rounded = Math.round(grams);
+    if (rounded >= 1000) return `~${(rounded/1000).toFixed(1).replace('.',',')}kg`;
+    return `~${rounded}g`;
+  }
+
+  function updateDimSummary() {
+    if (recommendedRows === null || recommendedCols === null) {
+      dimSummaryContainer.style.display = 'none';
+      return;
+    }
+    dimSummaryContainer.style.display = 'block';
+    const alturaTxt = savedTramaHeight !== null ? `${savedTramaHeight} cm` : '—';
+    const circTxt = savedTramaCircum !== null ? `${savedTramaCircum} cm` : '—';
+    dimSummaryContainer.innerHTML = `
+      <div style="font-weight:700; color:#9a3412; margin-bottom:4px;">📏 Dimensões da Cabaça</div>
+      <div>Altura: <b>${alturaTxt}</b> &nbsp;•&nbsp; Circunferência: <b>${circTxt}</b></div>
+      <div style="margin-top:4px;">Estrutura calculada: <b>${recommendedRows} fileiras × ${recommendedCols} colunas</b></div>
+    `;
+  }
+
+  function updateColorCounts() {
+    const counts = new Map();
+    for (const color of painted.values()) counts.set(color, (counts.get(color) || 0) + 1);
+    
+    colorCountsContainer.innerHTML = '';
+    if (counts.size === 0) {
+      colorCountsContainer.innerHTML = '<i>Nenhuma miçanga pintada ainda.</i>';
+      return;
+    }
+    const total = Array.from(counts.values()).reduce((a, b) => a + b, 0);
+    colorCountsContainer.innerHTML += `<div style="font-weight:800; border-bottom:1px solid #e7e5e4; padding-bottom:8px; margin-bottom:8px;">Total Geral: ${total} miçangas (${estimateWeightLabel(total)})</div>`;
+    
+    for (const [color, count] of counts.entries()) {
+      const row = document.createElement('div');
+      row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '8px';
+      row.innerHTML = `<span style="width:16px;height:16px;border-radius:4px;border:1px solid rgba(0,0,0,0.2);background:${color}"></span> <span>${nearestColorName(color)}: ${count} (${estimateWeightLabel(count)})</span>`;
+      colorCountsContainer.appendChild(row);
+    }
+  }
+
+  function setToolMode(mode) {
+    currentToolMode = mode;
+    brushBtn.classList.toggle('active', mode === 'brush');
+    eraserBtn.classList.toggle('active', mode === 'eraser');
+    pipetteBtn.classList.toggle('active', mode === 'pipette');
+    bucketBtn.classList.toggle('active', mode === 'bucket');
+    replaceBtn.classList.toggle('active', mode === 'replace');
+    pasteBtn.classList.toggle('active', mode === 'paste');
+    handBtns.forEach(btn => btn.classList.toggle('active', mode === 'hand'));
+
+    if(['brush', 'eraser', 'pipette', 'bucket', 'replace'].includes(mode)) switchPanel('colorPanel', false);
+    else if (mode === 'select' || mode === 'paste') switchPanel('selectPanel', false);
+
+    if (mode !== 'select') isSelecting = false;
+    if (mode !== 'paste') pastePreviewCell = null;
+
+    if (mode !== 'select' && mode !== 'paste') {
+        pinMultiSelectMode = false;
+        pinSelectBtn.classList.remove('active');
+    }
+
+    if (mode === 'hand') {
+      canvas.style.cursor = 'grab';
+    } else {
+      canvas.style.cursor = 'crosshair';
+    }
+
+    const icons = { 'brush': '🖌️', 'eraser': '🧹', 'pipette': '🧪', 'select': '⬚', 'paste': '📋', 'bucket': '🪣', 'replace': '🔀', 'hand': '✋' };
+    const names = { 'brush': 'Pincel', 'eraser': 'Borracha', 'pipette': 'Pipeta', 'select': 'Seleção', 'paste': 'Colar', 'bucket': 'Balde', 'replace': 'Substituir', 'hand': 'Mão' };
+    badgeIcon.textContent = icons[mode] || '🖌️';
+    badgeText.textContent = names[mode] || 'Pincel';
+    
+    draw();
+  }
+
+  brushBtn.addEventListener('click', () => setToolMode('brush'));
+  eraserBtn.addEventListener('click', () => setToolMode('eraser'));
+  pipetteBtn.addEventListener('click', () => setToolMode('pipette'));
+  bucketBtn.addEventListener('click', () => setToolMode('bucket'));
+  replaceBtn.addEventListener('click', () => setToolMode('replace'));
+  handBtns.forEach(btn => btn.addEventListener('click', () => setToolMode('hand')));
+
+  // Lógica de Dimensionar Trama
+  const dimHeightInput = document.getElementById('dimHeight');
+  const dimCircInput = document.getElementById('dimCirc');
+  const dimResultContainer = document.getElementById('dimResultContainer');
+  const dimResultText = document.getElementById('dimResultText');
+
+  document.getElementById('calcDimBtn').addEventListener('click', () => {
+    const height = parseFloat(dimHeightInput.value);
+    const circum = parseFloat(dimCircInput.value);
+    
+    if (isNaN(height) || isNaN(circum) || height <= 0 || circum <= 0) {
+      showToast('Por favor, informe valores válidos maiores que zero.');
+      return;
+    }
+
+    savedTramaHeight = height;
+    savedTramaCircum = circum;
+
+    const FACTOR = 1.5;
+    recommendedRows = Math.round(height / FACTOR);
+    recommendedCols = Math.round(circum / FACTOR);
+
+    if (!recommendedRows || recommendedRows <= 0 || !recommendedCols || recommendedCols <= 0) {
+      recommendedRows = null;
+      recommendedCols = null;
+      showToast('Valores muito pequenos para calcular a estrutura. Aumente as medidas informadas.');
+      return;
+    }
+
+    dimResultText.textContent = `${recommendedRows} fileiras × ${recommendedCols} colunas`;
+    dimResultContainer.style.display = 'block';
+    
+    draw();
+    scheduleAutoSave();
+    showToast('Área recomendada gerada no canvas!');
+  });
+
+  document.getElementById('clearDimBtn').addEventListener('click', () => {
+    recommendedRows = null;
+    recommendedCols = null;
+    savedTramaHeight = null;
+    savedTramaCircum = null;
+    dimHeightInput.value = '';
+    dimCircInput.value = '';
+    dimResultContainer.style.display = 'none';
+    draw();
+    scheduleAutoSave();
+    showToast('Moldura guia removida.');
+  });
+
+  // ============================================================
+  // Lógica do 🌐 Trama 3D
+  // ============================================================
+  let trama3dRevision = 0;
+  let trama3dLastBuiltRevision = -1;
+  let trama3dGhost = false;
+  let trama3dSeam = true;
+  let trama3dAutoRotate = false;
+  let trama3dPollTimer = null;
+  const trama3dCanvasWrap = document.getElementById('trama3dCanvasWrap');
+  const trama3dEmptyState = document.getElementById('trama3dEmptyState');
+
+  function trama3dHasMoldura() {
+    return recommendedRows !== null && recommendedCols !== null && recommendedRows > 0 && recommendedCols > 0;
+  }
+
+  function trama3dBuildPayload() {
+    const rows = recommendedRows, cols = recommendedCols;
+    const circum = savedTramaCircum || (cols * 1.5);
+    const radius = circum / (2 * Math.PI);
+    const beadDiameterCm = 1;
+
+    const uMin = -1, uSpan = 2 * cols;
+    const vMin = 0, vSpan = 2 * rows;
+
+    const cells = [];
+    for (const [key, color] of painted.entries()) {
+      const [r, c] = key.split(',').map(Number);
+      const u = c - r, v = c + r;
+      if (u < uMin || u > uMin + uSpan || v < vMin || v > vMin + vSpan) continue;
+      cells.push({ u, v, color });
+    }
+    return { radius, rows, cols, uMin, uSpan, vMin, vSpan, cells, beadDiameterCm };
+  }
+
+  function trama3dRebuild(force) {
+    if (!trama3dHasMoldura()) return;
+    if (!force && trama3dRevision === trama3dLastBuiltRevision) return;
+    if (!window.Trama3D) return;
+    const payload = trama3dBuildPayload();
+    window.Trama3D.build(payload);
+    trama3dLastBuiltRevision = trama3dRevision;
+  }
+
+  function trama3dRefreshUI() {
+    const has = trama3dHasMoldura();
+    trama3dEmptyState.style.display = has ? 'none' : 'flex';
+  }
+
+  function trama3dActivate() {
+    trama3dCanvasWrap.classList.add('active');
+    canvas.style.display = 'none';
+    canvasModeBadge.style.display = 'none';
+    trama3dRefreshUI();
+    if (!trama3dHasMoldura()) return;
+    requestAnimationFrame(() => {
+      if (window.Trama3D) {
+        window.Trama3D.ensureScene(trama3dCanvasWrap);
+        window.Trama3D.resume();
+        window.Trama3D.onResize();
+        window.Trama3D.setGhost(trama3dGhost);
+        window.Trama3D.setSeamVisible(trama3dSeam);
+        window.Trama3D.setAutoRotate(trama3dAutoRotate);
+        trama3dRebuild(true);
+      }
+    });
+    clearInterval(trama3dPollTimer);
+    trama3dPollTimer = setInterval(() => {
+      if (!trama3dCanvasWrap.classList.contains('active')) { clearInterval(trama3dPollTimer); return; }
+      trama3dRebuild(false);
+    }, 700);
+  }
+
+  function trama3dDeactivate() {
+    trama3dCanvasWrap.classList.remove('active');
+    canvas.style.display = '';
+    canvasModeBadge.style.display = '';
+    clearInterval(trama3dPollTimer);
+    if (window.Trama3D) window.Trama3D.pause();
+  }
+
+  document.getElementById('trama3dGoToDimBtn').addEventListener('click', () => {
+    document.getElementById('dimModal').classList.add('active');
+  });
+
+  document.getElementById('trama3dRotateBtn').addEventListener('click', (e) => {
+    trama3dAutoRotate = !trama3dAutoRotate;
+    e.currentTarget.classList.toggle('active', trama3dAutoRotate);
+    if (window.Trama3D) window.Trama3D.setAutoRotate(trama3dAutoRotate);
+  });
+
+  document.getElementById('trama3dGhostBtn').addEventListener('click', (e) => {
+    trama3dGhost = !trama3dGhost;
+    e.currentTarget.classList.toggle('active', trama3dGhost);
+    if (window.Trama3D) window.Trama3D.setGhost(trama3dGhost);
+    showToast(trama3dGhost ? 'Modo Fantasma: esfera transparente' : 'Modo Fantasma desligado');
+  });
+
+  document.getElementById('trama3dSeamBtn').addEventListener('click', (e) => {
+    trama3dSeam = !trama3dSeam;
+    e.currentTarget.classList.toggle('active', trama3dSeam);
+    if (window.Trama3D) window.Trama3D.setSeamVisible(trama3dSeam);
+  });
+
+  document.getElementById('trama3dRefreshBtn').addEventListener('click', () => {
+    if (!trama3dHasMoldura()) { showToast('Defina a moldura em 📏 Dimensionar Trama primeiro.'); return; }
+    trama3dRebuild(true);
+    showToast('Trama 3D atualizada!');
+  });
+
+  document.getElementById('trama3dCaptureBtn').addEventListener('click', () => {
+    if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Nada para capturar ainda.'); return; }
+    const dataUrl = window.Trama3D.capture();
+    if (!dataUrl) return;
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `trama3d_hd_${(document.getElementById('tramaName').value || 'trama').replace(/\s+/g, '_')}.png`;
+    a.click();
+    showToast('Foto HD salva!');
+  });
+
+  document.getElementById('trama3dRecordBtn').addEventListener('click', async (e) => {
+    if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Defina a moldura para visualizar e gravar.'); return; }
+    const btn = e.currentTarget;
+    const wasAutoRotate = trama3dAutoRotate;
+    if (!wasAutoRotate) window.Trama3D.setAutoRotate(true);
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '⏺️ 5s';
+    try {
+      const blob = await window.Trama3D.recordVideo(5000);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `trama3d_hd_${(document.getElementById('tramaName').value || 'trama').replace(/\s+/g, '_')}.webm`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      showToast('Vídeo HD salvo com sucesso!');
+    } catch (err) {
+      showToast('Seu navegador não suporta a gravação de vídeo.');
+    } finally {
+      if (!wasAutoRotate) window.Trama3D.setAutoRotate(false);
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  function adjustColor(hex, factor) {
+    const { r, g, b } = hexToRgb(hex);
+    if (factor > 1) {
+      const amt = factor - 1;
+      return `rgb(${Math.min(255,r+(255-r)*amt)},${Math.min(255,g+(255-g)*amt)},${Math.min(255,b+(255-b)*amt)})`;
+    } else {
+      return `rgb(${Math.max(0,r*factor)},${Math.max(0,g*factor)},${Math.max(0,b*factor)})`;
+    }
+  }
+
+  function draw3DBead(targetCtx, x, y, size, colorHex) {
+    const cx = x + size/2, cy = y + size/2, r = size*0.42;
+    targetCtx.save();
+    targetCtx.fillStyle = 'rgba(0,0,0,0.28)';
+    targetCtx.beginPath(); targetCtx.arc(cx+r*0.12, cy+r*0.15, r, 0, Math.PI*2); targetCtx.fill();
+    const grad = targetCtx.createRadialGradient(cx-r*0.3, cy-r*0.35, r*0.05, cx, cy, r);
+    grad.addColorStop(0, adjustColor(colorHex, 1.45));
+    grad.addColorStop(0.55, colorHex);
+    grad.addColorStop(1, adjustColor(colorHex, 0.45));
+    targetCtx.fillStyle = grad;
+    targetCtx.beginPath(); targetCtx.arc(cx, cy, r, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.strokeStyle = adjustColor(colorHex, 0.45);
+    targetCtx.lineWidth = Math.max(0.5, size*0.035); targetCtx.stroke();
+    targetCtx.fillStyle = 'rgba(255,255,255,0.8)';
+    targetCtx.beginPath(); targetCtx.ellipse(cx-r*0.32, cy-r*0.35, r*0.22, r*0.14, -Math.PI/4, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.restore();
+  }
+
+  function screenToLogical(sx, sy) {
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2;
+    const x1 = (sx - cx - pan.x)/zoom, y1 = (sy - cy - pan.y)/zoom;
+    const ca = Math.cos(-angle), sa = Math.sin(-angle);
+    return { x: ca*x1 - sa*y1 + cx, y: sa*x1 + ca*y1 + cy };
+  }
+  
+  function logicalToScreen(lx, ly) {
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2;
+    const x2 = lx - cx, y2 = ly - cy;
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    return { x: (ca*x2 - sa*y2)*zoom + cx + pan.x, y: (sa*x2 + ca*y2)*zoom + cy + pan.y };
+  }
+
+  function logicalToCell(lx, ly) { return { r: Math.floor(ly/baseCellSize), c: Math.floor(lx/baseCellSize) }; }
+  function screenToCell(sx, sy) { const l = screenToLogical(sx,sy); return logicalToCell(l.x, l.y); }
+
+  function processSelectionBox() {
+    if (!screenSelectionStart || !screenSelectionCurrent) return;
+    
+    const x1 = Math.min(screenSelectionStart.x, screenSelectionCurrent.x);
+    const x2 = Math.max(screenSelectionStart.x, screenSelectionCurrent.x);
+    const y1 = Math.min(screenSelectionStart.y, screenSelectionCurrent.y);
+    const y2 = Math.max(screenSelectionStart.y, screenSelectionCurrent.y);
+
+    if (x2 - x1 < 3 && y2 - y1 < 3) {
+        const cell = screenToCell(screenSelectionStart.x, screenSelectionStart.y);
+        selectedCells.add(`${cell.r},${cell.c}`);
+        return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const corners = [ 
+        screenToLogical(0,0), screenToLogical(rect.width,0), 
+        screenToLogical(0,rect.height), screenToLogical(rect.width,rect.height) 
+    ];
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (const p of corners) { 
+        minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); 
+        maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); 
+    }
+    
+    const cMin = Math.floor((minX-baseCellSize)/baseCellSize) - 2; 
+    const cMax = Math.floor((maxX+baseCellSize)/baseCellSize) + 2;
+    const rMin = Math.floor((minY-baseCellSize)/baseCellSize) - 2; 
+    const rMax = Math.floor((maxY+baseCellSize)/baseCellSize) + 2;
+
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const lx = c * baseCellSize + baseCellSize/2;
+        const ly = r * baseCellSize + baseCellSize/2;
+        const s = logicalToScreen(lx, ly);
+        
+        if (s.x >= x1 && s.x <= x2 && s.y >= y1 && s.y <= y2) {
+            selectedCells.add(`${r},${c}`);
+        }
+      }
+    }
+  }
+
+  function draw() {
+    canvas.style.width = '100%'; canvas.style.height = '100%';
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.fillStyle = backgroundColor; ctx.fillRect(0, 0, rect.width, rect.height);
+    const cx = rect.width/2, cy = rect.height/2;
+    
+    ctx.save();
+    ctx.translate(cx + pan.x, cy + pan.y); ctx.rotate(angle); ctx.scale(zoom, zoom); ctx.translate(-cx, -cy);
+
+    const corners = [ screenToLogical(0,0), screenToLogical(rect.width,0), screenToLogical(0,rect.height), screenToLogical(rect.width,rect.height) ];
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (const p of corners) { minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); }
+    const cMin = Math.floor((minX-baseCellSize)/baseCellSize), cMax = Math.floor((maxX+baseCellSize)/baseCellSize);
+    const rMin = Math.floor((minY-baseCellSize)/baseCellSize), rMax = Math.floor((maxY+baseCellSize)/baseCellSize);
+
+    let strokeColor = (backgroundColor.toLowerCase() === '#ffffff') ? '#d6d3d1' : 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = Math.max(0.4, 0.5/zoom);
+
+    // Fundo e linhas da grade base
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const x = c*baseCellSize, y = r*baseCellSize;
+        ctx.fillStyle = backgroundColor; 
+        ctx.fillRect(x,y,baseCellSize,baseCellSize);
+        if(gridVisible){ 
+            ctx.strokeStyle = strokeColor; 
+            ctx.strokeRect(x,y,baseCellSize,baseCellSize); 
+        }
+      }
+    }
+
+    // Moldura de referência (Dimensionar Trama)
+    if (recommendedRows !== null && recommendedCols !== null) {
+       ctx.save();
+       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); 
+       const S = baseCellSize;
+       const C = recommendedCols;
+       const R = recommendedRows;
+       
+       const minXBound = logicalToScreen(0, S).x; 
+       const maxXBound = logicalToScreen(C*S, -(C-1)*S).x; 
+       const minYBound = logicalToScreen(0, 0).y; 
+       const maxYBound = logicalToScreen(R*S, R*S).y; 
+       
+       ctx.strokeStyle = 'rgba(249, 115, 22, 0.85)'; 
+       ctx.lineWidth = 1.5; 
+       
+       ctx.beginPath();
+       ctx.moveTo(-99999, minYBound); ctx.lineTo(99999, minYBound);
+       ctx.moveTo(-99999, maxYBound); ctx.lineTo(99999, maxYBound);
+       ctx.moveTo(minXBound, -99999); ctx.lineTo(minXBound, 99999);
+       ctx.moveTo(maxXBound, -99999); ctx.lineTo(maxXBound, 99999);
+       ctx.stroke();
+       ctx.restore();
+    }
+
+    // Miçangas pintadas
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const color = painted.get(`${r},${c}`);
+        if(color) {
+            const x = c*baseCellSize, y = r*baseCellSize;
+            if(renderStyle === '3d') {
+                draw3DBead(ctx, x, y, baseCellSize, color);
+            } else {
+                ctx.fillStyle = color; 
+                ctx.fillRect(x,y,baseCellSize,baseCellSize);
+                if(gridVisible){ 
+                    ctx.strokeStyle = strokeColor; 
+                    ctx.strokeRect(x,y,baseCellSize,baseCellSize); 
+                }
+            }
+        }
+      }
+    }
+
+    // Células Selecionadas
+    if (selectedCells.size > 0) {
+      ctx.strokeStyle = '#c2410c'; ctx.fillStyle = 'rgba(194,65,12,0.4)'; 
+      ctx.lineWidth = Math.max(0.8, 1.5/zoom); ctx.setLineDash([4/zoom, 4/zoom]);
+      for (const key of selectedCells) {
+        const [r, c] = key.split(',').map(Number);
+        const sx = c * baseCellSize, sy = r * baseCellSize;
+        ctx.fillRect(sx, sy, baseCellSize, baseCellSize); 
+        ctx.strokeRect(sx, sy, baseCellSize, baseCellSize);
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Preview do colar
+    if (currentToolMode === 'paste' && clipboard && pastePreviewCell) {
+      ctx.globalAlpha = 0.75;
+      for (const [relKey, color] of clipboard.cells.entries()) {
+        const [dr, dc] = relKey.split(',').map(Number);
+        const x = (pastePreviewCell.c + dc)*baseCellSize, y = (pastePreviewCell.r + dr)*baseCellSize;
+        if(renderStyle==='3d') draw3DBead(ctx, x, y, baseCellSize, color);
+        else { ctx.fillStyle=color; ctx.fillRect(x,y,baseCellSize,baseCellSize); }
+      }
+      ctx.globalAlpha = 1;
+      ctx.strokeStyle = '#c2410c'; ctx.lineWidth = Math.max(0.8, 1.5/zoom); ctx.setLineDash([6/zoom, 4/zoom]);
+      ctx.strokeRect(pastePreviewCell.c*baseCellSize, pastePreviewCell.r*baseCellSize, clipboard.w*baseCellSize, clipboard.h*baseCellSize);
+      ctx.setLineDash([]);
+    }
+    
+    ctx.restore();
+
+    // Moldura de seleção em drag
+    if (isSelecting && screenSelectionStart && screenSelectionCurrent) {
+        const x = Math.min(screenSelectionStart.x, screenSelectionCurrent.x);
+        const y = Math.min(screenSelectionStart.y, screenSelectionCurrent.y);
+        const w = Math.abs(screenSelectionStart.x - screenSelectionCurrent.x);
+        const h = Math.abs(screenSelectionStart.y - screenSelectionCurrent.y);
+
+        ctx.strokeStyle = '#c2410c';
+        ctx.fillStyle = 'rgba(194,65,12,0.18)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([6, 4]);
+        ctx.fillRect(x, y, w, h);
+        ctx.strokeRect(x, y, w, h);
+        ctx.setLineDash([]);
+    }
+  }
+
+  let undoStack=[], redoStack=[];
+  const UNDO_CAP = 200;
+  function pushUndo(entry) {
+    undoStack.push(entry);
+    if (undoStack.length > UNDO_CAP) undoStack.shift();
+    redoStack = [];
+  }
+  function applyPaintAt(sx, sy, color, forceErase=false) {
+    const {r,c} = screenToCell(sx,sy); const key = `${r},${c}`;
+    if (currentToolMode==='pipette' && !forceErase) {
+      const pc = painted.get(key);
+      if(pc){ selectColor(pc); showToast(`Cor capturada!`); }
+      return false;
+    }
+    const prev = painted.get(key) || null;
+    if (prev===color) return false;
+    if (color===null) painted.delete(key); else painted.set(key, color);
+    pushUndo({key, prev, next:color}); scheduleAutoSave();
+    return true;
+  }
+
+  function performColorReplace(startCell, newColor) {
+      const startKey = `${startCell.r},${startCell.c}`;
+      const targetColor = painted.get(startKey);
+      
+      if (!targetColor) {
+          showToast("Selecione uma miçanga pintada para substituir a cor.");
+          return;
+      }
+      if (targetColor === newColor) return;
+
+      const changes = [];
+      for (const [key, color] of painted.entries()) {
+          if (color === targetColor) {
+              if(newColor) painted.set(key, newColor); else painted.delete(key);
+              changes.push({key, prev: targetColor, next: newColor});
+          }
+      }
+      
+      if (changes.length) {
+          pushUndo({changes}); scheduleAutoSave(); draw();
+          showToast(`Substituídas ${changes.length} miçangas!`);
+      }
+  }
+
+  function performBucketFill(startCell, newColor) {
+      const hasSel = selectedCells.size > 0;
+      const changes = [];
+
+      if (hasSel) {
+          for (const key of selectedCells) {
+              const prev = painted.get(key) || null;
+              if (prev !== newColor) {
+                  if(newColor) painted.set(key, newColor); else painted.delete(key);
+                  changes.push({key, prev, next: newColor});
+              }
+          }
+          
+          if (changes.length) {
+              pushUndo({changes}); scheduleAutoSave(); draw();
+              showToast('Seleção preenchida!');
+          }
+      } else {
+          const startKey = `${startCell.r},${startCell.c}`;
+          const targetColor = painted.get(startKey) || null;
+          if (targetColor === newColor) return;
+
+          let rMinFill = -Infinity, rMaxFill = Infinity, cMinFill = -Infinity, cMaxFill = Infinity;
+          
+          if (targetColor === null) {
+              const rect = canvas.getBoundingClientRect();
+              const corners = [ screenToLogical(0,0), screenToLogical(rect.width,0), screenToLogical(0,rect.height), screenToLogical(rect.width,rect.height) ];
+              let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+              for (const p of corners) { minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); }
+              cMinFill = Math.floor((minX-baseCellSize)/baseCellSize) - 4; 
+              cMaxFill = Math.floor((maxX+baseCellSize)/baseCellSize) + 4;
+              rMinFill = Math.floor((minY-baseCellSize)/baseCellSize) - 4; 
+              rMaxFill = Math.floor((maxY+baseCellSize)/baseCellSize) + 4;
+          }
+
+          const stack = [startCell];
+          const visited = new Set([startKey]);
+
+          while (stack.length > 0) {
+              const {r, c} = stack.pop();
+              const k = `${r},${c}`;
+              const curColor = painted.get(k) || null;
+              
+              if (curColor === targetColor) {
+                  if(newColor) painted.set(k, newColor); else painted.delete(k);
+                  changes.push({key: k, prev: curColor, next: newColor});
+                  
+                  const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
+                  for (const n of neighbors) {
+                      if (n.r >= rMinFill && n.r <= rMaxFill && n.c >= cMinFill && n.c <= cMaxFill) {
+                          const nk = `${n.r},${n.c}`;
+                          if (!visited.has(nk)) {
+                              visited.add(nk);
+                              stack.push(n);
+                          }
+                      }
+                  }
+              }
+          }
+          
+          if (changes.length) {
+              pushUndo({changes}); scheduleAutoSave(); draw();
+          }
+      }
+  }
+
+  function toggleMultiSelectCell(px, py) {
+      const cell = screenToCell(px, py);
+      const key = `${cell.r},${cell.c}`;
+      if (selectedCells.has(key)) {
+          selectedCells.delete(key);
+          return 'remove';
+      } else {
+          selectedCells.add(key);
+          return 'add';
+      }
+  }
+
+  let pointerDownInfo = null, isPanning=false;
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('pointerdown', e => {
+    try { canvas.setPointerCapture(e.pointerId); } catch(err) {}
+    const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+
+    if (e.pointerType === 'touch') {
+      const pos = { x: e.clientX, y: e.clientY };
+      touchPointers.set(e.pointerId, { current: pos, prev: pos });
+
+      if (touchPointers.size === 2) {
+        isPanning = true;
+        for (const [pid, timeoutId] of pendingTouchPaint) { clearTimeout(timeoutId); pendingTouchPaint.delete(pid); }
+        return;
+      }
+      if (touchPointers.size === 1) {
+        if (currentToolMode==='hand') {
+          isPanning = true;
+          pointerDownInfo = { type: 'pan', sx: e.clientX, sy: e.clientY };
+          return;
+        }
+        if (currentToolMode==='paste') { commitClipboardAt(screenToCell(px,py)); return; }
+        if (currentToolMode==='bucket') { performBucketFill(screenToCell(px,py), colorPicker.value); return; }
+        if (currentToolMode==='replace') { performColorReplace(screenToCell(px,py), colorPicker.value); return; }
+        if (currentToolMode==='select') {
+          if (pinMultiSelectMode) {
+            const mode = toggleMultiSelectCell(px, py);
+            pointerDownInfo = { type: 'multi-select', mode };
+            updateSelectionState();
+            draw();
+            return;
+          }
+          selectedCells.clear();
+          isSelecting = true; 
+          screenSelectionStart = {x: px, y: py}; 
+          screenSelectionCurrent = {x: px, y: py};
+          draw();
+          return;
+        }
+        const pointerId = e.pointerId;
+        const timeoutId = setTimeout(() => {
+          pendingTouchPaint.delete(pointerId);
+          if (touchPointers.size !== 1 || !touchPointers.has(pointerId)) return;
+          const color = currentToolMode==='eraser' ? null : colorPicker.value;
+          if (applyPaintAt(px, py, color)) draw();
+        }, TOUCH_PAINT_DELAY);
+        pendingTouchPaint.set(pointerId, timeoutId);
+      }
+      return;
+    }
+
+    if (e.button===1 || currentToolMode==='hand') {
+      e.preventDefault(); 
+      pointerDownInfo = {type:'pan', sx:e.clientX, sy:e.clientY}; 
+      isPanning = true;
+      canvas.style.cursor = 'grabbing';
+      return;
+    }
+
+    if (currentToolMode==='paste') { commitClipboardAt(screenToCell(px,py)); return; }
+    if (currentToolMode==='bucket') { performBucketFill(screenToCell(px,py), colorPicker.value); return; }
+    if (currentToolMode==='replace') { performColorReplace(screenToCell(px,py), colorPicker.value); return; }
+    
+    if (currentToolMode==='select') { 
+        if ((e.shiftKey || pinMultiSelectMode) && e.button === 0) {
+            const mode = toggleMultiSelectCell(px, py);
+            pointerDownInfo = { type: 'multi-select', mode };
+            updateSelectionState();
+            draw();
+            return;
+        }
+        
+        selectedCells.clear(); 
+        isSelecting=true; 
+        screenSelectionStart = {x: px, y: py}; 
+        screenSelectionCurrent = {x: px, y: py};
+        draw(); 
+        return; 
+    }
+    
+    const color = (e.button===2 || currentToolMode==='eraser') ? null : colorPicker.value;
+    if(applyPaintAt(px,py, color, e.button===2)) draw();
+    pointerDownInfo={type:(e.button===2||currentToolMode==='eraser')?'erase':'draw'};
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerType === 'touch') {
+      if (!touchPointers.has(e.pointerId)) return;
+      const ptrData = touchPointers.get(e.pointerId);
+      ptrData.prev = ptrData.current;
+      ptrData.current = { x: e.clientX, y: e.clientY };
+
+      if (touchPointers.size === 2 && isPanning) {
+        const pts = Array.from(touchPointers.values());
+        const ptr1 = pts[0], ptr2 = pts[1];
+        const prevCentroidX = (ptr1.prev.x + ptr2.prev.x)/2, prevCentroidY = (ptr1.prev.y + ptr2.prev.y)/2;
+        const curCentroidX = (ptr1.current.x + ptr2.current.x)/2, curCentroidY = (ptr1.current.y + ptr2.current.y)/2;
+        pan.x += curCentroidX - prevCentroidX; pan.y += curCentroidY - prevCentroidY;
+
+        const rect = canvas.getBoundingClientRect();
+        const prevDist = Math.hypot(ptr1.prev.x-ptr2.prev.x, ptr1.prev.y-ptr2.prev.y);
+        const curDist = Math.hypot(ptr1.current.x-ptr2.current.x, ptr1.current.y-ptr2.current.y);
+        if (prevDist > 1 && curDist > 1) {
+          const focalX = curCentroidX - rect.left, focalY = curCentroidY - rect.top;
+          const before = screenToLogical(focalX, focalY);
+          zoom = Math.max(0.2, Math.min(10, zoom * (curDist/prevDist)));
+          const after = logicalToScreen(before.x, before.y);
+          pan.x += (focalX - after.x); pan.y += (focalY - after.y);
+        }
+        draw();
+        return;
+      }
+      if (touchPointers.size === 1) {
+        const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+        if (currentToolMode==='hand' && isPanning && pointerDownInfo) {
+          pan.x += (e.clientX - pointerDownInfo.sx);
+          pan.y += (e.clientY - pointerDownInfo.sy);
+          pointerDownInfo.sx = e.clientX;
+          pointerDownInfo.sy = e.clientY;
+          draw();
+          return;
+        }
+        if (currentToolMode==='paste') { pastePreviewCell=screenToCell(px,py); draw(); return; }
+        if (currentToolMode==='select' && isSelecting) { screenSelectionCurrent = {x:px, y:py}; draw(); return; }
+        
+        if (pendingTouchPaint.has(e.pointerId)) { clearTimeout(pendingTouchPaint.get(e.pointerId)); pendingTouchPaint.delete(e.pointerId); }
+        if (pointerDownInfo && pointerDownInfo.type === 'multi-select' && currentToolMode === 'select') {
+          const cell = screenToCell(px, py);
+          const key = `${cell.r},${cell.c}`;
+          if (pointerDownInfo.mode === 'add') selectedCells.add(key);
+          else selectedCells.delete(key);
+          updateSelectionState();
+          draw();
+          return;
+        }
+        if (currentToolMode==='select') return;
+        const color = currentToolMode==='eraser' ? null : colorPicker.value;
+        if (applyPaintAt(px, py, color)) draw();
+      }
+      return;
+    }
+
+    if(isPanning && pointerDownInfo){
+       pan.x += (e.clientX - pointerDownInfo.sx); pan.y += (e.clientY - pointerDownInfo.sy);
+       pointerDownInfo.sx = e.clientX; pointerDownInfo.sy = e.clientY; draw(); return;
+    }
+    const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+    
+    if (currentToolMode==='paste') { pastePreviewCell=screenToCell(px,py); draw(); return; }
+    if (currentToolMode==='select' && isSelecting) { screenSelectionCurrent = {x:px, y:py}; draw(); return; }
+    
+    if (pointerDownInfo && pointerDownInfo.type === 'multi-select' && currentToolMode === 'select') {
+        const cell = screenToCell(px, py);
+        const key = `${cell.r},${cell.c}`;
+        if (pointerDownInfo.mode === 'add') selectedCells.add(key);
+        else selectedCells.delete(key);
+        updateSelectionState();
+        draw();
+        return;
+    }
+
+    if (!pointerDownInfo) return;
+    if(applyPaintAt(px,py, pointerDownInfo.type==='erase'?null:colorPicker.value)) draw();
+  });
+
+  canvas.addEventListener('pointerup', e => {
+    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+
+    if (e.pointerType === 'touch') {
+      if (currentToolMode === 'select' && isSelecting) {
+        const rect = canvas.getBoundingClientRect();
+        screenSelectionCurrent = {x: e.clientX-rect.left, y: e.clientY-rect.top};
+        isSelecting = false;
+        processSelectionBox();
+        screenSelectionStart = null;
+        screenSelectionCurrent = null;
+        updateSelectionState(); 
+        draw();
+        touchPointers.delete(e.pointerId);
+        return;
+      }
+      if (pendingTouchPaint.has(e.pointerId)) {
+        clearTimeout(pendingTouchPaint.get(e.pointerId));
+        pendingTouchPaint.delete(e.pointerId);
+        if (!isPanning) {
+          const rect = canvas.getBoundingClientRect();
+          const color = currentToolMode==='eraser' ? null : colorPicker.value;
+          if (applyPaintAt(e.clientX-rect.left, e.clientY-rect.top, color)) draw();
+        }
+      }
+      touchPointers.delete(e.pointerId);
+      if (touchPointers.size < 2) isPanning = false;
+      pointerDownInfo = null;
+      if (currentToolMode === 'hand') canvas.style.cursor = 'grab';
+      else canvas.style.cursor = 'crosshair';
+      return;
+    }
+
+    if(isSelecting && currentToolMode === 'select') {
+      const rect = canvas.getBoundingClientRect();
+      screenSelectionCurrent = {x: e.clientX-rect.left, y: e.clientY-rect.top};
+      isSelecting = false;
+      processSelectionBox();
+      screenSelectionStart = null;
+      screenSelectionCurrent = null;
+      updateSelectionState(); 
+      draw();
+    }
+    pointerDownInfo=null; isPanning=false;
+    if (currentToolMode === 'hand') canvas.style.cursor = 'grab';
+    else canvas.style.cursor = 'crosshair';
+  });
+
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect=canvas.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const before = screenToLogical(mx,my);
+    zoom = Math.max(0.2, Math.min(10, zoom * Math.exp(-e.deltaY*0.0012)));
+    const after = logicalToScreen(before.x, before.y);
+    pan.x += (mx-after.x); pan.y += (my-after.y); draw();
+  }, {passive:false});
+
+  function updateSelectionState() {
+    const hasSel = selectedCells.size > 0;
+    copyBtn.disabled = !hasSel;
+    cutBtn.disabled = !hasSel;
+    deleteSelBtn.disabled = !hasSel;
+    
+    const hs = !!clipboard; 
+    pasteBtn.disabled = !hs; 
+    document.getElementById('rotateClipBtn').disabled = !hs;
+    document.getElementById('mirrorHClipBtn').disabled = !hs; 
+    document.getElementById('mirrorVClipBtn').disabled = !hs;
+  }
+  
+  function deleteSelectionData() {
+      if(selectedCells.size === 0) return;
+      const changes = [];
+      
+      for (const k of selectedCells) {
+          const prev = painted.get(k) || null;
+          if (prev) { painted.delete(k); changes.push({key:k, prev, next:null}); }
+      }
+      
+      if(changes.length){ pushUndo({changes}); scheduleAutoSave(); }
+      draw();
+  }
+
+  copyBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    const cells = new Map();
+    let rMin = Infinity, rMax = -Infinity, cMin = Infinity, cMax = -Infinity;
+
+    for (const key of selectedCells) {
+        const [r, c] = key.split(',').map(Number);
+        const color = painted.get(key);
+        if (color) { 
+            rMin = Math.min(rMin, r); rMax = Math.max(rMax, r);
+            cMin = Math.min(cMin, c); cMax = Math.max(cMax, c);
+        }
+    }
+    if (rMin === Infinity) { showToast('Seleção vazia!'); return; }
+    for (const key of selectedCells) {
+        const [r, c] = key.split(',').map(Number);
+        const color = painted.get(key);
+        if (color) cells.set(`${r-rMin},${c-cMin}`, color);
+    }
+
+    clipboard = {w:cMax-cMin+1, h:rMax-rMin+1, cells};
+    renderClipPreview(); updateSelectionState(); showToast(`Área copiada!`);
+  });
+
+  cutBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    copyBtn.click();
+    deleteSelectionData();
+    selectedCells.clear();
+    updateSelectionState();
+    setToolMode('paste'); 
+    showToast(`Recortado!`);
+  });
+
+  deleteSelBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    deleteSelectionData();
+    showToast(`Área apagada!`);
+  });
+
+  cancelSelectBtn.addEventListener('click', () => { 
+      selectedCells.clear();
+      screenSelectionStart = null;
+      screenSelectionCurrent = null;
+      setToolMode('brush'); 
+      updateSelectionState(); 
+      draw(); 
+  });
+
+  pinSelectBtn.addEventListener('click', () => {
+    pinMultiSelectMode = !pinMultiSelectMode;
+    pinSelectBtn.classList.toggle('active', pinMultiSelectMode);
+    if (pinMultiSelectMode && currentToolMode !== 'select') {
+      setToolMode('select');
+    }
+    showToast(pinMultiSelectMode ? 'Seleção múltipla fixada: toque nas células para marcar.' : 'Seleção múltipla desativada.');
+  });
+  
+  pasteBtn.addEventListener('click', () => { if(clipboard) setToolMode('paste'); });
+
+  function commitClipboardAt(cell) {
+    if(!clipboard) return;
+    const changes=[];
+    for(const [rk, c] of clipboard.cells.entries()){
+      const [dr,dc]=rk.split(',').map(Number), r=cell.r+dr, col=cell.c+dc, key=`${r},${col}`, prev=painted.get(key)||null;
+      if(prev!==c){ painted.set(key,c); changes.push({key,prev,next:c}); }
+    }
+    if(changes.length){ pushUndo({changes}); scheduleAutoSave(); showToast('Colado!'); }
+    draw();
+  }
+
+  function transformClipboard(type) {
+    if(!clipboard) return;
+    const {w,h,cells} = clipboard, nc = new Map();
+    for(const [rk, c] of cells.entries()){
+      const [dr,dc]=rk.split(',').map(Number);
+      if(type==='rot') nc.set(`${dc},${h-1-dr}`, c);
+      if(type==='mh') nc.set(`${dc},${dr}`, c);
+      if(type==='mv') nc.set(`${w-1-dc},${h-1-dr}`, c);
+    }
+    const swaps = (type==='rot' || type==='mh' || type==='mv');
+    clipboard = {w:(swaps?h:w), h:(swaps?w:h), cells:nc};
+    renderClipPreview(); draw();
+  }
+  document.getElementById('rotateClipBtn').addEventListener('click', ()=>transformClipboard('rot'));
+  document.getElementById('mirrorHClipBtn').addEventListener('click', ()=>transformClipboard('mh'));
+  document.getElementById('mirrorVClipBtn').addEventListener('click', ()=>transformClipboard('mv'));
+
+  function renderClipPreview() {
+    if(!clipboard) { clipPreviewCanvas.getContext('2d').clearRect(0,0,48,48); return; }
+    const pctx = clipPreviewCanvas.getContext('2d'), W=48, H=48;
+    pctx.fillStyle = backgroundColor; pctx.fillRect(0,0,W,H);
+    pctx.save(); pctx.translate(W/2,H/2); pctx.rotate(angle);
+    const diag = (clipboard.w+clipboard.h)*0.707, cell = Math.min((W-8)/Math.max(1,diag), (H-8)/Math.max(1,diag));
+    pctx.translate(-(clipboard.w*cell)/2, -(clipboard.h*cell)/2);
+    for(const [rk,c] of clipboard.cells.entries()){
+      const [dr,dc]=rk.split(',').map(Number);
+      if(renderStyle==='3d') draw3DBead(pctx, dc*cell, dr*cell, cell, c);
+      else { pctx.fillStyle=c; pctx.fillRect(dc*cell, dr*cell, cell, cell); }
+    }
+    pctx.restore();
+  }
+
+  zoomInBtn.addEventListener('click', () => { zoom = Math.min(10, zoom*1.2); draw(); });
+  zoomOutBtn.addEventListener('click', () => { zoom = Math.max(0.2, zoom/1.2); draw(); });
+  
+  function getTightBounds() {
+    let hasContent = false;
+    let mx=Infinity, MX=-Infinity, my=Infinity, MY=-Infinity;
+    const ca=Math.cos(angle), sa=Math.sin(angle);
+
+    function addPoint(px, py) {
+      const rx = px*ca - py*sa, ry = px*sa + py*ca;
+      mx=Math.min(mx,rx); MX=Math.max(MX,rx); my=Math.min(my,ry); MY=Math.max(MY,ry);
+      hasContent = true;
+    }
+
+    for(const k of painted.keys()){
+      const [r,c]=k.split(',').map(Number), x=c*baseCellSize, y=r*baseCellSize;
+      addPoint(x, y); addPoint(x+baseCellSize, y); addPoint(x, y+baseCellSize); addPoint(x+baseCellSize, y+baseCellSize);
+    }
+    
+    if (recommendedRows !== null && recommendedCols !== null) {
+      const S = baseCellSize, C = recommendedCols, R = recommendedRows;
+      addPoint(0, S); addPoint(C*S, -(C-1)*S); addPoint(0, 0); addPoint(R*S, R*S);
+    }
+
+    if(!hasContent) return null;
+    const cxR=(mx+MX)/2, cyR=(my+MY)/2;
+    return {w:MX-mx, h:MY-my, cxL: ca*cxR + sa*cyR, cyL: -sa*cxR + ca*cyR};
+  }
+
+  function centerCanvas() {
+    const b = getTightBounds(); if(!b){ pan={x:0,y:0}; draw(); return; }
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2, ca=Math.cos(angle), sa=Math.sin(angle);
+    const x1 = ca*(b.cxL-cx) - sa*(b.cyL-cy), y1 = sa*(b.cxL-cx) + ca*(b.cyL-cy);
+    pan.x = -(x1*zoom); pan.y = -(y1*zoom);
+  }
+  centerBtn.addEventListener('click', () => { centerCanvas(); draw(); });
+  fitScreenBtn.addEventListener('click', () => {
+    const b = getTightBounds(); if(!b){ zoom=1; pan={x:0,y:0}; draw(); return; }
+    zoom = Math.max(0.2, Math.min(10, Math.min((canvas.clientWidth*.85)/b.w, (canvas.clientHeight*.85)/b.h)));
+    centerCanvas(); draw();
+  });
+
+  const pStep = 26;
+  function panBy(dx, dy) { pan.x += dx; pan.y += dy; draw(); }
+  function attachHoldToRepeat(button, fn) {
+    let intervalId = null, timeoutId = null;
+    function stop() { if(timeoutId) clearTimeout(timeoutId); if(intervalId) clearInterval(intervalId); timeoutId=null; intervalId=null; }
+    button.addEventListener('pointerdown', e => { e.preventDefault(); fn(); timeoutId = setTimeout(()=>{ intervalId = setInterval(fn, 60); }, 350); });
+    button.addEventListener('pointerup', stop);
+    button.addEventListener('pointerleave', stop);
+    button.addEventListener('pointercancel', stop);
+  }
+  attachHoldToRepeat(panUpBtn, ()=>panBy(0, pStep));
+  attachHoldToRepeat(panDownBtn, ()=>panBy(0, -pStep));
+  attachHoldToRepeat(panLeftBtn, ()=>panBy(pStep, 0));
+  attachHoldToRepeat(panRightBtn, ()=>panBy(-pStep, 0));
+
+  gridToggleBtn.addEventListener('click', () => { gridVisible=!gridVisible; gridToggleBtn.classList.toggle('active', gridVisible); draw(); });
+  renderToggleBtn.addEventListener('click', () => { renderStyle = renderStyle==='2d'?'3d':'2d'; renderToggleBtn.textContent = renderStyle==='2d'?'2D':'3D'; draw(); renderClipPreview(); });
+  bgToggleBtn.addEventListener('click', () => {
+    const isTerra = backgroundColor.toLowerCase() !== '#ffffff';
+    backgroundColor = isTerra ? '#FFFFFF' : '#B5651D';
+    bgToggleBtn.textContent = isTerra ? '⚪' : '🟠';
+    draw(); renderClipPreview();
+  });
+
+  document.getElementById('undoBtn').addEventListener('click', () => {
+    const l=undoStack.pop(); if(!l)return;
+    (l.changes||[l]).forEach(({key,prev}) => prev?painted.set(key,prev):painted.delete(key));
+    redoStack.push(l); draw(); scheduleAutoSave();
+  });
+  document.getElementById('redoBtn').addEventListener('click', () => {
+    const l=redoStack.pop(); if(!l)return;
+    (l.changes||[l]).forEach(({key,next}) => next?painted.set(key,next):painted.delete(key));
+    undoStack.push(l); draw(); scheduleAutoSave();
+  });
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if(painted.size) showConfirm('Apagar Trama', 'Limpar todo o desenho?', () => { painted.clear(); undoStack=[]; redoStack=[]; draw(); scheduleAutoSave(); });
+  });
+
+  let autosaveTimer = null;
+  function buildData(name) {
+    return { 
+      app:'TramaTrama', version:'0.9.23', name, author:document.getElementById('tramaAuthor').value,
+      savedAt:new Date().toISOString(), bg:backgroundColor, grid:gridVisible, style:renderStyle,
+      recRows: recommendedRows, recCols: recommendedCols,
+      savedHeight: savedTramaHeight, savedCircum: savedTramaCircum,
+      painted:Array.from(painted.entries()) 
+    };
+  }
+  function scheduleAutoSave() {
+    trama3dRevision++;
+    saveBadge.className = 'save-badge-rail saving'; saveBadge.textContent = 'Salvando';
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(() => {
+      try {
+        localStorage.setItem('tt_autosave', JSON.stringify(buildData(document.getElementById('tramaName').value)));
+        saveBadge.className = 'save-badge-rail'; saveBadge.textContent = '✓ Salvo';
+      } catch(e) {
+        saveBadge.className = 'save-badge-rail'; saveBadge.textContent = '⚠ Não salvo';
+        if (e && e.name === 'QuotaExceededError') {
+          showToast('Armazenamento local cheio! Exporte sua Trama para não perder o trabalho.');
+        } else {
+          showToast('Não foi possível salvar automaticamente.');
+        }
+      }
+    }, 600);
+  }
+
+  function getSaves() { try{return JSON.parse(localStorage.getItem('tt_saves'))||{};}catch(e){return {};} }
+  function setSaves(s) {
+    try {
+      localStorage.setItem('tt_saves', JSON.stringify(s));
+    } catch(e) {
+      if (e && e.name === 'QuotaExceededError') {
+        showToast('Armazenamento local cheio! Exclua trabalhos salvos antigos ou exporte antes de salvar um novo.');
+      } else {
+        showToast('Não foi possível salvar esta Trama.');
+      }
+      return;
+    }
+    refreshSaves();
+  }
+  function refreshSaves() {
+    const s = getSaves(), sel = document.getElementById('savedTramasSelect'); sel.innerHTML='';
+    const k = Object.keys(s).sort();
+    if(!k.length) { sel.innerHTML='<option value="">— nenhuma salva —</option>'; return; }
+    k.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = `${n} (${new Date(s[n].savedAt).toLocaleDateString()})`; sel.appendChild(o); });
+  }
+
+  function isValidTramaData(d) {
+    if (!d || typeof d !== 'object') return false;
+    if (!Array.isArray(d.painted)) return false;
+    for (const entry of d.painted) {
+      if (!Array.isArray(entry) || entry.length !== 2) return false;
+      if (typeof entry[0] !== 'string' || typeof entry[1] !== 'string') return false;
+    }
+    if (d.recRows !== undefined && d.recRows !== null && typeof d.recRows !== 'number') return false;
+    if (d.recCols !== undefined && d.recCols !== null && typeof d.recCols !== 'number') return false;
+    return true;
+  }
+
+  function loadData(d) {
+    if (!isValidTramaData(d)) { showToast('Arquivo de Trama inválido ou corrompido.'); return; }
+    painted.clear(); d.painted.forEach(([k,v])=>painted.set(k,v));
+    document.getElementById('tramaName').value = d.name||''; document.getElementById('tramaAuthor').value = d.author||'';
+    backgroundColor = d.bg||'#B5651D'; gridVisible = d.grid!==false; renderStyle = d.style||'2d';
+    gridToggleBtn.classList.toggle('active', gridVisible); renderToggleBtn.textContent = renderStyle.toUpperCase();
+    bgToggleBtn.textContent = (backgroundColor.toLowerCase() === '#ffffff') ? '⚪' : '🟠';
+    
+    recommendedRows = d.recRows !== undefined ? d.recRows : null;
+    recommendedCols = d.recCols !== undefined ? d.recCols : null;
+    savedTramaHeight = d.savedHeight !== undefined ? d.savedHeight : null;
+    savedTramaCircum = d.savedCircum !== undefined ? d.savedCircum : null;
+    
+    if (recommendedRows !== null && recommendedCols !== null) {
+      dimResultText.textContent = `${recommendedRows} fileiras × ${recommendedCols} colunas`;
+      dimResultContainer.style.display = 'block';
+    } else {
+      dimResultContainer.style.display = 'none';
+      document.getElementById('dimHeight').value = '';
+      document.getElementById('dimCirc').value = '';
+    }
+
+    undoStack=[]; redoStack=[]; setToolMode('brush'); centerCanvas(); fitScreenBtn.click();
+  }
+
+  function handleNewTrama() {
+    const action = () => { painted.clear(); loadData({painted:[], recRows:null, recCols:null, savedHeight:null, savedCircum:null}); showToast('Nova trama iniciada!'); };
+    if (painted.size > 0) {
+      showConfirm('Nova Trama', 'Iniciar uma nova trama? O que não foi salvo será perdido.', action);
+    } else {
+      action();
+    }
+  }
+
+  document.getElementById('newTramaBtn').addEventListener('click', () => {
+    document.getElementById('fileModal').classList.remove('active');
+    handleNewTrama();
+  });
+  document.getElementById('newFileRailBtn').addEventListener('click', handleNewTrama);
+
+  document.getElementById('saveTramaBtn').addEventListener('click', () => {
+    const n = document.getElementById('tramaName').value || 'trama-1', s = getSaves();
+    s[n] = buildData(n); setSaves(s); document.getElementById('savedTramasSelect').value = n; showToast('Salvo no navegador!');
+  });
+  document.getElementById('loadSelectedBtn').addEventListener('click', () => {
+    const n = document.getElementById('savedTramasSelect').value, s = getSaves();
+    if(s[n]) { loadData(s[n]); document.getElementById('fileModal').classList.remove('active'); showToast('Carregada!'); }
+  });
+  document.getElementById('deleteSelectedBtn').addEventListener('click', () => {
+    const n = document.getElementById('savedTramasSelect').value, s = getSaves();
+    if(s[n]) showConfirm('Excluir', `Excluir "${n}"?`, () => { delete s[n]; setSaves(s); showToast('Excluída!'); });
+  });
+
+  document.getElementById('exportTramaBtn').addEventListener('click', () => {
+      const name = document.getElementById('tramaName').value || 'trama';
+      const b = new Blob([JSON.stringify(buildData(name), null, 2)], {type:'application/json'});
+      const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${name}.json`; a.click();
+  });
+  document.getElementById('importTramaBtn').addEventListener('click', () => document.getElementById('loadTramaFile').click());
+  document.getElementById('loadTramaFile').addEventListener('change', e => {
+      const f = e.target.files[0]; if(!f)return;
+      const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if(!isValidTramaData(d)){ showToast('Arquivo de Trama inválido ou corrompido.'); return; } loadData(d); document.getElementById('fileModal').classList.remove('active'); showToast('Importado!'); } catch(e){showToast('Erro ao abrir.');}}; r.readAsText(f);
+  });
+  
+  function buildExportCanvas(transparent) {
+    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    for (const key of painted.keys()) {
+      const [r, c] = key.split(',').map(Number);
+      if (r < minR) minR = r; if (r > maxR) maxR = r;
+      if (c < minC) minC = c; if (c > maxC) maxC = c;
+    }
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    let minX=Infinity, MX=-Infinity, minY=Infinity, MY=-Infinity;
+    for (const key of painted.keys()) {
+      const [r, c] = key.split(',').map(Number), x0 = c * baseCellSize, y0 = r * baseCellSize;
+      [[x0, y0], [x0 + baseCellSize, y0], [x0, y0 + baseCellSize], [x0 + baseCellSize, y0 + baseCellSize]].forEach(([x,y])=>{
+        const rx = x * ca - y * sa, ry = x * sa + y * ca;
+        if (rx < minX) minX = rx; if (rx > MX) MX = rx;
+        if (ry < minY) minY = ry; if (ry > MY) MY = ry;
+      });
+    }
+    const PAD=80, w = Math.round((MX-minX+PAD*2)*2), h = Math.round((MY-minY+PAD*2)*2);
+    const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h; const tctx = tmp.getContext('2d');
+    if (!transparent) { tctx.fillStyle = backgroundColor; tctx.fillRect(0, 0, w, h); }
+    tctx.translate(w/2, h/2); tctx.rotate(angle); tctx.scale(2, 2); tctx.translate(-(ca*(minX+MX)/2 + sa*(minY+MY)/2), -(-sa*(minX+MX)/2 + ca*(minY+MY)/2));
+
+    const stroke = backgroundColor.toLowerCase() === '#ffffff' ? '#d6d3d1' : 'rgba(0,0,0,0.15)';
+    tctx.lineWidth = 0.25;
+    for (let r = minR-2; r <= maxR+2; r++) {
+      for (let c = minC-2; c <= maxC+2; c++) {
+        const p = painted.get(`${r},${c}`), x = c*baseCellSize, y = r*baseCellSize;
+        if (transparent && !p) continue;
+        if (renderStyle === '3d') {
+          if (!transparent) { tctx.fillStyle = backgroundColor; tctx.fillRect(x, y, baseCellSize, baseCellSize); if (gridVisible) { tctx.strokeStyle = stroke; tctx.strokeRect(x,y,baseCellSize,baseCellSize); } }
+          if (p) draw3DBead(tctx, x, y, baseCellSize, p);
+        } else {
+          tctx.fillStyle = p || backgroundColor; tctx.fillRect(x, y, baseCellSize, baseCellSize);
+          if (gridVisible && !transparent) { tctx.strokeStyle = stroke; tctx.strokeRect(x,y,baseCellSize,baseCellSize); }
+        }
+      }
+    }
+    return tmp;
+  }
+
+  document.getElementById('exportImgBtn').addEventListener('click', () => {
+      if(!painted.size){showToast('Canvas vazio');return;}
+      const trans = document.getElementById('exportFormat').value === 'png', tmp = buildExportCanvas(trans);
+      const baseName = (document.getElementById('tramaName').value.trim() || 'trama').replace(/[^\w\-]+/g, '_');
+      tmp.toBlob(b => { const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`${baseName}.`+(trans?'png':'jpg'); a.click(); }, trans?'image/png':'image/jpeg', 0.95);
+  });
+
+  let manropeFontPromise = null;
+  function loadManropeFontBase64() {
+    if (manropeFontPromise) return manropeFontPromise;
+    manropeFontPromise = fetch('https://raw.githubusercontent.com/google/fonts/main/ofl/manrope/Manrope%5Bwght%5D.ttf')
+      .then(r => { if(!r.ok) throw new Error('fetch falhou'); return r.arrayBuffer(); })
+      .then(buf => {
+        let binary = '';
+        const bytes = new Uint8Array(buf);
+        const chunk = 0x8000;
+        for (let i = 0; i < bytes.length; i += chunk) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + chunk));
+        }
+        return btoa(binary);
+      })
+      .catch(() => null);
+    return manropeFontPromise;
+  }
+
+  document.getElementById('exportPdfBtn').addEventListener('click', async () => {
+      if(!painted.size){showToast('Canvas vazio');return;}
+      if(!window.jspdf || !window.jspdf.jsPDF){showToast('Aguarde biblioteca');return;}
+      showToast('Gerando PDF...');
+
+      const tmp = buildExportCanvas(false);
+      const imgData = tmp.toDataURL('image/jpeg', 0.95);
+      const rawName = document.getElementById('tramaName').value.trim();
+      const name = rawName || 'Sem título';
+      const author = document.getElementById('tramaAuthor').value.trim() || 'Não informado';
+      const now = new Date();
+      const dataStr = now.toLocaleDateString('pt-BR');
+      const horaStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+      const counts = new Map();
+      for (const color of painted.values()) counts.set(color, (counts.get(color) || 0) + 1);
+      const countEntries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+      const totalMicangas = countEntries.reduce((sum, [, n]) => sum + n, 0);
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      const manropeBase64 = await loadManropeFontBase64();
+      let usingManrope = false;
+      if (manropeBase64) {
+        try {
+          pdf.addFileToVFS('Manrope.ttf', manropeBase64);
+          pdf.addFont('Manrope.ttf', 'Manrope', 'normal');
+          pdf.setFont('Manrope');
+          usingManrope = true;
+        } catch (err) { usingManrope = false; }
+      }
+      if (!usingManrope) pdf.setFont('helvetica', 'bold');
+
+      function pdfText(txt, x, y) {
+        if (usingManrope) {
+          const off = 0.11;
+          pdf.text(txt, x, y);
+          pdf.text(txt, x + off, y);
+        } else {
+          pdf.text(txt, x, y);
+        }
+      }
+
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const marginMm = 14;
+      let y = marginMm;
+
+      pdf.setFontSize(18);
+      pdfText('Trama Trama', marginMm, y); y += 8;
+
+      pdf.setFontSize(10.5); pdf.setTextColor(80);
+      pdfText(`Nome da trama: ${name}`, marginMm, y); y += 5;
+      pdfText(`Autoria: ${author}`, marginMm, y); y += 5;
+      pdfText(`Gerado em: ${dataStr} às ${horaStr}`, marginMm, y); y += 4;
+
+      if (recommendedRows !== null && recommendedCols !== null) {
+        const alturaTxt = savedTramaHeight !== null ? `${savedTramaHeight} cm` : '—';
+        const circTxt = savedTramaCircum !== null ? `${savedTramaCircum} cm` : '—';
+        pdfText(`Dimensões da cabaça: ${alturaTxt} (altura) × ${circTxt} (circunferência)`, marginMm, y); y += 5;
+        pdfText(`Estrutura calculada: ${recommendedRows} fileiras × ${recommendedCols} colunas`, marginMm, y); y += 4;
+      }
+
+      pdf.setDrawColor(200); pdf.line(marginMm, y, pageW - marginMm, y); y += 8;
+
+      const availW = pageW - marginMm * 2;
+      const legendRows = Math.ceil(countEntries.length / 2);
+      const legendReserve = 12 + legendRows * 6 + 12;
+      const availH = pageH - y - marginMm - legendReserve;
+      const imgRatio = tmp.width / tmp.height;
+      let drawW = availW, drawH = availW / imgRatio;
+      if (drawH > availH) { drawH = availH; drawW = availH * imgRatio; }
+      const offsetX = marginMm + (availW - drawW) / 2;
+      pdf.setDrawColor(220); pdf.rect(offsetX - 0.5, y - 0.5, drawW + 1, drawH + 1);
+      pdf.addImage(imgData, 'JPEG', offsetX, y, drawW, drawH);
+      y += drawH + 10;
+
+      pdf.setFontSize(12); pdf.setTextColor(20);
+      pdfText('Legenda e Contagem de Miçangas:', marginMm, y); y += 6;
+
+      pdf.setFontSize(10.5);
+      const swatchSize = 4;
+      const legendColGap = availW / 2;
+      const legendStartY = y;
+      for (let i = 0; i < countEntries.length; i++) {
+        const [color, count] = countEntries[i];
+        const col = i % 2, row = Math.floor(i / 2);
+        const colX = marginMm + col * legendColGap;
+        const rowY = legendStartY + row * 6;
+        const rgb = hexToRgb(color);
+        pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+        pdf.setDrawColor(150);
+        pdf.rect(colX, rowY - swatchSize + 1, swatchSize, swatchSize, 'FD');
+        pdf.setTextColor(30);
+        pdfText(`${nearestColorName(color)}: ${count} miçangas (${estimateWeightLabel(count)})`, colX + swatchSize + 3, rowY);
+      }
+      y = legendStartY + legendRows * 6 + 2;
+      pdf.setFontSize(11);
+      pdfText(`Total Geral: ${totalMicangas} miçangas (peso aprox.: ${estimateWeightLabel(totalMicangas)})`, marginMm, y);
+
+      pdf.setFontSize(9); pdf.setTextColor(150);
+      pdfText('Trama Trama v0.9.23 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 8);
+
+      const sanitizedName = (rawName || 'Trama').replace(/[^\w\-]+/g, '_');
+      const filename = `${sanitizedName}_TramaTrama.pdf`;
+      pdf.save(filename);
+      showToast(`PDF "${filename}" baixado!`);
+  });
+
+  const imageInput = document.getElementById('imageInput');
+  const imagePreviewWrap = document.getElementById('imagePreviewWrap');
+  const imagePreview = document.getElementById('imagePreview');
+  const imageColorModeSelect = document.getElementById('imageColorMode');
+  const customColorCountDiv = document.getElementById('customColorCountDiv');
+  const customColorCount = document.getElementById('customColorCount');
+  const customColorSlider = document.getElementById('customColorSlider');
+  const generateImageBtn = document.getElementById('generateImageBtn');
+  const dimModeColsBtn = document.getElementById('dimModeCols');
+  const dimModeRowsBtn = document.getElementById('dimModeRows');
+  const imageDimLabel = document.getElementById('imageDimLabel');
+  const imageSizeBeadsInput = document.getElementById('imageSizeBeads');
+  const imageDimEstimate = document.getElementById('imageDimEstimate');
+
+  let loadedImg = null;
+  let imageDimMode = 'cols'; 
+
+  function setImageDimMode(mode) {
+    imageDimMode = mode;
+    dimModeColsBtn.classList.toggle('active', mode === 'cols');
+    dimModeRowsBtn.classList.toggle('active', mode === 'rows');
+    imageDimLabel.textContent = mode === 'cols' ? 'Largura (em colunas):' : 'Altura (em fileiras):';
+    updateImageEstimate();
+  }
+  dimModeColsBtn.addEventListener('click', () => setImageDimMode('cols'));
+  dimModeRowsBtn.addEventListener('click', () => setImageDimMode('rows'));
+
+  function updateImageEstimate() {
+    if (!loadedImg) { imageDimEstimate.textContent = '-- colunas × -- fileiras'; return; }
+    const sizeVal = Math.max(5, parseInt(imageSizeBeadsInput.value) || 40);
+    let cols, rows;
+    if (imageDimMode === 'cols') {
+      cols = sizeVal;
+      rows = Math.max(1, Math.round(cols * (loadedImg.height / loadedImg.width)));
+    } else {
+      rows = sizeVal;
+      cols = Math.max(1, Math.round(rows * (loadedImg.width / loadedImg.height)));
+    }
+    imageDimEstimate.textContent = `${cols} colunas × ${rows} fileiras`;
+  }
+  imageSizeBeadsInput.addEventListener('input', updateImageEstimate);
+
+  imageColorModeSelect.addEventListener('change', (e) => {
+    customColorCountDiv.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+
+  customColorSlider.addEventListener('input', (e) => { customColorCount.value = e.target.value; });
+  customColorCount.addEventListener('input', (e) => { customColorSlider.value = e.target.value; });
+
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImg = img;
+        const maxW = 300, maxH = 164;
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        imagePreview.width = img.width * scale;
+        imagePreview.height = img.height * scale;
+        const pCtx = imagePreview.getContext('2d');
+        pCtx.clearRect(0, 0, imagePreview.width, imagePreview.height);
+        pCtx.drawImage(img, 0, 0, imagePreview.width, imagePreview.height);
+        imagePreviewWrap.style.display = 'flex';
+        generateImageBtn.disabled = false;
+        updateImageEstimate();
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function getClosestBasicColor(r, g, b) {
+    let bestDist = Infinity, bestHex = '#000000';
+    BASIC_COLORS.forEach(hex => {
+        const c = hexToRgb(hex);
+        const dist = (c.r - r)**2 + (c.g - g)**2 + (c.b - b)**2;
+        if (dist < bestDist) { bestDist = dist; bestHex = hex; }
+    });
+    return bestHex;
+  }
+
+  function kMeansQuantize(pixels, k, maxIters = 8) {
+      if (pixels.length === 0) return {};
+      if (k > pixels.length) k = pixels.length;
+
+      let centroids = [];
+      for(let i = 0; i < k; i++) {
+          const p = pixels[Math.floor(Math.random() * pixels.length)];
+          centroids.push({r: p.r, g: p.g, b: p.b});
+      }
+
+      let assignments = new Int32Array(pixels.length);
+
+      for (let iter = 0; iter < maxIters; iter++) {
+          let clusterSums = Array(k).fill(0).map(() => ({r:0, g:0, b:0, count:0}));
+          let changed = false;
+
+          for (let i = 0; i < pixels.length; i++) {
+              let p = pixels[i];
+              let minDist = Infinity, bestC = 0;
+              for (let j = 0; j < k; j++) {
+                  let c = centroids[j];
+                  let dist = (p.r - c.r)**2 + (p.g - c.g)**2 + (p.b - c.b)**2;
+                  if (dist < minDist) { minDist = dist; bestC = j; }
+              }
+              if (assignments[i] !== bestC) changed = true;
+              assignments[i] = bestC;
+
+              clusterSums[bestC].r += p.r;
+              clusterSums[bestC].g += p.g;
+              clusterSums[bestC].b += p.b;
+              clusterSums[bestC].count++;
+          }
+
+          for (let j = 0; j < k; j++) {
+              if (clusterSums[j].count > 0) {
+                  centroids[j].r = clusterSums[j].r / clusterSums[j].count;
+                  centroids[j].g = clusterSums[j].g / clusterSums[j].count;
+                  centroids[j].b = clusterSums[j].b / clusterSums[j].count;
+              }
+          }
+
+          if (!changed) break; 
+      }
+
+      let resultMap = {};
+      for (let i = 0; i < pixels.length; i++) {
+          let c = centroids[assignments[i]];
+          resultMap[pixels[i].key] = rgbToHex(Math.round(c.r), Math.round(c.g), Math.round(c.b));
+      }
+      return resultMap;
+  }
+
+  generateImageBtn.addEventListener('click', () => {
+    if (!loadedImg) { showToast('Selecione uma imagem primeiro!'); return; }
+
+    const sizeVal = Math.max(5, parseInt(imageSizeBeadsInput.value) || 40);
+    const mode = imageColorModeSelect.value;
+    const targetColorCount = parseInt(customColorCount.value) || 5;
+
+    const originalText = generateImageBtn.innerHTML;
+    generateImageBtn.innerHTML = '⏳ Processando...';
+    generateImageBtn.disabled = true;
+
+    setTimeout(() => {
+        let wBeads, hBeads;
+        if (imageDimMode === 'cols') {
+          wBeads = sizeVal;
+          hBeads = Math.max(1, Math.round(wBeads * (loadedImg.height / loadedImg.width)));
+        } else {
+          hBeads = sizeVal;
+          wBeads = Math.max(1, Math.round(hBeads * (loadedImg.width / loadedImg.height)));
+        }
+        const scale = loadedImg.width / wBeads;
+
+        const imgCanvas = document.createElement('canvas');
+        imgCanvas.width = loadedImg.width;
+        imgCanvas.height = loadedImg.height;
+        const imgCtx = imgCanvas.getContext('2d');
+        imgCtx.drawImage(loadedImg, 0, 0);
+        const imgData = imgCtx.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
+
+        const limit = Math.ceil(wBeads + hBeads);
+        let collectedPixels = []; 
+        const changes = [];
+
+        for (let r = -limit; r <= limit; r++) {
+          for (let c = -limit; c <= limit; c++) {
+            
+            const x_beads = (c - r) / 2;
+            const y_beads = (c + r) / 2;
+            const img_x = Math.floor((x_beads + wBeads/2) * scale);
+            const img_y = Math.floor((y_beads + hBeads/2) * scale);
+
+            if (img_x >= 0 && img_x < loadedImg.width && img_y >= 0 && img_y < loadedImg.height) {
+               const idx = (img_y * loadedImg.width + img_x) * 4;
+               const a_val = imgData.data[idx+3];
+
+               if (a_val > 128) { 
+                  const r_val = imgData.data[idx];
+                  const g_val = imgData.data[idx+1];
+                  const b_val = imgData.data[idx+2];
+                  collectedPixels.push({ r: r_val, g: g_val, b: b_val, key: `${r},${c}` });
+               }
+            }
+          }
+        }
+
+        if (mode === 'custom' && collectedPixels.length > 0) {
+            const quantizedMap = kMeansQuantize(collectedPixels, Math.max(2, Math.min(32, targetColorCount)));
+            for (const px of collectedPixels) {
+                const finalColor = quantizedMap[px.key];
+                const prev = painted.get(px.key) || null;
+                if (prev !== finalColor) {
+                   painted.set(px.key, finalColor);
+                   changes.push({key: px.key, prev, next: finalColor});
+                }
+            }
+        } else {
+            for (const px of collectedPixels) {
+                let finalColor = '#000000';
+                if (mode === 'basic') {
+                  finalColor = getClosestBasicColor(px.r, px.g, px.b);
+                } else if (mode === 'bw') {
+                  const lum = 0.299*px.r + 0.587*px.g + 0.114*px.b;
+                  finalColor = lum > 127 ? '#ffffff' : '#000000';
+                }
+
+                const prev = painted.get(px.key) || null;
+                if (prev !== finalColor) {
+                   painted.set(px.key, finalColor);
+                   changes.push({key: px.key, prev, next: finalColor});
+                }
+            }
+        }
+
+        if (changes.length > 0) {
+          pushUndo({changes});
+          scheduleAutoSave();
+        }
+
+        generateImageBtn.innerHTML = originalText;
+        generateImageBtn.disabled = false;
+        document.getElementById('imageModal').classList.remove('active');
+        
+        showToast(`Imagem convertida! (${wBeads} colunas × ${hBeads} fileiras)`);
+        centerCanvas();
+        draw();
+        
+    }, 50); 
+  });
+
+  window.addEventListener('keydown', e => {
+      if(['INPUT','SELECT'].includes(e.target.tagName)) return;
+      
+      if(e.key==='1') setToolMode('brush'); 
+      if(e.key==='2') setToolMode('eraser');
+      if(e.key==='3') setToolMode('pipette'); 
+      if(e.key==='4') setToolMode('select');
+      if(e.key==='5') setToolMode('bucket');
+      if(e.key==='6') setToolMode('replace');
+      if(e.key==='7' || e.key.toLowerCase()==='h') setToolMode('hand');
+
+      if (e.code === 'Space' && !e.repeat && !isSpacePanning) {
+        e.preventDefault();
+        isSpacePanning = true;
+        toolBeforeSpace = currentToolMode;
+        setToolMode('hand');
+        return;
+      }
+
+      if(e.key==='ArrowUp') { e.preventDefault(); panBy(0, pStep); }
+      if(e.key==='ArrowDown') { e.preventDefault(); panBy(0, -pStep); }
+      if(e.key==='ArrowLeft') { e.preventDefault(); panBy(pStep, 0); }
+      if(e.key==='ArrowRight') { e.preventDefault(); panBy(-pStep, 0); }
+      
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+          if(currentToolMode === 'select' && !copyBtn.disabled) copyBtn.click();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'x') {
+          if(currentToolMode === 'select' && !cutBtn.disabled) cutBtn.click();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'v') {
+          if(clipboard && !pasteBtn.disabled) pasteBtn.click();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+          if (e.shiftKey) document.getElementById('redoBtn').click();
+          else document.getElementById('undoBtn').click();
+      }
+
+      if(e.key === 'Escape') {
+          e.preventDefault();
+          document.querySelectorAll('.modal-overlay').forEach(m=> {
+            m.classList.remove('active');
+            if (m.id === 'dimModal' && recommendedRows !== null && recommendedCols !== null) {
+              fitScreenBtn.click();
+            }
+          });
+          if (currentToolMode === 'paste') {
+              setToolMode('select');
+          } else if (selectedCells.size > 0 || isSelecting) {
+              cancelSelectBtn.click();
+          } else if (currentToolMode === 'select') {
+              setToolMode('brush');
+          } else if (!document.getElementById('trama3dPanel').hidden) {
+              switchPanel('colorPanel', true);
+          }
+      }
+
+      if(e.key === 'Delete' || e.key === 'Backspace') {
+          if (selectedCells.size > 0) {
+              e.preventDefault();
+              deleteSelBtn.click();
+          }
+      }
+  });
+
+  window.addEventListener('keyup', e => {
+    if(['INPUT','SELECT'].includes(e.target.tagName)) return;
+    if (e.code === 'Space' && isSpacePanning) {
+      e.preventDefault();
+      isSpacePanning = false;
+      if (toolBeforeSpace) {
+        setToolMode(toolBeforeSpace);
+        toolBeforeSpace = null;
+      }
+    }
+  });
+
+  window.addEventListener('blur', () => {
+    if (isSpacePanning) {
+      isSpacePanning = false;
+      if (toolBeforeSpace) setToolMode(toolBeforeSpace);
+      toolBeforeSpace = null;
+    }
+    isPanning = false;
+    pointerDownInfo = null;
+  });
+
+  canvas.addEventListener('pointercancel', () => {
+    isPanning = false;
+    pointerDownInfo = null;
+    if (currentToolMode === 'hand') canvas.style.cursor = 'grab';
+    else canvas.style.cursor = 'crosshair';
+  });
+
+  // Initialization
+  buildColorPalette(); renderRecentColors(); refreshSaves(); updateSelectionState();
+  try { const raw=localStorage.getItem('tt_autosave'); if(raw){ const d=JSON.parse(raw); if(isValidTramaData(d)) loadData(d); } } catch(e){}
+  window.addEventListener('resize', draw);
+  fitScreenBtn.click();
+})();
+</script>
+</body>
+</html>
