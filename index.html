@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-  <title>Trama Trama 0.9.25 / Trama Xequerê</title>
+  <title>Trama Trama 0.9.26 / Trama Xequerê</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -474,9 +474,12 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     let renderer, scene, camera, controls, rafId = null;
+    let modelGroup = null;
     let beadMesh = null, sphereMesh = null, seamLine = null;
     let ambientLight = null, keyLight = null, fillLight = null;
     let ghostMode = false, seamVisible = true;
+    let rotateSpeedLevel = 0; // 0: parado, 1: lenta, 2: média, 3: rápida
+    let rotateAxis = 'horizontal'; // 'horizontal' ou 'vertical'
     let lastRadius = 10;
     let container = null;
     const dummy = new THREE.Object3D();
@@ -492,6 +495,9 @@
       scene = new THREE.Scene();
       scene.background = new THREE.Color(0xffffff);
 
+      modelGroup = new THREE.Group();
+      scene.add(modelGroup);
+
       camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
       camera.position.set(0, 0, 4.2);
 
@@ -505,7 +511,6 @@
       controls.minDistance = 1.2;
       controls.maxDistance = 12;
       controls.autoRotate = false;
-      controls.autoRotateSpeed = 2.2;
 
       ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
       scene.add(ambientLight);
@@ -533,6 +538,17 @@
     function animate() {
       rafId = requestAnimationFrame(animate);
       onResize();
+
+      if (modelGroup && rotateSpeedLevel > 0) {
+        const speeds = [0, 0.007, 0.018, 0.042];
+        const s = speeds[rotateSpeedLevel] || 0.018;
+        if (rotateAxis === 'vertical') {
+          modelGroup.rotation.x += s;
+        } else {
+          modelGroup.rotation.y += s;
+        }
+      }
+
       controls.update();
       renderer.render(scene, camera);
     }
@@ -543,7 +559,12 @@
       const isFirstBuild = !beadMesh;
       lastRadius = radius;
 
-      if (sphereMesh) { sphereMesh.geometry.dispose(); sphereMesh.material.dispose(); scene.remove(sphereMesh); }
+      if (!modelGroup) {
+        modelGroup = new THREE.Group();
+        scene.add(modelGroup);
+      }
+
+      if (sphereMesh) { sphereMesh.geometry.dispose(); sphereMesh.material.dispose(); modelGroup.remove(sphereMesh); }
       const sphereGeo = buildSphereGeometry(radius);
       const sphereMat = new THREE.MeshStandardMaterial({
         color: 0xB5651D,
@@ -555,9 +576,9 @@
       });
       sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
       sphereMesh.visible = !ghostMode;
-      scene.add(sphereMesh);
+      modelGroup.add(sphereMesh);
 
-      if (beadMesh) { beadMesh.geometry.dispose(); beadMesh.material.dispose(); scene.remove(beadMesh); }
+      if (beadMesh) { beadMesh.geometry.dispose(); beadMesh.material.dispose(); modelGroup.remove(beadMesh); }
       const beadGeo = new THREE.SphereGeometry((beadDiameterCm || 1) / 2, 14, 12);
       const beadMat = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.08, vertexColors: true });
       const count = Math.max(cells.length, 1);
@@ -589,9 +610,9 @@
       }
       beadMesh.geometry.setAttribute('color', new THREE.InstancedBufferAttribute(colorArr, 3));
       beadMesh.instanceMatrix.needsUpdate = true;
-      scene.add(beadMesh);
+      modelGroup.add(beadMesh);
 
-      if (seamLine) { seamLine.geometry.dispose(); seamLine.material.dispose(); scene.remove(seamLine); }
+      if (seamLine) { seamLine.geometry.dispose(); seamLine.material.dispose(); modelGroup.remove(seamLine); }
       const seamPts = [];
       for (let i = 0; i <= 40; i++) {
         const phiDeg = 60 - (i / 40) * 120;
@@ -603,7 +624,7 @@
       const seamMat = new THREE.LineBasicMaterial({ color: 0xf97316, transparent: true, opacity: 0.9, linewidth: 2 });
       seamLine = new THREE.Line(seamGeo, seamMat);
       seamLine.visible = seamVisible;
-      scene.add(seamLine);
+      modelGroup.add(seamLine);
 
       camera.near = Math.max(radius * 0.01, 0.05);
       camera.far = radius * 50;
@@ -631,8 +652,60 @@
       if (seamLine) seamLine.visible = val;
     }
 
-    function setAutoRotate(val) {
-      if (controls) controls.autoRotate = val;
+    function setRotateSpeedLevel(level) {
+      if (typeof level === 'boolean') {
+        rotateSpeedLevel = level ? 2 : 0;
+      } else {
+        rotateSpeedLevel = Math.max(0, Math.min(3, parseInt(level, 10) || 0));
+      }
+    }
+
+    function setRotateAxis(axis) {
+      rotateAxis = (axis === 'vertical') ? 'vertical' : 'horizontal';
+    }
+
+    function resetView() {
+      if (modelGroup) {
+        modelGroup.rotation.set(0, 0, 0);
+      }
+      if (camera && controls) {
+        camera.position.set(0, lastRadius * 0.3, lastRadius * 3.1);
+        controls.target.set(0, 0, 0);
+        controls.update();
+      }
+    }
+
+    function setViewpoint(name) {
+      if (!camera || !controls) return;
+      if (modelGroup) modelGroup.rotation.set(0, 0, 0);
+      const D = lastRadius * 3.1;
+      const yNorm = lastRadius * 0.3;
+      controls.target.set(0, 0, 0);
+
+      switch (name) {
+        case 'top':
+          camera.position.set(0, D, 0.001);
+          break;
+        case 'top-front':
+          camera.position.set(0, D * 0.7071, D * 0.7071);
+          break;
+        case 'bottom':
+          camera.position.set(0, -D, 0.001);
+          break;
+        case 'front':
+          camera.position.set(0, yNorm, D);
+          break;
+        case 'back':
+          camera.position.set(0, yNorm, -D);
+          break;
+        case 'left':
+          camera.position.set(-D, yNorm, 0);
+          break;
+        case 'right':
+          camera.position.set(D, yNorm, 0);
+          break;
+      }
+      controls.update();
     }
 
     function capture() {
@@ -648,8 +721,6 @@
           return;
         }
         try {
-          // Grava em uma taxa de quadros mais leve (24fps) e bitrate reduzido
-          // para priorizar fluidez em vez de resolução máxima (sem modo HD).
           const stream = renderer.domElement.captureStream(24);
           const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ? 'video/webm;codecs=vp8'
             : (MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : '');
@@ -674,8 +745,10 @@
     function resume() { if (!rafId && renderer) animate(); }
 
     window.Trama3D = {
-      ensureScene, build, setGhost, setSeamVisible, setAutoRotate, capture, onResize,
-      recordVideo, pause, resume
+      ensureScene, build, setGhost, setSeamVisible, 
+      setRotateSpeedLevel, setRotateAxis,
+      setAutoRotate: setRotateSpeedLevel,
+      resetView, setViewpoint, capture, onResize, recordVideo, pause, resume
     };
   </script>
 </head>
@@ -805,13 +878,31 @@
 
       <!-- PAINEL TRAMA 3D -->
       <div class="panel-section" id="trama3dPanel" hidden>
+        <!-- Bloco 1: Atualizar, Emenda, Transparência -->
         <div class="tool-grid">
-          <button id="trama3dRotateBtn" class="rail-btn-small" title="Girar automaticamente (Atalho: R ou Espaço)">🔁</button>
-          <button id="trama3dGhostBtn" class="rail-btn-small" title="Modo Fantasma / Transparência (Atalho: F)">👻</button>
-          <button id="trama3dSeamBtn" class="rail-btn-small active" title="Mostrar linha de emenda (Atalho: E)">🧵</button>
-          <button id="trama3dRefreshBtn" class="rail-btn-small" title="Atualizar com desenho atual (Atalho: U)">🔄</button>
+          <button id="trama3dRefreshBtn" class="rail-btn-small" title="Atualizar e focar na emenda (Atalho: U)">🔁</button>
+          <button id="trama3dSeamBtn" class="rail-btn-small active" title="Mostrar linha de emenda (Atalho: E)">📍</button>
+          <button id="trama3dGhostBtn" class="rail-btn-small" title="Transparência (Atalho: F)">⭕</button>
         </div>
         <div class="rail-sep"></div>
+        <!-- Bloco 2: Pontos de Vista -->
+        <div class="tool-grid">
+          <button id="trama3dViewTopBtn" class="rail-btn-small" title="Vista superior">⬇️</button>
+          <button id="trama3dViewTopFrontBtn" class="rail-btn-small" title="Vista superior frontal">↘️</button>
+          <button id="trama3dViewBottomBtn" class="rail-btn-small" title="Vista inferior">⬆️</button>
+          <button id="trama3dViewFrontBtn" class="rail-btn-small" title="Vista frontal">⤵️</button>
+          <button id="trama3dViewBackBtn" class="rail-btn-small" title="Vista traseira">⤴️</button>
+          <button id="trama3dViewLeftBtn" class="rail-btn-small" title="Vista lateral esquerda">➡️</button>
+          <button id="trama3dViewRightBtn" class="rail-btn-small" title="Vista lateral direita">⬅️</button>
+        </div>
+        <div class="rail-sep"></div>
+        <!-- Bloco 3: Botões Giro -->
+        <div class="tool-grid">
+          <button id="trama3dRotateBtn" class="rail-btn-small" title="Rotação automática: Parada (Atalho: R ou Espaço)">🔄</button>
+          <button id="trama3dAxisBtn" class="rail-btn-small" title="Eixo de rotação: Horizontal ↔️ (Atalho: X)">↔️</button>
+        </div>
+        <div class="rail-sep"></div>
+        <!-- Bloco 4: Baixar Img; Baixar Vídeo -->
         <div class="tool-grid">
           <button id="trama3dCaptureBtn" class="rail-btn-small" title="Baixar imagem (Atalho: P)">📸</button>
           <button id="trama3dRecordBtn" class="rail-btn-small" title="Gravar 15s do giro em vídeo">🎥</button>
@@ -1008,7 +1099,7 @@
 <!-- Modal: Sobre -->
 <div id="aboutModal" class="modal-overlay">
   <div class="modal-card">
-    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:11px; background:#fff7ed; color:#c2410c; padding:2px 6px; border-radius:8px; border:1px solid #fed7aa;">v0.9.25</span></h3>
+    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:11px; background:#fff7ed; color:#c2410c; padding:2px 6px; border-radius:8px; border:1px solid #fed7aa;">v0.9.26</span></h3>
     <div style="font-size:13px; line-height:1.55; color:#57534e;">
       <p><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
       <p><b>📏 Dimensionamento Inteligente:</b> Cálculo bidirecional instantâneo entre centímetros reais da cabaça e contagem de fileiras/colunas.</p>
@@ -1019,12 +1110,12 @@
   </div>
 </div>
 
-<!-- Modal: Ajuda & Guia Completo (Accordion Restaurado com 10 Seções) -->
+<!-- Modal: Ajuda & Guia Completo (Accordion com 10 Seções) -->
 <div id="helpModal" class="modal-overlay">
   <div class="modal-card help-modal-card">
     <h3 class="modal-title" style="justify-content: space-between;">
       <span>📖 Guia Completo do Trama Trama</span>
-      <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.25</span>
+      <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.26</span>
     </h3>
 
     <div class="help-search-box">
@@ -1122,12 +1213,22 @@
         <div class="help-accordion-content">
           <p style="margin: 8px 0 6px 0;">Permite inspecionar o fechamento da rede ao redor de uma esfera 3D <i>(Requer dimensionamento prévio em 📏)</i>.</p>
           <ul>
-            <li><b>🔁 Girar (<kbd>R</kbd> ou <kbd>Espaço</kbd>):</b> Alterna a rotação automática contínua da peça.</li>
-            <li><b>👻 Modo Fantasma (<kbd>F</kbd>):</b> Torna a esfera virtual de apoio 100% invisível para permitir ver a trama de ambos os lados simultaneamente.</li>
-            <li><b>🧵 Linha de Emenda (<kbd>E</kbd>):</b> Exibe ou oculta o meridiano vertical onde a trama se fecha ao redor da cabaça.</li>
-            <li><b>🔄 Atualizar (<kbd>U</kbd> ou <kbd>Enter</kbd>):</b> Reconstrói a malha trazendo as novas miçangas pintadas no canvas.</li>
+            <li><b>🔁 Atualizar (<kbd>U</kbd> ou <kbd>Enter</kbd>):</b> Reconstrói a malha trazendo as novas miçangas pintadas no canvas e retoma a visão frontal focada na linha de emenda.</li>
+            <li><b>📍 Linha de Emenda (<kbd>E</kbd>):</b> Exibe ou oculta o meridiano vertical onde a trama se fecha ao redor da cabaça.</li>
+            <li><b>⭕ Transparência (<kbd>F</kbd>):</b> Torna a esfera virtual de apoio 100% invisível para permitir ver a trama de ambos os lados simultaneamente.</li>
+            <li><b>Pontos de Vista Rápidos:</b>
+              <br>• <b>⬇️ Vista superior:</b> Ângulo superior olhando o topo da cabaça.
+              <br>• <b>↘️ Vista superior frontal:</b> Perspectiva diagonal de cima para baixo voltada para a frente da peça.
+              <br>• <b>⬆️ Vista inferior:</b> Ângulo inferior olhando a base da cabaça.
+              <br>• <b>⤵️ Vista frontal:</b> Visão frontal alinhada diretamente com a emenda.
+              <br>• <b>⤴️ Vista traseira:</b> Visão do lado posterior oposto à emenda.
+              <br>• <b>➡️ Vista lateral esquerda:</b> Inspeção da lateral esquerda da esfera.
+              <br>• <b>⬅️ Vista lateral direita:</b> Inspeção da lateral direita da esfera.
+            </li>
+            <li><b>🔄 Rotação Automática (<kbd>R</kbd> ou <kbd>Espaço</kbd>):</b> Alterna a rotação contínua entre 4 níveis: <i>Parada &rarr; Lenta &rarr; Média &rarr; Rápida</i>. A intensidade é refletida na cor do botão.</li>
+            <li><b>↔️ / ↕️ Alternar Eixo (<kbd>X</kbd>):</b> Define se o giro ocorre no <b>Eixo Horizontal ↔️</b> ou no <b>Eixo Vertical ↕️</b>.</li>
             <li><b>📸 Imagem (<kbd>P</kbd>):</b> Exporta arquivo <code>.png</code> do ângulo de visão atual.</li>
-            <li><b>🎥 Gravação de Vídeo:</b> Grava um giro completo de 15 segundos em vídeo <code>.webm</code> leve e estável da peça tridimensional.</li>
+            <li><b>🎥 Gravação de Vídeo:</b> Grava um giro de 15 segundos em vídeo <code>.webm</code> leve e estável da peça tridimensional.</li>
             <li><b>Retornar ao 2D (<kbd>Esc</kbd>):</b> Sai da visualização 3D e retorna à mesa de pintura.</li>
           </ul>
         </div>
@@ -1489,7 +1590,6 @@
     let h = parseFloat(dimHeightInput.value);
     let circ = parseFloat(dimCircInput.value);
 
-    // Se preencheu cm mas não o número de miçangas
     if ((isNaN(r) || r <= 0) && !isNaN(h) && h > 0) {
       r = Math.max(1, Math.round(h / BEAD_GRID_FACTOR));
       dimRowsInput.value = r;
@@ -1499,7 +1599,6 @@
       dimColsInput.value = c;
     }
 
-    // Se preencheu miçangas mas não cm
     if ((isNaN(h) || h <= 0) && !isNaN(r) && r > 0) {
       h = r * BEAD_GRID_FACTOR;
       dimHeightInput.value = formatCm(h);
@@ -1787,10 +1886,13 @@
   let trama3dLastBuiltRevision = -1;
   let trama3dGhost = false;
   let trama3dSeam = true;
-  let trama3dAutoRotate = false;
+  let trama3dRotateSpeed = 0; // 0: parada, 1: lenta, 2: média, 3: rápida
+  let trama3dRotateAxis = 'horizontal'; // 'horizontal' ou 'vertical'
   let trama3dPollTimer = null;
   const trama3dCanvasWrap = document.getElementById('trama3dCanvasWrap');
   const trama3dEmptyState = document.getElementById('trama3dEmptyState');
+  const trama3dRotateBtn = document.getElementById('trama3dRotateBtn');
+  const trama3dAxisBtn = document.getElementById('trama3dAxisBtn');
 
   function trama3dHasMoldura() {
     return recommendedRows !== null && recommendedCols !== null && recommendedRows > 0 && recommendedCols > 0;
@@ -1842,8 +1944,6 @@
     trama3dRefreshUI();
     if (!trama3dHasMoldura()) return;
     requestAnimationFrame(() => {
-      // Se o usuário já trocou de painel antes deste frame rodar, aborta
-      // para evitar reconstruir/renderizar a cena 3D num estado inválido.
       if (myToken !== trama3dActivationToken) return;
       if (!trama3dCanvasWrap.classList.contains('active')) return;
       if (!window.Trama3D) return;
@@ -1853,7 +1953,8 @@
         window.Trama3D.onResize();
         window.Trama3D.setGhost(trama3dGhost);
         window.Trama3D.setSeamVisible(trama3dSeam);
-        window.Trama3D.setAutoRotate(trama3dAutoRotate);
+        window.Trama3D.setRotateSpeedLevel(trama3dRotateSpeed);
+        window.Trama3D.setRotateAxis(trama3dRotateAxis);
         trama3dRebuild(true);
       } catch (err) {
         console.error('Erro ao ativar Trama 3D:', err);
@@ -1868,7 +1969,7 @@
   }
 
   function trama3dDeactivate() {
-    trama3dActivationToken++; // invalida qualquer ativação pendente em rAF
+    trama3dActivationToken++;
     trama3dCanvasWrap.classList.remove('active');
     canvas.style.display = '';
     canvasModeBadge.style.display = '';
@@ -1879,17 +1980,57 @@
     }
   }
 
-  document.getElementById('trama3dRotateBtn').addEventListener('click', (e) => {
-    trama3dAutoRotate = !trama3dAutoRotate;
-    e.currentTarget.classList.toggle('active', trama3dAutoRotate);
-    if (window.Trama3D) window.Trama3D.setAutoRotate(trama3dAutoRotate);
+  function updateRotateBtnAppearance() {
+    trama3dRotateBtn.classList.remove('active');
+    trama3dRotateBtn.style.background = '';
+    trama3dRotateBtn.style.color = '';
+    trama3dRotateBtn.style.borderColor = '';
+
+    const axisIcon = trama3dRotateAxis === 'horizontal' ? '↔️' : '↕️';
+
+    if (trama3dRotateSpeed === 0) {
+      trama3dRotateBtn.title = 'Rotação automática: Parada (Atalho: R ou Espaço)';
+    } else if (trama3dRotateSpeed === 1) {
+      trama3dRotateBtn.style.background = '#fed7aa';
+      trama3dRotateBtn.style.color = '#9a3412';
+      trama3dRotateBtn.style.borderColor = '#fdba74';
+      trama3dRotateBtn.title = `Rotação: Lenta ${axisIcon} (Atalho: R ou Espaço)`;
+    } else if (trama3dRotateSpeed === 2) {
+      trama3dRotateBtn.style.background = '#f97316';
+      trama3dRotateBtn.style.color = '#ffffff';
+      trama3dRotateBtn.style.borderColor = '#ea580c';
+      trama3dRotateBtn.title = `Rotação: Média ${axisIcon} (Atalho: R ou Espaço)`;
+    } else if (trama3dRotateSpeed === 3) {
+      trama3dRotateBtn.classList.add('active');
+      trama3dRotateBtn.title = `Rotação: Rápida ${axisIcon} (Atalho: R ou Espaço)`;
+    }
+  }
+
+  trama3dRotateBtn.addEventListener('click', () => {
+    trama3dRotateSpeed = (trama3dRotateSpeed + 1) % 4;
+    updateRotateBtnAppearance();
+    if (window.Trama3D) window.Trama3D.setRotateSpeedLevel(trama3dRotateSpeed);
+
+    const axisIcon = trama3dRotateAxis === 'horizontal' ? '↔️ Horizontal' : '↕️ Vertical';
+    const labels = ['Rotação parada', `Rotação: Lenta (${axisIcon})`, `Rotação: Média (${axisIcon})`, `Rotação: Rápida (${axisIcon})`];
+    showToast(labels[trama3dRotateSpeed]);
+  });
+
+  trama3dAxisBtn.addEventListener('click', () => {
+    trama3dRotateAxis = (trama3dRotateAxis === 'horizontal') ? 'vertical' : 'horizontal';
+    const isH = trama3dRotateAxis === 'horizontal';
+    trama3dAxisBtn.textContent = isH ? '↔️' : '↕️';
+    trama3dAxisBtn.title = `Eixo de rotação: ${isH ? 'Horizontal ↔️' : 'Vertical ↕️'} (Atalho: X)`;
+    updateRotateBtnAppearance();
+    if (window.Trama3D) window.Trama3D.setRotateAxis(trama3dRotateAxis);
+    showToast(`Eixo de rotação: ${isH ? 'Horizontal ↔️' : 'Vertical ↕️'}`);
   });
 
   document.getElementById('trama3dGhostBtn').addEventListener('click', (e) => {
     trama3dGhost = !trama3dGhost;
     e.currentTarget.classList.toggle('active', trama3dGhost);
     if (window.Trama3D) window.Trama3D.setGhost(trama3dGhost);
-    showToast(trama3dGhost ? 'Modo Fantasma ativado' : 'Modo Fantasma desativado');
+    showToast(trama3dGhost ? 'Transparência ativada' : 'Transparência desativada');
   });
 
   document.getElementById('trama3dSeamBtn').addEventListener('click', (e) => {
@@ -1901,7 +2042,8 @@
   document.getElementById('trama3dRefreshBtn').addEventListener('click', () => {
     if (!trama3dHasMoldura()) { showToast('Defina as medidas em 📏 Dimensionar Trama primeiro.'); return; }
     trama3dRebuild(true);
-    showToast('Trama 3D atualizada!');
+    if (window.Trama3D && window.Trama3D.resetView) window.Trama3D.resetView();
+    showToast('Trama 3D atualizada e focada na emenda!');
   });
 
   document.getElementById('trama3dCaptureBtn').addEventListener('click', () => {
@@ -1915,11 +2057,37 @@
     showToast('Foto salva!');
   });
 
+  const viewButtons = [
+    { id: 'trama3dViewTopBtn', view: 'top', label: 'Vista superior' },
+    { id: 'trama3dViewTopFrontBtn', view: 'top-front', label: 'Vista superior frontal' },
+    { id: 'trama3dViewBottomBtn', view: 'bottom', label: 'Vista inferior' },
+    { id: 'trama3dViewFrontBtn', view: 'front', label: 'Vista frontal' },
+    { id: 'trama3dViewBackBtn', view: 'back', label: 'Vista traseira' },
+    { id: 'trama3dViewLeftBtn', view: 'left', label: 'Vista lateral esquerda' },
+    { id: 'trama3dViewRightBtn', view: 'right', label: 'Vista lateral direita' }
+  ];
+
+  viewButtons.forEach(({ id, view, label }) => {
+    const btn = document.getElementById(id);
+    if (btn) {
+      btn.addEventListener('click', () => {
+        if (!trama3dHasMoldura()) {
+          showToast('Defina as medidas em 📏 Dimensionar Trama primeiro.');
+          return;
+        }
+        if (window.Trama3D && window.Trama3D.setViewpoint) {
+          window.Trama3D.setViewpoint(view);
+          showToast(label);
+        }
+      });
+    }
+  });
+
   document.getElementById('trama3dRecordBtn').addEventListener('click', async (e) => {
     if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Defina a moldura para gravar.'); return; }
     const btn = e.currentTarget;
-    const wasAutoRotate = trama3dAutoRotate;
-    if (!wasAutoRotate) window.Trama3D.setAutoRotate(true);
+    const prevSpeed = trama3dRotateSpeed;
+    if (prevSpeed === 0 && window.Trama3D) window.Trama3D.setRotateSpeedLevel(2);
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = '⏺️ 15s';
@@ -1935,7 +2103,7 @@
     } catch (err) {
       showToast('Gravação de vídeo não suportada neste navegador.');
     } finally {
-      if (!wasAutoRotate) window.Trama3D.setAutoRotate(false);
+      if (prevSpeed === 0 && window.Trama3D) window.Trama3D.setRotateSpeedLevel(0);
       btn.disabled = false;
       btn.textContent = original;
     }
@@ -2224,7 +2392,6 @@
       const hasSel = selectedCells.size > 0;
       const changes = [];
 
-      // Cenário 1: Há uma seleção ativa delimitada
       if (hasSel) {
           for (const key of selectedCells) {
               const prev = painted.get(key) || null;
@@ -2247,9 +2414,7 @@
 
       const inMoldura = isCellInsideMoldura(startCell.r, startCell.c);
 
-      // Cenário 2: Preenchendo área vazia/fundo (targetColor === null)
       if (targetColor === null) {
-          // 2A: Clique dentro da régua / moldura ativa
           if (inMoldura) {
               const stack = [startCell];
               const visited = new Set([startKey]);
@@ -2265,7 +2430,6 @@
 
                       const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
                       for (const n of neighbors) {
-                          // A régua atua como barreira física rígida: nunca ultrapassa suas bordas
                           if (isCellInsideMoldura(n.r, n.c)) {
                               const nk = `${n.r},${n.c}`;
                               if (!visited.has(nk)) {
@@ -2289,13 +2453,11 @@
               return;
           }
 
-          // 2B: Clique fora da régua (ou sem régua definida)
           if (painted.size === 0) {
               showToast('Área aberta! O balde precisa de um contorno fechado ou da régua para não derramar.');
               return;
           }
 
-          // Calcula a caixa delimitadora (bounding box) das miçangas existentes
           let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
           for (const k of painted.keys()) {
               const [pr, pc] = k.split(',').map(Number);
@@ -2303,13 +2465,11 @@
               if (pc < minC) minC = pc; if (pc > maxC) maxC = pc;
           }
 
-          // Se o clique começou fora do envelope das miçangas pintadas, é espaço aberto infinito
           if (startCell.r < minR || startCell.r > maxR || startCell.c < minC || startCell.c > maxC) {
               showToast('Área aberta! O balde precisa de um contorno fechado para não derramar.');
               return;
           }
 
-          // Preenchimento com detecção de vazamento (leak detection)
           const stack = [startCell];
           const visited = new Set([startKey]);
           const fillCells = [];
@@ -2331,7 +2491,6 @@
 
                   const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
                   for (const n of neighbors) {
-                      // Se algum vizinho escapar da caixa delimitadora do desenho, o contorno vazou
                       if (n.r < minR || n.r > maxR || n.c < minC || n.c > maxC) {
                           leaked = true;
                           break;
@@ -2363,7 +2522,6 @@
           return;
       }
 
-      // Cenário 3: Preenchimento sobre miçangas já pintadas (substituição contígua de cor)
       const stack = [startCell];
       const visited = new Set([startKey]);
 
@@ -2794,8 +2952,6 @@
     const pctx = clipPreviewCanvas.getContext('2d'), W=48, H=48;
     pctx.fillStyle = backgroundColor; pctx.fillRect(0,0,W,H);
 
-    // Calcula a bounding box real (em espaço de célula) das posições dr/dc
-    // presentes no clipboard, para centralizar o preview com precisão.
     let minDr = Infinity, maxDr = -Infinity, minDc = Infinity, maxDc = -Infinity;
     for (const rk of clipboard.cells.keys()) {
       const [dr, dc] = rk.split(',').map(Number);
@@ -2904,7 +3060,7 @@
   let autosaveTimer = null;
   function buildData(name) {
     return { 
-      app:'TramaTrama', version:'0.9.25', name, author:document.getElementById('tramaAuthor').value,
+      app:'TramaTrama', version:'0.9.26', name, author:document.getElementById('tramaAuthor').value,
       savedAt:new Date().toISOString(), bg:backgroundColor, grid:gridVisible, style:renderStyle,
       recRows: recommendedRows, recCols: recommendedCols,
       savedHeight: savedTramaHeight, savedCircum: savedTramaCircum,
@@ -3151,7 +3307,7 @@
       pdf.text(`Total Geral: ${totalMicangas} miçangas (peso aprox.: ${estimateWeightLabel(totalMicangas)})`, marginMm, y);
 
       pdf.setFontSize(9); pdf.setTextColor(150);
-      pdf.text('Trama Trama v0.9.25 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 8);
+      pdf.text('Trama Trama v0.9.26 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 8);
 
       const sanitizedName = (rawName || 'Trama').replace(/[^\w\-]+/g, '_');
       const filename = `${sanitizedName}_TramaTrama.pdf`;
@@ -3271,7 +3427,6 @@
 
               clusterSums[bestC].r += p.r;
               clusterSums[bestC].g += p.g;
-              clusterSums[bestC].b += p.b;
               clusterSums[bestC].count++;
           }
 
@@ -3406,7 +3561,8 @@
 
       if (!document.getElementById('trama3dPanel').hidden) {
         const k3d = e.key.toLowerCase();
-        if (k3d === 'r' || e.code === 'Space') { e.preventDefault(); document.getElementById('trama3dRotateBtn').click(); return; }
+        if (k3d === 'r' || e.code === 'Space') { e.preventDefault(); trama3dRotateBtn.click(); return; }
+        if (k3d === 'x') { e.preventDefault(); trama3dAxisBtn.click(); return; }
         if (k3d === 'f') { e.preventDefault(); document.getElementById('trama3dGhostBtn').click(); return; }
         if (k3d === 'e') { e.preventDefault(); document.getElementById('trama3dSeamBtn').click(); return; }
         if (k3d === 'u' || e.key === 'Enter') { e.preventDefault(); document.getElementById('trama3dRefreshBtn').click(); return; }
