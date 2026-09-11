@@ -22,7 +22,7 @@
       --border-color: rgba(231, 229, 228, 0.9);
       --border-dark: rgba(214, 211, 209, 0.9);
       --shadow-float: 0 16px 36px -4px rgba(0, 0, 0, 0.22), 0 6px 16px -2px rgba(0, 0, 0, 0.12);
-      --sidebar-width: 66px;
+      --sidebar-width: 50px;
     }
     
     * { box-sizing: border-box; font-family: var(--font-main) !important; }
@@ -35,7 +35,7 @@
     }
     
     button, input, select {
-      font-size: 13px; padding: 7px; border-radius: 6px;
+      font-size: 11.5px; padding: 6px; border-radius: 5px;
       border: 1px solid var(--border-dark);
       background: #ffffff; color: var(--text-main);
       transition: all 0.15s ease;
@@ -119,7 +119,7 @@
       background: var(--bg-surface);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-radius: 18px;
+      border-radius: 16px;
       border: 1px solid rgba(255, 255, 255, 0.7);
       box-shadow: var(--shadow-float);
       z-index: 40;
@@ -137,8 +137,8 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 10px 5px;
-      gap: 6px;
+      padding: 8px 4px;
+      gap: 5px;
       height: 100%;
       min-height: 0;
       overflow-y: auto;
@@ -160,37 +160,37 @@
       width: 60%;
       height: 1px;
       background: var(--border-dark);
-      margin: 4px auto;
+      margin: 3px auto;
       flex-shrink: 0;
     }
     
     .rail-btn {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       padding: 0;
-      font-size: 20px;
-      border-radius: 12px;
+      font-size: 16px;
+      border-radius: 9px;
       flex-shrink: 0;
       position: relative;
     }
     .rail-btn-small {
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       padding: 0;
-      font-size: 18px;
-      border-radius: 12px;
+      font-size: 15px;
+      border-radius: 9px;
       flex-shrink: 0;
     }
-    .btn-text-icon { font-size: 14px; font-weight: 800; color: #44403c; }
+    .btn-text-icon { font-size: 12px; font-weight: 800; color: #44403c; }
     .icon-rotate-45 { display: inline-block; transform: rotate(45deg); }
     #recentColorsSection { display: contents; }
     #recentColorsSection[hidden] { display: none; }
 
     .save-badge-rail {
-      width: 48px;
-      font-size: 10px;
-      padding: 5px 2px;
-      border-radius: 9px;
+      width: 36px;
+      font-size: 9px;
+      padding: 4px 1px;
+      border-radius: 7px;
       background: rgba(34, 197, 94, 0.15);
       color: #15803d;
       border: 1px solid rgba(34, 197, 94, 0.35);
@@ -202,7 +202,7 @@
       flex-shrink: 0;
       user-select: none;
       transition: all 0.2s ease;
-      line-height: 1.15;
+      line-height: 1.1;
     }
     .save-badge-rail.saving {
       background: rgba(245, 158, 11, 0.18);
@@ -210,32 +210,32 @@
       border-color: rgba(245, 158, 11, 0.4);
     }
 
-    .panel-section { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; }
+    .panel-section { display: flex; flex-direction: column; align-items: center; gap: 5px; width: 100%; }
     .panel-section[hidden] { display: none !important; }
 
     .color-grid, .tool-grid {
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 5px;
       width: 100%;
       align-items: center;
       padding: 0;
     }
     
     .swatch { 
-      width: 48px; height: 48px; border-radius: 12px; 
+      width: 36px; height: 36px; border-radius: 9px; 
       border: 1px solid rgba(0,0,0,0.18); cursor: pointer; padding: 0; 
       box-shadow: inset 0 0 2px rgba(0,0,0,0.15);
       flex-shrink: 0;
     }
-    .swatch.selected { outline: 2.5px solid var(--primary); outline-offset: 2px; transform: scale(1.05); }
+    .swatch.selected { outline: 2.5px solid var(--primary); outline-offset: 1.5px; transform: scale(1.05); }
 
     .clip-preview {
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 8px;
       background: #B5651D;
-      width: 48px;
-      height: 48px;
+      width: 36px;
+      height: 36px;
       margin: 0 auto;
       flex-shrink: 0;
     }
@@ -249,10 +249,10 @@
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     .modal-card {
-      background: #ffffff; border-radius: 16px; padding: 22px;
-      max-width: 500px; width: 92%; max-height: 90vh; overflow-y: auto;
-      box-shadow: 0 24px 38px -5px rgba(0,0,0,0.25);
-      transform: translateY(12px); transition: transform 0.2s;
+      background: #ffffff; border-radius: 14px; padding: 18px;
+      max-width: 425px; width: 90%; max-height: 88vh; overflow-y: auto;
+      box-shadow: 0 20px 32px -4px rgba(0,0,0,0.25);
+      transform: translateY(10px); transition: transform 0.2s;
     }
     .modal-overlay.active .modal-card { transform: translateY(0); }
 
@@ -266,16 +266,16 @@
     #trama3dCanvasWrap canvas { display: block; width: 100%; height: 100%; touch-action: none; }
     #trama3dEmptyState {
       position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-      flex-direction: column; gap: 10px; color: #292524; text-align: center; padding: 24px; z-index: 2;
+      flex-direction: column; gap: 8px; color: #292524; text-align: center; padding: 20px; z-index: 2;
       background: rgba(255, 255, 255, 0.92);
     }
-    .modal-title { margin: 0 0 16px 0; font-size: 16px; color: #7c2d12; font-weight: 800; display:flex; align-items:center; gap:8px;}
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .modal-title { margin: 0 0 13px 0; font-size: 14px; color: #7c2d12; font-weight: 800; display:flex; align-items:center; gap:7px;}
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
     
-    .form-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 12px; width: 100%; }
-    .form-group label { font-size: 12px; font-weight: 700; color: #57534e; }
+    .form-group { display: flex; flex-direction: column; gap: 3px; margin-bottom: 10px; width: 100%; }
+    .form-group label { font-size: 11px; font-weight: 700; color: #57534e; }
     .form-group input, .form-group select { width: 100%; min-width: 0; }
-    .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+    .form-row { display: flex; gap: 8px; margin-bottom: 10px; }
     .form-row > * { flex: 1; min-width: 0; }
 
     input[type="number"]::-webkit-inner-spin-button,
@@ -286,32 +286,32 @@
     input[type="number"] { -moz-appearance: textfield; }
 
     #toastContainer { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 200; pointer-events: none; }
-    .toast { background: #7c2d12; color: #fff; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: auto; }
+    .toast { background: #7c2d12; color: #fff; padding: 8px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: auto; }
     .toast.show { opacity: 1; transform: translateY(0); }
 
     /* ESTILOS ESPECÍFICOS DO GUIA DE AJUDA ACCORDION */
     .help-modal-card {
-      max-width: 720px !important;
-      width: 94%;
-      height: 85vh;
-      max-height: 85vh;
+      max-width: 610px !important;
+      width: 90%;
+      height: 80vh;
+      max-height: 80vh;
       display: flex;
       flex-direction: column;
-      padding: 22px 24px;
+      padding: 18px 20px;
       overflow: hidden !important;
     }
     .help-search-box {
       display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 7px;
+      margin-bottom: 10px;
       flex-shrink: 0;
     }
     .help-search-box input {
       flex: 1;
-      padding: 9px 12px;
-      font-size: 13px;
+      padding: 7px 10px;
+      font-size: 11.5px;
       border: 1px solid var(--border-dark);
-      border-radius: 8px;
+      border-radius: 7px;
       outline: none;
       background: #faf6f0;
     }
@@ -323,22 +323,22 @@
     .help-accordion-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 8px;
       flex: 1 1 0;
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      padding-right: 6px;
+      padding-right: 5px;
       scrollbar-width: thin;
       scrollbar-color: #c2410c #f5f5f4;
     }
-    .help-accordion-container::-webkit-scrollbar { width: 6px; }
+    .help-accordion-container::-webkit-scrollbar { width: 5px; }
     .help-accordion-container::-webkit-scrollbar-track { background: #f5f5f4; border-radius: 4px; }
     .help-accordion-container::-webkit-scrollbar-thumb { background: #c2410c; border-radius: 4px; }
     
     .help-accordion-item {
       border: 1px solid var(--border-color);
-      border-radius: 10px;
+      border-radius: 8px;
       background: #faf6f0;
       overflow: hidden;
       transition: border-color 0.2s ease, box-shadow 0.2s ease;
@@ -353,27 +353,27 @@
       width: 100%;
       background: transparent;
       border: none;
-      padding: 13px 16px;
+      padding: 10px 13px;
       text-align: left;
-      font-size: 13.5px;
+      font-size: 12px;
       font-weight: 700;
       color: #44403c;
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: pointer;
-      min-height: 48px;
+      min-height: 40px;
     }
     .help-accordion-header:hover {
       background: rgba(194, 65, 12, 0.05);
       color: var(--primary);
     }
     .help-accordion-header .chevron {
-      font-size: 12px;
+      font-size: 11px;
       transition: transform 0.2s ease;
       color: #a8a29e;
       flex-shrink: 0;
-      margin-left: 8px;
+      margin-left: 6px;
     }
     .help-accordion-item.open .help-accordion-header .chevron {
       transform: rotate(180deg);
@@ -381,22 +381,22 @@
     }
     .help-accordion-content {
       display: none;
-      padding: 4px 16px 16px 16px;
-      font-size: 13px;
-      line-height: 1.6;
+      padding: 4px 13px 13px 13px;
+      font-size: 11.5px;
+      line-height: 1.55;
       color: #44403c;
       border-top: 1px solid rgba(231, 229, 228, 0.7);
       background: #ffffff;
     }
     .help-accordion-item.open .help-accordion-content { display: block; }
-    .help-accordion-content ul { margin: 8px 0 0 0; padding-left: 20px; }
-    .help-accordion-content li { margin-bottom: 8px; }
+    .help-accordion-content ul { margin: 6px 0 0 0; padding-left: 17px; }
+    .help-accordion-content li { margin-bottom: 6px; }
     .help-accordion-content kbd {
       background: #f5f5f4;
       border: 1px solid #d6d3d1;
       border-radius: 4px;
-      padding: 2px 6px;
-      font-size: 11px;
+      padding: 2px 5px;
+      font-size: 10px;
       font-family: monospace !important;
       color: #292524;
       box-shadow: 0 1px 0 rgba(0,0,0,0.1);
@@ -404,11 +404,11 @@
     .help-table-shortcuts {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
-      font-size: 12.5px;
+      margin-top: 8px;
+      font-size: 11px;
     }
     .help-table-shortcuts th, .help-table-shortcuts td {
-      padding: 8px 10px;
+      padding: 6px 8px;
       border-bottom: 1px solid #f0ede8;
       text-align: left;
     }
@@ -421,40 +421,40 @@
     /* RESPONSIVIDADE MOBILE */
     @media (max-width: 860px) {
       .sidebar { 
-        top: 10px; left: 10px; right: 10px; bottom: auto;
-        width: auto; max-width: calc(100vw - 20px);
-        height: auto; max-height: calc(100vh - 20px); max-height: calc(100dvh - 20px);
-        flex-direction: column; border-radius: 16px;
-        box-shadow: 0 10px 28px -4px rgba(0,0,0,0.28);
+        top: 8px; left: 8px; right: 8px; bottom: auto;
+        width: auto; max-width: calc(100vw - 16px);
+        height: auto; max-height: calc(100vh - 16px); max-height: calc(100dvh - 16px);
+        flex-direction: column; border-radius: 13px;
+        box-shadow: 0 8px 24px -4px rgba(0,0,0,0.25);
       }
       .icon-rail, .side-panel { 
         width: 100%; flex: 0 0 auto; flex-direction: row; 
         height: auto; min-height: 0;
         overflow-x: auto; overflow-y: hidden;
-        padding: 7px 8px; height: auto;
+        padding: 5px 6px; height: auto;
         align-items: center; justify-content: flex-start;
         -webkit-overflow-scrolling: touch;
         overscroll-behavior-x: contain;
       }
       .icon-rail { border-right: none; border-bottom: 1px solid var(--border-color); }
-      .rail-sep { width: 1px; height: 32px; margin: 0 7px; flex-shrink: 0; }
-      .color-grid, .tool-grid { display: flex; flex-direction: row; width: max-content; gap: 7px; padding: 0; flex-wrap: nowrap; flex-shrink: 0; }
-      .swatch, .rail-btn, .rail-btn-small { width: 44px; height: 44px; font-size: 18px; border-radius: 11px; flex-shrink: 0; }
-      .save-badge-rail { width: auto; height: 44px; padding: 0 10px; font-size: 11px; white-space: nowrap; }
-      .panel-section { flex-direction: row; width: max-content; min-width: max-content; justify-content: flex-start; flex-wrap: nowrap; flex-shrink: 0; gap: 7px; }
-      .clip-preview { width: 44px; height: 44px; flex-shrink: 0; margin: 0; }
+      .rail-sep { width: 1px; height: 24px; margin: 0 5px; flex-shrink: 0; }
+      .color-grid, .tool-grid { display: flex; flex-direction: row; width: max-content; gap: 5px; padding: 0; flex-wrap: nowrap; flex-shrink: 0; }
+      .swatch, .rail-btn, .rail-btn-small { width: 32px; height: 32px; font-size: 14px; border-radius: 8px; flex-shrink: 0; }
+      .save-badge-rail { width: auto; height: 32px; padding: 0 8px; font-size: 10px; white-space: nowrap; }
+      .panel-section { flex-direction: row; width: max-content; min-width: max-content; justify-content: flex-start; flex-wrap: nowrap; flex-shrink: 0; gap: 5px; }
+      .clip-preview { width: 32px; height: 32px; flex-shrink: 0; margin: 0; }
       #clearBtn { margin-left: 2px; }
       
       .canvas-mode-badge { 
-        top: auto; bottom: 16px; right: 16px;
+        top: auto; bottom: 12px; right: 12px;
         padding: 0; border-radius: 50%; 
-        width: 40px; height: 40px;
-        justify-content: center; font-size: 18px;
+        width: 32px; height: 32px;
+        justify-content: center; font-size: 15px;
       }
       .canvas-mode-badge #badgeText { display: none !important; }
       .help-modal-card { 
-        max-width: 96% !important; width: 96%;
-        height: 90vh; max-height: 90vh; padding: 16px; 
+        max-width: 92% !important; width: 92%;
+        height: 82vh; max-height: 82vh; padding: 14px; 
       }
     }
   </style>
@@ -474,15 +474,16 @@
     import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
     let renderer, scene, camera, controls, rafId = null;
-    let modelGroup = null;
     let beadMesh = null, sphereMesh = null, seamLine = null;
     let ambientLight = null, keyLight = null, fillLight = null;
     let ghostMode = false, seamVisible = true;
-    let rotateSpeedLevel = 0; // 0: parado, 1: lenta, 2: média, 3: rápida
-    let rotateAxis = 'horizontal'; // 'horizontal' ou 'vertical'
     let lastRadius = 10;
     let container = null;
     const dummy = new THREE.Object3D();
+
+    let modelGroup = null;
+    let rotSpeed = 0; // 0=parado, 1=lenta, 2=media, 3=rapida
+    let rotAxis = 'h'; // 'h' = horizontal (em torno de Y), 'v' = vertical (em torno de X)
 
     function buildSphereGeometry(radius) {
       return new THREE.SphereGeometry(radius * 0.985, 48, 32);
@@ -539,13 +540,12 @@
       rafId = requestAnimationFrame(animate);
       onResize();
 
-      if (modelGroup && rotateSpeedLevel > 0) {
-        const speeds = [0, 0.007, 0.018, 0.042];
-        const s = speeds[rotateSpeedLevel] || 0.018;
-        if (rotateAxis === 'vertical') {
-          modelGroup.rotation.x += s;
+      if (modelGroup && rotSpeed > 0) {
+        const step = (rotSpeed === 1 ? 0.004 : (rotSpeed === 2 ? 0.012 : 0.024));
+        if (rotAxis === 'h') {
+          modelGroup.rotation.y += step;
         } else {
-          modelGroup.rotation.y += s;
+          modelGroup.rotation.x += step;
         }
       }
 
@@ -652,59 +652,55 @@
       if (seamLine) seamLine.visible = val;
     }
 
-    function setRotateSpeedLevel(level) {
-      if (typeof level === 'boolean') {
-        rotateSpeedLevel = level ? 2 : 0;
-      } else {
-        rotateSpeedLevel = Math.max(0, Math.min(3, parseInt(level, 10) || 0));
-      }
+    function setRotationLevel(level) {
+      rotSpeed = level; // 0, 1, 2, 3
     }
 
-    function setRotateAxis(axis) {
-      rotateAxis = (axis === 'vertical') ? 'vertical' : 'horizontal';
+    function setRotationAxis(axis) {
+      rotAxis = (axis === 'v' ? 'v' : 'h');
     }
 
     function resetView() {
-      if (modelGroup) {
-        modelGroup.rotation.set(0, 0, 0);
-      }
-      if (camera && controls) {
-        camera.position.set(0, lastRadius * 0.3, lastRadius * 3.1);
+      if (modelGroup) modelGroup.rotation.set(0, 0, 0);
+      if (controls && camera) {
         controls.target.set(0, 0, 0);
+        camera.position.set(0, lastRadius * 0.3, lastRadius * 3.1);
+        camera.lookAt(0, 0, 0);
         controls.update();
       }
     }
 
-    function setViewpoint(name) {
+    function setView(viewName) {
       if (!camera || !controls) return;
       if (modelGroup) modelGroup.rotation.set(0, 0, 0);
-      const D = lastRadius * 3.1;
-      const yNorm = lastRadius * 0.3;
       controls.target.set(0, 0, 0);
-
-      switch (name) {
+      const d = lastRadius * 3.1;
+      switch (viewName) {
         case 'top':
-          camera.position.set(0, D, 0.001);
+          camera.position.set(0, d, 0.0001);
           break;
-        case 'top-front':
-          camera.position.set(0, D * 0.7071, D * 0.7071);
+        case 'topFront':
+          camera.position.set(0, d * 0.7071, d * 0.7071);
           break;
         case 'bottom':
-          camera.position.set(0, -D, 0.001);
+          camera.position.set(0, -d, 0.0001);
           break;
         case 'front':
-          camera.position.set(0, yNorm, D);
+          camera.position.set(0, 0, d);
           break;
         case 'back':
-          camera.position.set(0, yNorm, -D);
+          camera.position.set(0, 0, -d);
           break;
         case 'left':
-          camera.position.set(-D, yNorm, 0);
+          camera.position.set(-d, 0, 0);
           break;
         case 'right':
-          camera.position.set(D, yNorm, 0);
+          camera.position.set(d, 0, 0);
           break;
+        default:
+          camera.position.set(0, lastRadius * 0.3, d);
       }
+      camera.lookAt(0, 0, 0);
       controls.update();
     }
 
@@ -745,10 +741,8 @@
     function resume() { if (!rafId && renderer) animate(); }
 
     window.Trama3D = {
-      ensureScene, build, setGhost, setSeamVisible, 
-      setRotateSpeedLevel, setRotateAxis,
-      setAutoRotate: setRotateSpeedLevel,
-      resetView, setViewpoint, capture, onResize, recordVideo, pause, resume
+      ensureScene, build, setGhost, setSeamVisible, setRotationLevel, setRotationAxis,
+      resetView, setView, capture, onResize, recordVideo, pause, resume
     };
   </script>
 </head>
@@ -824,7 +818,7 @@
           <button id="replaceBtn" class="rail-btn-small" title="Substituir Cor Global (Atalho: R ou 6)">🔀</button>
           <button id="pipetteBtn" class="rail-btn-small" title="Conta-gotas / Pipeta (Atalho: C, 3 ou I)">🧪</button>
           <button class="swatch" id="customColorBtn" title="Cor Personalizada">
-            <span style="font-size: 16px; font-weight:800; color:#78716c;">+</span>
+            <span style="font-size: 14px; font-weight:800; color:#78716c;">+</span>
           </button>
         </div>
         <div class="rail-sep"></div>
@@ -855,7 +849,7 @@
       <!-- PAINEL DE VISUALIZAÇÃO -->
       <div class="panel-section" id="viewPanel" hidden>
         <div class="tool-grid">
-          <button id="handBtn" class="rail-btn-small hand-btn" title="Mão / Mover Tela (Atalho: M, 7, H ou Espaço)">🖐🏽</button>
+          <button id="handBtn" class="rail-btn-small hand-btn active" title="Mão / Mover Tela (Atalho: M, 7, H ou Espaço)">🖐🏽</button>
           <button id="zoomIn" class="rail-btn-small" title="Ampliar (+ ou =)">➕</button>
           <button id="zoomOut" class="rail-btn-small" title="Reduzir (-)">➖</button>
           <button id="fitScreenBtn" class="rail-btn-small" title="Ajustar à Tela (Atalho: A ou 0)">⤢</button>
@@ -914,15 +908,15 @@
 
 <!-- Modal: Dimensionar Trama com Campos Interdependentes -->
 <div id="dimModal" class="modal-overlay">
-  <div class="modal-card" style="max-width: 440px;">
+  <div class="modal-card" style="max-width: 375px; padding: 18px;">
     <h3 class="modal-title">📏 Dimensionar Trama</h3>
-    <div style="font-size:13px; color:#57534e; margin-bottom:14px; line-height:1.45;">
+    <div style="font-size:11.5px; color:#57534e; margin-bottom:12px; line-height:1.4;">
       Informe as medidas em centímetros <b>ou</b> em quantidade de miçangas (fileiras e colunas). Os campos são <b>interdependentes</b> e atualizam-se instantaneamente (fator: ~1,50 cm por miçanga).
     </div>
 
     <!-- Bloco 1: Centímetros -->
-    <div style="background:#fcf9f5; border:1px solid #e7e5e4; border-radius:10px; padding:12px; margin-bottom:12px;">
-      <div style="font-size:11px; font-weight:800; color:#c2410c; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+    <div style="background:#fcf9f5; border:1px solid #e7e5e4; border-radius:8px; padding:10px; margin-bottom:10px;">
+      <div style="font-size:10px; font-weight:800; color:#c2410c; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
         1. Medidas em Centímetros (cm)
       </div>
       <div class="form-row" style="margin-bottom:0;">
@@ -938,8 +932,8 @@
     </div>
 
     <!-- Bloco 2: Fileiras e Colunas -->
-    <div style="background:#fcf9f5; border:1px solid #e7e5e4; border-radius:10px; padding:12px; margin-bottom:14px;">
-      <div style="font-size:11px; font-weight:800; color:#c2410c; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+    <div style="background:#fcf9f5; border:1px solid #e7e5e4; border-radius:8px; padding:10px; margin-bottom:12px;">
+      <div style="font-size:10px; font-weight:800; color:#c2410c; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:6px;">
         2. Grade de Miçangas (Nós)
       </div>
       <div class="form-row" style="margin-bottom:0;">
@@ -954,13 +948,13 @@
       </div>
     </div>
 
-    <button id="calcDimBtn" class="btn-primary" style="width:100%; margin-bottom:12px; padding:10px;">Aplicar Moldura Guia</button>
+    <button id="calcDimBtn" class="btn-primary" style="width:100%; margin-bottom:10px; padding:8px;">Aplicar Moldura Guia</button>
     
-    <div id="dimResultContainer" style="display: none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
-      <div style="font-weight:700; color:#9a3412; margin-bottom:4px;">Área e Medidas Confirmadas:</div>
-      <div id="dimResultText" style="font-size:14px; font-weight:800; color:#c2410c;">-- fileiras × -- colunas</div>
-      <div id="dimResultCmText" style="font-size:12px; font-weight:600; color:#78716c; margin-top:2px;">-- cm (altura) × -- cm (circunferência)</div>
-      <div style="font-size:11px; color:#78716c; margin-top:6px; line-height:1.3;">A moldura foi projetada como guia (fator: ~1,50 cm por miçanga). O canvas permanece livre para criações além da área.</div>
+    <div id="dimResultContainer" style="display: none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 10px; border-radius: 7px; margin-bottom: 14px;">
+      <div style="font-weight:700; color:#9a3412; margin-bottom:3px; font-size:11.5px;">Área e Medidas Confirmadas:</div>
+      <div id="dimResultText" style="font-size:12.5px; font-weight:800; color:#c2410c;">-- fileiras × -- colunas</div>
+      <div id="dimResultCmText" style="font-size:11px; font-weight:600; color:#78716c; margin-top:2px;">-- cm (altura) × -- cm (circunferência)</div>
+      <div style="font-size:10px; color:#78716c; margin-top:5px; line-height:1.25;">A moldura foi projetada como guia (fator: ~1,50 cm por miçanga). O canvas permanece livre para criações além da área.</div>
     </div>
 
     <div class="modal-actions" style="justify-content: space-between;">
@@ -974,24 +968,24 @@
 <div id="imageModal" class="modal-overlay">
   <div class="modal-card">
     <h3 class="modal-title">🖼️ Imagem para Trama</h3>
-    <div style="font-size:13px; color:#57534e; margin-bottom:16px;">
+    <div style="font-size:11.5px; color:#57534e; margin-bottom:13px;">
       Selecione uma imagem para convertê-la em miçangas na malha a 45°.
     </div>
 
     <div class="form-group">
       <label>1. Selecione uma imagem:</label>
       <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
-      <div id="imagePreviewWrap" style="display:none; max-height: 180px; overflow: hidden; align-items: center; justify-content: center; border-radius: 8px; margin-top: 8px; background:#faf6f0; border:1px solid var(--border-color); padding:8px;">
-          <canvas id="imagePreview" style="max-width: 100%; max-height: 164px; display:block;"></canvas>
+      <div id="imagePreviewWrap" style="display:none; max-height: 155px; overflow: hidden; align-items: center; justify-content: center; border-radius: 7px; margin-top: 7px; background:#faf6f0; border:1px solid var(--border-color); padding:7px;">
+          <canvas id="imagePreview" style="max-width: 100%; max-height: 140px; display:block;"></canvas>
       </div>
     </div>
 
     <div class="form-group">
       <label>2. Tamanho da trama:</label>
-      <p style="font-size:11px; color: var(--text-muted); margin: 0 0 8px 0; line-height: 1.3;">
+      <p style="font-size:10px; color: var(--text-muted); margin: 0 0 6px 0; line-height: 1.25;">
         Escolha se prefere definir a <b>largura (colunas)</b> ou a <b>altura (fileiras)</b> — o app calcula a outra medida proporcionalmente.
       </p>
-      <div class="form-row" style="margin-bottom:8px;">
+      <div class="form-row" style="margin-bottom:7px;">
         <button type="button" id="dimModeCols" class="active">↔️ Definir Largura</button>
         <button type="button" id="dimModeRows">↕️ Definir Altura</button>
       </div>
@@ -1002,7 +996,7 @@
         </div>
         <div class="form-group" style="margin-bottom:0;">
           <label>Resultado estimado:</label>
-          <div id="imageDimEstimate" style="font-size:13px; font-weight:800; color:#c2410c; padding:7px 0;">-- colunas × -- fileiras</div>
+          <div id="imageDimEstimate" style="font-size:11.5px; font-weight:800; color:#c2410c; padding:6px 0;">-- colunas × -- fileiras</div>
         </div>
       </div>
     </div>
@@ -1016,15 +1010,15 @@
        </select>
     </div>
 
-    <div class="form-group" id="customColorCountDiv" style="display: none; background: #faf6f0; padding: 12px; border-radius: 8px; border: 1px solid #e7e5e4;">
+    <div class="form-group" id="customColorCountDiv" style="display: none; background: #faf6f0; padding: 10px; border-radius: 7px; border: 1px solid #e7e5e4;">
         <label>Quantidade máxima de cores:</label>
-        <div style="display: flex; align-items: center; gap: 10px; margin-top:4px;">
+        <div style="display: flex; align-items: center; gap: 8px; margin-top:3px;">
            <input type="range" id="customColorSlider" min="2" max="32" value="5" style="flex: 1;">
-           <input type="number" id="customColorCount" value="5" min="2" max="32" style="width: 60px;">
+           <input type="number" id="customColorCount" value="5" min="2" max="32" style="width: 52px;">
         </div>
     </div>
 
-    <div style="font-size:11px; color:#9a3412; background:#fff7ed; border:1px solid #fed7aa; padding:8px 10px; border-radius:8px; margin-bottom:4px;">
+    <div style="font-size:10px; color:#9a3412; background:#fff7ed; border:1px solid #fed7aa; padding:7px 9px; border-radius:7px; margin-bottom:4px;">
       ✨ <b>Estampa Flutuante:</b> A imagem gerada acompanhará o cursor ancorada pelo <b>canto superior esquerdo</b>. Clique onde desejar para estampar.
     </div>
 
@@ -1037,10 +1031,10 @@
 
 <!-- Modal: Contagem e Dimensões -->
 <div id="countModal" class="modal-overlay">
-  <div class="modal-card" style="max-width: 400px;">
+  <div class="modal-card" style="max-width: 340px; padding: 18px;">
     <h3 class="modal-title">📦 Contagem & Dimensões</h3>
-    <div id="dimSummaryContainer" style="display:none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size:13px; color:#57534e;"></div>
-    <div id="colorCountsContainer" style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#44403c;"></div>
+    <div id="dimSummaryContainer" style="display:none; background: rgb(255, 247, 237); border: 1px solid rgb(254, 215, 170); padding: 9px 10px; border-radius: 7px; margin-bottom: 12px; font-size:11.5px; color:#57534e;"></div>
+    <div id="colorCountsContainer" style="display:flex; flex-direction:column; gap:7px; font-size:11.5px; color:#44403c;"></div>
     <div class="modal-actions"><button class="btn-primary closeModalBtn">Fechar</button></div>
   </div>
 </div>
@@ -1062,7 +1056,7 @@
       <button id="newTramaBtn">📄 Nova Trama</button>
       <button id="saveTramaBtn" class="btn-primary">💾 Salvar Local</button>
     </div>
-    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:13px 0;">
     <div class="form-group">
       <label>Tramas Salvas no Navegador:</label>
       <select id="savedTramasSelect"><option value="">— nenhuma salva —</option></select>
@@ -1071,7 +1065,7 @@
       <button id="loadSelectedBtn">📂 Carregar</button>
       <button id="deleteSelectedBtn" class="btn-danger">🗑️ Excluir</button>
     </div>
-    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:13px 0;">
     <div class="form-group">
       <label>Arquivos (.json)</label>
       <div class="form-row" style="margin:0;">
@@ -1080,10 +1074,10 @@
         <input id="loadTramaFile" type="file" accept="application/json,.json" style="display:none">
       </div>
     </div>
-    <hr style="border:0; border-top:1px solid #e7e5e4; margin:16px 0;">
+    <hr style="border:0; border-top:1px solid #e7e5e4; margin:13px 0;">
     <div class="form-group">
       <label>Exportar Imagem / PDF</label>
-      <select id="exportFormat" style="margin-bottom:8px;">
+      <select id="exportFormat" style="margin-bottom:7px;">
         <option value="jpeg">JPG (com fundo)</option>
         <option value="png">PNG (fundo transparente)</option>
       </select>
@@ -1099,8 +1093,8 @@
 <!-- Modal: Sobre -->
 <div id="aboutModal" class="modal-overlay">
   <div class="modal-card">
-    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:11px; background:#fff7ed; color:#c2410c; padding:2px 6px; border-radius:8px; border:1px solid #fed7aa;">v0.9.26</span></h3>
-    <div style="font-size:13px; line-height:1.55; color:#57534e;">
+    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:10px; background:#fff7ed; color:#c2410c; padding:2px 5px; border-radius:7px; border:1px solid #fed7aa;">v0.9.26</span></h3>
+    <div style="font-size:11.5px; line-height:1.5; color:#57534e;">
       <p><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
       <p><b>📏 Dimensionamento Inteligente:</b> Cálculo bidirecional instantâneo entre centímetros reais da cabaça e contagem de fileiras/colunas.</p>
       <p><b>🪘 Trama Xequerê:</b> Ciclo de oficinas de confecção do instrumento, articulando reflexões históricas e ritmos afro-brasileiros.</p>
@@ -1110,7 +1104,7 @@
   </div>
 </div>
 
-<!-- Modal: Ajuda & Guia Completo (Accordion com 10 Seções) -->
+<!-- Modal: Ajuda & Guia Completo (Accordion Restaurado com 10 Seções) -->
 <div id="helpModal" class="modal-overlay">
   <div class="modal-card help-modal-card">
     <h3 class="modal-title" style="justify-content: space-between;">
@@ -1357,9 +1351,9 @@
 
 <!-- Modal: Confirmação -->
 <div id="confirmModal" class="modal-overlay">
-  <div class="modal-card" style="max-width:400px;">
+  <div class="modal-card" style="max-width:340px; padding: 18px;">
     <h3 class="modal-title" id="confirmModalTitle">Confirmação</h3>
-    <p id="confirmModalMessage" style="font-size:13px; color:#57534e; margin-bottom:16px;">Tem certeza?</p>
+    <p id="confirmModalMessage" style="font-size:11.5px; color:#57534e; margin-bottom:14px;">Tem certeza?</p>
     <div class="modal-actions">
       <button id="confirmCancelBtn">Cancelar</button>
       <button id="confirmOkBtn" class="btn-primary">Confirmar</button>
@@ -1590,6 +1584,7 @@
     let h = parseFloat(dimHeightInput.value);
     let circ = parseFloat(dimCircInput.value);
 
+    // Se preencheu cm mas não o número de miçangas
     if ((isNaN(r) || r <= 0) && !isNaN(h) && h > 0) {
       r = Math.max(1, Math.round(h / BEAD_GRID_FACTOR));
       dimRowsInput.value = r;
@@ -1599,6 +1594,7 @@
       dimColsInput.value = c;
     }
 
+    // Se preencheu miçangas mas não cm
     if ((isNaN(h) || h <= 0) && !isNaN(r) && r > 0) {
       h = r * BEAD_GRID_FACTOR;
       dimHeightInput.value = formatCm(h);
@@ -1768,7 +1764,7 @@
     colorPicker.value = hex;
     registerRecentColor(hex);
     highlightPaletteSelection();
-    if(currentToolMode !== 'brush') setToolMode('brush');
+    setToolMode('brush');
   }
 
   customColorBtn.addEventListener('click', () => colorPicker.click());
@@ -1869,8 +1865,8 @@
 
     const icons = { 'brush': '🖌️', 'eraser': '🧹', 'pipette': '🧪', 'select': '⬚', 'paste': '📋', 'bucket': '🪣', 'replace': '🔀', 'hand': '🖐🏽' };
     const names = { 'brush': 'Pincel', 'eraser': 'Borracha', 'pipette': 'Pipeta', 'select': 'Seleção', 'paste': 'Colar', 'bucket': 'Balde', 'replace': 'Substituir', 'hand': 'Mão' };
-    badgeIcon.textContent = icons[mode] || '🖌️';
-    badgeText.textContent = names[mode] || 'Pincel';
+    badgeIcon.textContent = icons[mode] || '🖐🏽';
+    badgeText.textContent = names[mode] || 'Mão';
     
     draw();
   }
@@ -1886,13 +1882,11 @@
   let trama3dLastBuiltRevision = -1;
   let trama3dGhost = false;
   let trama3dSeam = true;
-  let trama3dRotateSpeed = 0; // 0: parada, 1: lenta, 2: média, 3: rápida
-  let trama3dRotateAxis = 'horizontal'; // 'horizontal' ou 'vertical'
+  let trama3dRotationLevel = 0; // 0 = parado, 1 = lenta, 2 = media, 3 = rapida
+  let trama3dRotationAxis = 'h'; // 'h' = horizontal ↔️, 'v' = vertical ↕️
   let trama3dPollTimer = null;
   const trama3dCanvasWrap = document.getElementById('trama3dCanvasWrap');
   const trama3dEmptyState = document.getElementById('trama3dEmptyState');
-  const trama3dRotateBtn = document.getElementById('trama3dRotateBtn');
-  const trama3dAxisBtn = document.getElementById('trama3dAxisBtn');
 
   function trama3dHasMoldura() {
     return recommendedRows !== null && recommendedCols !== null && recommendedRows > 0 && recommendedCols > 0;
@@ -1953,8 +1947,8 @@
         window.Trama3D.onResize();
         window.Trama3D.setGhost(trama3dGhost);
         window.Trama3D.setSeamVisible(trama3dSeam);
-        window.Trama3D.setRotateSpeedLevel(trama3dRotateSpeed);
-        window.Trama3D.setRotateAxis(trama3dRotateAxis);
+        window.Trama3D.setRotationLevel(trama3dRotationLevel);
+        window.Trama3D.setRotationAxis(trama3dRotationAxis);
         trama3dRebuild(true);
       } catch (err) {
         console.error('Erro ao ativar Trama 3D:', err);
@@ -1980,70 +1974,92 @@
     }
   }
 
-  function updateRotateBtnAppearance() {
-    trama3dRotateBtn.classList.remove('active');
-    trama3dRotateBtn.style.background = '';
-    trama3dRotateBtn.style.color = '';
-    trama3dRotateBtn.style.borderColor = '';
+  const rotateBtn = document.getElementById('trama3dRotateBtn');
+  function updateRotateBtnStyle() {
+    rotateBtn.classList.remove('active');
+    rotateBtn.style.background = '';
+    rotateBtn.style.color = '';
+    rotateBtn.style.borderColor = '';
 
-    const axisIcon = trama3dRotateAxis === 'horizontal' ? '↔️' : '↕️';
-
-    if (trama3dRotateSpeed === 0) {
-      trama3dRotateBtn.title = 'Rotação automática: Parada (Atalho: R ou Espaço)';
-    } else if (trama3dRotateSpeed === 1) {
-      trama3dRotateBtn.style.background = '#fed7aa';
-      trama3dRotateBtn.style.color = '#9a3412';
-      trama3dRotateBtn.style.borderColor = '#fdba74';
-      trama3dRotateBtn.title = `Rotação: Lenta ${axisIcon} (Atalho: R ou Espaço)`;
-    } else if (trama3dRotateSpeed === 2) {
-      trama3dRotateBtn.style.background = '#f97316';
-      trama3dRotateBtn.style.color = '#ffffff';
-      trama3dRotateBtn.style.borderColor = '#ea580c';
-      trama3dRotateBtn.title = `Rotação: Média ${axisIcon} (Atalho: R ou Espaço)`;
-    } else if (trama3dRotateSpeed === 3) {
-      trama3dRotateBtn.classList.add('active');
-      trama3dRotateBtn.title = `Rotação: Rápida ${axisIcon} (Atalho: R ou Espaço)`;
+    if (trama3dRotationLevel === 0) {
+      rotateBtn.title = 'Rotação automática: Parada (Atalho: R ou Espaço)';
+      showToast('Giro automático: Parado');
+    } else if (trama3dRotationLevel === 1) {
+      rotateBtn.style.background = '#fed7aa';
+      rotateBtn.style.color = '#9a3412';
+      rotateBtn.style.borderColor = '#fdba74';
+      rotateBtn.title = 'Rotação automática: Lenta (Atalho: R ou Espaço)';
+      showToast('Giro automático: Lento 🐢');
+    } else if (trama3dRotationLevel === 2) {
+      rotateBtn.style.background = '#f97316';
+      rotateBtn.style.color = '#ffffff';
+      rotateBtn.style.borderColor = '#ea580c';
+      rotateBtn.title = 'Rotação automática: Média (Atalho: R ou Espaço)';
+      showToast('Giro automático: Médio 🐇');
+    } else if (trama3dRotationLevel === 3) {
+      rotateBtn.classList.add('active');
+      rotateBtn.title = 'Rotação automática: Rápida (Atalho: R ou Espaço)';
+      showToast('Giro automático: Rápido ⚡');
     }
   }
 
-  trama3dRotateBtn.addEventListener('click', () => {
-    trama3dRotateSpeed = (trama3dRotateSpeed + 1) % 4;
-    updateRotateBtnAppearance();
-    if (window.Trama3D) window.Trama3D.setRotateSpeedLevel(trama3dRotateSpeed);
-
-    const axisIcon = trama3dRotateAxis === 'horizontal' ? '↔️ Horizontal' : '↕️ Vertical';
-    const labels = ['Rotação parada', `Rotação: Lenta (${axisIcon})`, `Rotação: Média (${axisIcon})`, `Rotação: Rápida (${axisIcon})`];
-    showToast(labels[trama3dRotateSpeed]);
+  rotateBtn.addEventListener('click', () => {
+    trama3dRotationLevel = (trama3dRotationLevel + 1) % 4;
+    updateRotateBtnStyle();
+    if (window.Trama3D) window.Trama3D.setRotationLevel(trama3dRotationLevel);
   });
 
-  trama3dAxisBtn.addEventListener('click', () => {
-    trama3dRotateAxis = (trama3dRotateAxis === 'horizontal') ? 'vertical' : 'horizontal';
-    const isH = trama3dRotateAxis === 'horizontal';
-    trama3dAxisBtn.textContent = isH ? '↔️' : '↕️';
-    trama3dAxisBtn.title = `Eixo de rotação: ${isH ? 'Horizontal ↔️' : 'Vertical ↕️'} (Atalho: X)`;
-    updateRotateBtnAppearance();
-    if (window.Trama3D) window.Trama3D.setRotateAxis(trama3dRotateAxis);
-    showToast(`Eixo de rotação: ${isH ? 'Horizontal ↔️' : 'Vertical ↕️'}`);
+  const axisBtn = document.getElementById('trama3dAxisBtn');
+  axisBtn.addEventListener('click', () => {
+    trama3dRotationAxis = (trama3dRotationAxis === 'h' ? 'v' : 'h');
+    axisBtn.textContent = trama3dRotationAxis === 'h' ? '↔️' : '↕️';
+    axisBtn.title = `Eixo de rotação: ${trama3dRotationAxis === 'h' ? 'Horizontal ↔️' : 'Vertical ↕️'} (Atalho: X)`;
+    if (window.Trama3D) window.Trama3D.setRotationAxis(trama3dRotationAxis);
+    showToast(`Eixo de rotação: ${trama3dRotationAxis === 'h' ? 'Horizontal ↔️' : 'Vertical ↕️'}`);
   });
 
   document.getElementById('trama3dGhostBtn').addEventListener('click', (e) => {
     trama3dGhost = !trama3dGhost;
     e.currentTarget.classList.toggle('active', trama3dGhost);
     if (window.Trama3D) window.Trama3D.setGhost(trama3dGhost);
-    showToast(trama3dGhost ? 'Transparência ativada' : 'Transparência desativada');
+    showToast(trama3dGhost ? 'Transparência ativada (cabaça invisível)' : 'Transparência desativada');
   });
 
   document.getElementById('trama3dSeamBtn').addEventListener('click', (e) => {
     trama3dSeam = !trama3dSeam;
     e.currentTarget.classList.toggle('active', trama3dSeam);
     if (window.Trama3D) window.Trama3D.setSeamVisible(trama3dSeam);
+    showToast(trama3dSeam ? 'Linha de emenda visível' : 'Linha de emenda oculta');
   });
 
   document.getElementById('trama3dRefreshBtn').addEventListener('click', () => {
     if (!trama3dHasMoldura()) { showToast('Defina as medidas em 📏 Dimensionar Trama primeiro.'); return; }
     trama3dRebuild(true);
-    if (window.Trama3D && window.Trama3D.resetView) window.Trama3D.resetView();
-    showToast('Trama 3D atualizada e focada na emenda!');
+    if (window.Trama3D) window.Trama3D.resetView();
+    showToast('Trama 3D atualizada e alinhada na emenda!');
+  });
+
+  // Pontos de vista rápidos
+  document.getElementById('trama3dViewTopBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('top'); showToast('Vista superior'); }
+  });
+  document.getElementById('trama3dViewTopFrontBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('topFront'); showToast('Vista superior frontal'); }
+  });
+  document.getElementById('trama3dViewBottomBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('bottom'); showToast('Vista inferior'); }
+  });
+  document.getElementById('trama3dViewFrontBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('front'); showToast('Vista frontal (emenda)'); }
+  });
+  document.getElementById('trama3dViewBackBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('back'); showToast('Vista traseira'); }
+  });
+  document.getElementById('trama3dViewLeftBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('left'); showToast('Vista lateral esquerda'); }
+  });
+  document.getElementById('trama3dViewRightBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('right'); showToast('Vista lateral direita'); }
   });
 
   document.getElementById('trama3dCaptureBtn').addEventListener('click', () => {
@@ -2057,37 +2073,15 @@
     showToast('Foto salva!');
   });
 
-  const viewButtons = [
-    { id: 'trama3dViewTopBtn', view: 'top', label: 'Vista superior' },
-    { id: 'trama3dViewTopFrontBtn', view: 'top-front', label: 'Vista superior frontal' },
-    { id: 'trama3dViewBottomBtn', view: 'bottom', label: 'Vista inferior' },
-    { id: 'trama3dViewFrontBtn', view: 'front', label: 'Vista frontal' },
-    { id: 'trama3dViewBackBtn', view: 'back', label: 'Vista traseira' },
-    { id: 'trama3dViewLeftBtn', view: 'left', label: 'Vista lateral esquerda' },
-    { id: 'trama3dViewRightBtn', view: 'right', label: 'Vista lateral direita' }
-  ];
-
-  viewButtons.forEach(({ id, view, label }) => {
-    const btn = document.getElementById(id);
-    if (btn) {
-      btn.addEventListener('click', () => {
-        if (!trama3dHasMoldura()) {
-          showToast('Defina as medidas em 📏 Dimensionar Trama primeiro.');
-          return;
-        }
-        if (window.Trama3D && window.Trama3D.setViewpoint) {
-          window.Trama3D.setViewpoint(view);
-          showToast(label);
-        }
-      });
-    }
-  });
-
   document.getElementById('trama3dRecordBtn').addEventListener('click', async (e) => {
     if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Defina a moldura para gravar.'); return; }
     const btn = e.currentTarget;
-    const prevSpeed = trama3dRotateSpeed;
-    if (prevSpeed === 0 && window.Trama3D) window.Trama3D.setRotateSpeedLevel(2);
+    const previousLevel = trama3dRotationLevel;
+    if (previousLevel === 0) {
+      trama3dRotationLevel = 1;
+      updateRotateBtnStyle();
+      if (window.Trama3D) window.Trama3D.setRotationLevel(1);
+    }
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = '⏺️ 15s';
@@ -2103,7 +2097,11 @@
     } catch (err) {
       showToast('Gravação de vídeo não suportada neste navegador.');
     } finally {
-      if (prevSpeed === 0 && window.Trama3D) window.Trama3D.setRotateSpeedLevel(0);
+      if (previousLevel === 0) {
+        trama3dRotationLevel = 0;
+        updateRotateBtnStyle();
+        if (window.Trama3D) window.Trama3D.setRotationLevel(0);
+      }
       btn.disabled = false;
       btn.textContent = original;
     }
@@ -2393,6 +2391,7 @@
       const hasSel = selectedCells.size > 0;
       const changes = [];
 
+      // Cenário 1: Há uma seleção ativa delimitada
       if (hasSel) {
           for (const key of selectedCells) {
               const prev = painted.get(key) || null;
@@ -2415,7 +2414,9 @@
 
       const inMoldura = isCellInsideMoldura(startCell.r, startCell.c);
 
+      // Cenário 2: Preenchendo área vazia/fundo (targetColor === null)
       if (targetColor === null) {
+          // 2A: Clique dentro da régua / moldura ativa
           if (inMoldura) {
               const stack = [startCell];
               const visited = new Set([startKey]);
@@ -2454,6 +2455,7 @@
               return;
           }
 
+          // 2B: Clique fora da régua (ou sem régua definida)
           if (painted.size === 0) {
               showToast('Área aberta! O balde precisa de um contorno fechado ou da régua para não derramar.');
               return;
@@ -2523,6 +2525,7 @@
           return;
       }
 
+      // Cenário 3: Preenchimento sobre miçangas já pintadas
       const stack = [startCell];
       const visited = new Set([startKey]);
 
@@ -2898,8 +2901,8 @@
       if(prev!==c){ painted.set(key,c); changes.push({key,prev,next:c}); }
     }
     if(changes.length){ pushUndo({changes}); scheduleAutoSave(); showToast('Estampa aplicada!'); }
-    setToolMode('hand');
     draw();
+    setToolMode('hand');
   }
 
   function transformClipboard(type) {
@@ -3134,6 +3137,7 @@
       dimRowsInput.value = '';
       dimColsInput.value = '';
     }
+
     undoStack=[]; redoStack=[]; setToolMode('hand'); centerCanvas(); fitScreenBtn.click();
   }
 
@@ -3141,8 +3145,8 @@
     const action = () => { 
       painted.clear(); 
       loadData({painted:[], recRows:null, recCols:null, savedHeight:null, savedCircum:null}); 
-      setToolMode('hand');
       showToast('Nova trama iniciada!'); 
+      setToolMode('hand');
     };
     if (painted.size > 0) {
       showConfirm('Nova Trama', 'Iniciar uma nova trama? Alterações não salvas serão perdidas.', action);
@@ -3429,6 +3433,7 @@
 
               clusterSums[bestC].r += p.r;
               clusterSums[bestC].g += p.g;
+              clusterSums[bestC].b += p.b;
               clusterSums[bestC].count++;
           }
 
@@ -3563,13 +3568,13 @@
 
       if (!document.getElementById('trama3dPanel').hidden) {
         const k3d = e.key.toLowerCase();
-        if (k3d === 'r' || e.code === 'Space') { e.preventDefault(); trama3dRotateBtn.click(); return; }
-        if (k3d === 'x') { e.preventDefault(); trama3dAxisBtn.click(); return; }
+        if (k3d === 'r' || e.code === 'Space') { e.preventDefault(); document.getElementById('trama3dRotateBtn').click(); return; }
+        if (k3d === 'x') { e.preventDefault(); document.getElementById('trama3dAxisBtn').click(); return; }
         if (k3d === 'f') { e.preventDefault(); document.getElementById('trama3dGhostBtn').click(); return; }
         if (k3d === 'e') { e.preventDefault(); document.getElementById('trama3dSeamBtn').click(); return; }
         if (k3d === 'u' || e.key === 'Enter') { e.preventDefault(); document.getElementById('trama3dRefreshBtn').click(); return; }
         if (k3d === 'p') { e.preventDefault(); document.getElementById('trama3dCaptureBtn').click(); return; }
-        if (e.key === 'Escape') { e.preventDefault(); switchPanel('colorPanel', true); setToolMode('hand'); return; }
+        if (e.key === 'Escape') { e.preventDefault(); switchPanel('colorPanel', true); return; }
       }
 
       if (currentToolMode === 'paste' && clipboard) {
@@ -3641,11 +3646,10 @@
           });
           if (modalClosed) return;
 
-          if (currentToolMode === 'paste') setToolMode('hand');
+          if (currentToolMode === 'paste') setToolMode('select');
           else if (selectedCells.size > 0 || isSelecting) cancelSelectBtn.click();
           else if (currentToolMode === 'select') setToolMode('hand');
-          else if (!document.getElementById('trama3dPanel').hidden) { switchPanel('colorPanel', true); setToolMode('hand'); }
-          else setToolMode('hand');
+          else if (!document.getElementById('trama3dPanel').hidden) switchPanel('colorPanel', true);
       }
 
       if(e.key === 'Delete' || e.key === 'Backspace') {
@@ -3688,7 +3692,6 @@
   buildColorPalette(); renderRecentColors(); refreshSaves(); updateSelectionState();
   try { const raw=localStorage.getItem('tt_autosave'); if(raw){ const d=JSON.parse(raw); if(isValidTramaData(d)) loadData(d); } } catch(e){}
   window.addEventListener('resize', draw);
-  setToolMode('hand');
   fitScreenBtn.click();
 })();
 </script>
