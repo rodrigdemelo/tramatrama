@@ -489,6 +489,22 @@
       return new THREE.SphereGeometry(radius * 0.985, 48, 32);
     }
 
+    function getIdealDistance(radius) {
+      const r = radius || lastRadius || 10;
+      const aspect = (camera && camera.aspect) ? camera.aspect : ((container && container.clientWidth && container.clientHeight) ? container.clientWidth / container.clientHeight : 1);
+      const halfFovRad = (45 / 2) * (Math.PI / 180);
+      const tanHalf = Math.tan(halfFovRad);
+      // Distância base com respiro vertical de ~25%
+      const distBase = (r * 1.35) / tanHalf;
+      if (aspect < 1) {
+        // Modo retrato (celular em pé): afasta para que a cabaça nunca corte nas laterais
+        return distBase / Math.max(aspect, 0.45);
+      } else {
+        // Modo paisagem (desktop): afasta com folga para não colidir com o dock lateral
+        return distBase * 1.15;
+      }
+    }
+
     function ensureScene(wrapEl) {
       if (renderer) { container = wrapEl; return; }
       if (!wrapEl) return;
@@ -510,7 +526,7 @@
       controls.enableDamping = true;
       controls.dampingFactor = 0.08;
       controls.minDistance = 1.2;
-      controls.maxDistance = 12;
+      controls.maxDistance = 15;
       controls.autoRotate = false;
 
       ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
@@ -630,9 +646,10 @@
       camera.far = radius * 50;
       camera.updateProjectionMatrix();
       controls.minDistance = radius * 1.15;
-      controls.maxDistance = radius * 10;
+      controls.maxDistance = radius * 15;
       if (isFirstBuild || radiusChanged) {
-        camera.position.set(0, radius * 0.3, radius * 3.1);
+        const d = getIdealDistance(radius);
+        camera.position.set(0, radius * 0.3, d);
         controls.target.set(0, 0, 0);
       }
       controls.update();
@@ -664,7 +681,8 @@
       if (modelGroup) modelGroup.rotation.set(0, 0, 0);
       if (controls && camera) {
         controls.target.set(0, 0, 0);
-        camera.position.set(0, lastRadius * 0.3, lastRadius * 3.1);
+        const d = getIdealDistance(lastRadius);
+        camera.position.set(0, lastRadius * 0.3, d);
         camera.lookAt(0, 0, 0);
         controls.update();
       }
@@ -674,7 +692,7 @@
       if (!camera || !controls) return;
       if (modelGroup) modelGroup.rotation.set(0, 0, 0);
       controls.target.set(0, 0, 0);
-      const d = lastRadius * 3.1;
+      const d = getIdealDistance(lastRadius);
       switch (viewName) {
         case 'top':
           camera.position.set(0, d, 0.0001);
@@ -3440,7 +3458,7 @@
           for (let j = 0; j < k; j++) {
               if (clusterSums[j].count > 0) {
                   centroids[j].r = clusterSums[j].r / clusterSums[j].count;
-                  centroids[j].g = clusterSums[j].g / clusterSums[j].count;
+                  centroids[j].g = clusterSums[j].r / clusterSums[j].count;
                   centroids[j].b = clusterSums[j].b / clusterSums[j].count;
               }
           }
