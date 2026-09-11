@@ -758,8 +758,8 @@
   <main class="canvas-area">
     <div id="canvasWrap">
       <div id="canvasModeBadge" class="canvas-mode-badge" title="Ferramenta Ativa">
-        <span id="badgeIcon">🖌️</span>
-        <span id="badgeText">Pincel</span>
+        <span id="badgeIcon">🖐🏽</span>
+        <span id="badgeText">Mão</span>
       </div>
       <canvas id="gridCanvas"></canvas>
       <div id="trama3dCanvasWrap">
@@ -810,9 +810,9 @@
       <!-- PAINEL DE PINTURA -->
       <div class="panel-section" id="colorPanel">
         <div class="tool-grid">
-          <button id="brushBtn" class="rail-btn-small active" title="Pincel (Atalho: P ou 1)">🖌️</button>
+          <button id="brushBtn" class="rail-btn-small" title="Pincel (Atalho: P ou 1)">🖌️</button>
           <button id="eraserBtn" class="rail-btn-small" title="Borracha (Atalho: B ou 2, ou Botão Direito)">🧹</button>
-          <button id="handBtnColor" class="rail-btn-small hand-btn" title="Mão / Mover Tela (Atalho: M, 7, H ou segure Espaço)">🖐🏽</button>
+          <button id="handBtnColor" class="rail-btn-small hand-btn active" title="Mão / Mover Tela (Atalho: M, 7, H ou segure Espaço)">🖐🏽</button>
           <button id="bucketBtn" class="rail-btn-small" title="Balde de Tinta / Preencher Seleção (Atalho: T ou 5)">🪣</button>
         </div>
         <div class="rail-sep"></div>
@@ -1427,7 +1427,7 @@
   let dpr = window.devicePixelRatio || 1;
   const painted = new Map();       
 
-  let currentToolMode = 'brush';
+  let currentToolMode = 'hand';
   let renderStyle = '2d';
   let backgroundColor = '#B5651D';
   let gridVisible = true;
@@ -1719,7 +1719,7 @@
 
     if (autoSetTool) {
       if(targetId === 'colorPanel') {
-         if(!['brush', 'eraser', 'pipette', 'bucket', 'replace'].includes(currentToolMode)) setToolMode('brush');
+         if(!['brush', 'eraser', 'pipette', 'bucket', 'replace', 'hand'].includes(currentToolMode)) setToolMode('hand');
       } else if(targetId === 'selectPanel') {
          if (currentToolMode !== 'paste') setToolMode('select');
       }
@@ -2385,6 +2385,7 @@
       if (changes.length) {
           pushUndo({changes}); scheduleAutoSave(); draw();
           showToast(`Substituídas ${changes.length} miçangas!`);
+          setToolMode('hand');
       }
   }
 
@@ -2875,7 +2876,7 @@
       selectedCells.clear();
       screenSelectionStart = null;
       screenSelectionCurrent = null;
-      setToolMode('brush'); 
+      setToolMode('hand'); 
       updateSelectionState(); 
       draw(); 
   });
@@ -2897,6 +2898,7 @@
       if(prev!==c){ painted.set(key,c); changes.push({key,prev,next:c}); }
     }
     if(changes.length){ pushUndo({changes}); scheduleAutoSave(); showToast('Estampa aplicada!'); }
+    setToolMode('hand');
     draw();
   }
 
@@ -3132,14 +3134,14 @@
       dimRowsInput.value = '';
       dimColsInput.value = '';
     }
-
-    undoStack=[]; redoStack=[]; setToolMode('brush'); centerCanvas(); fitScreenBtn.click();
+    undoStack=[]; redoStack=[]; setToolMode('hand'); centerCanvas(); fitScreenBtn.click();
   }
 
   function handleNewTrama() {
     const action = () => { 
       painted.clear(); 
       loadData({painted:[], recRows:null, recCols:null, savedHeight:null, savedCircum:null}); 
+      setToolMode('hand');
       showToast('Nova trama iniciada!'); 
     };
     if (painted.size > 0) {
@@ -3567,7 +3569,7 @@
         if (k3d === 'e') { e.preventDefault(); document.getElementById('trama3dSeamBtn').click(); return; }
         if (k3d === 'u' || e.key === 'Enter') { e.preventDefault(); document.getElementById('trama3dRefreshBtn').click(); return; }
         if (k3d === 'p') { e.preventDefault(); document.getElementById('trama3dCaptureBtn').click(); return; }
-        if (e.key === 'Escape') { e.preventDefault(); switchPanel('colorPanel', true); return; }
+        if (e.key === 'Escape') { e.preventDefault(); switchPanel('colorPanel', true); setToolMode('hand'); return; }
       }
 
       if (currentToolMode === 'paste' && clipboard) {
@@ -3639,10 +3641,11 @@
           });
           if (modalClosed) return;
 
-          if (currentToolMode === 'paste') setToolMode('select');
+          if (currentToolMode === 'paste') setToolMode('hand');
           else if (selectedCells.size > 0 || isSelecting) cancelSelectBtn.click();
-          else if (currentToolMode === 'select') setToolMode('brush');
-          else if (!document.getElementById('trama3dPanel').hidden) switchPanel('colorPanel', true);
+          else if (currentToolMode === 'select') setToolMode('hand');
+          else if (!document.getElementById('trama3dPanel').hidden) { switchPanel('colorPanel', true); setToolMode('hand'); }
+          else setToolMode('hand');
       }
 
       if(e.key === 'Delete' || e.key === 'Backspace') {
@@ -3685,6 +3688,7 @@
   buildColorPalette(); renderRecentColors(); refreshSaves(); updateSelectionState();
   try { const raw=localStorage.getItem('tt_autosave'); if(raw){ const d=JSON.parse(raw); if(isValidTramaData(d)) loadData(d); } } catch(e){}
   window.addEventListener('resize', draw);
+  setToolMode('hand');
   fitScreenBtn.click();
 })();
 </script>
