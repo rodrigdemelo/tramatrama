@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-  <title>Trama Trama 0.9.26 / Trama Xequerê</title>
+  <title>Trama Trama 0.9.27 / Trama Xequerê</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -108,7 +108,6 @@
       border: 1px solid rgba(255,255,255,0.18);
     }
 
-    /* BARRA FLUTUANTE (DOCK) */
     .sidebar {
       position: absolute;
       top: 16px;
@@ -240,7 +239,6 @@
       flex-shrink: 0;
     }
 
-    /* MODAIS */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(41, 37, 36, 0.6); backdrop-filter: blur(4px);
@@ -418,7 +416,6 @@
       background: #faf6f0;
     }
 
-    /* RESPONSIVIDADE MOBILE */
     @media (max-width: 860px) {
       .sidebar { 
         top: 8px; left: 8px; right: 8px; bottom: auto;
@@ -728,6 +725,18 @@
       return renderer.domElement.toDataURL('image/png');
     }
 
+    function captureView(viewName, size = 800) {
+      if (!renderer || !scene || !camera || !controls) return null;
+      renderer.setSize(size, size, false);
+      camera.aspect = 1;
+      camera.updateProjectionMatrix();
+      setView(viewName);
+      renderer.render(scene, camera);
+      const dataUrl = renderer.domElement.toDataURL('image/png');
+      onResize();
+      return dataUrl;
+    }
+
     function recordVideo(durationMs) {
       return new Promise((resolve, reject) => {
         if (!renderer || !renderer.domElement.captureStream || typeof MediaRecorder === 'undefined') {
@@ -760,7 +769,7 @@
 
     window.Trama3D = {
       ensureScene, build, setGhost, setSeamVisible, setRotationLevel, setRotationAxis,
-      resetView, setView, capture, onResize, recordVideo, pause, resume
+      resetView, setView, capture, captureView, onResize, recordVideo, pause, resume
     };
   </script>
 </head>
@@ -1111,7 +1120,7 @@
 <!-- Modal: Sobre -->
 <div id="aboutModal" class="modal-overlay">
   <div class="modal-card">
-    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:10px; background:#fff7ed; color:#c2410c; padding:2px 5px; border-radius:7px; border:1px solid #fed7aa;">v0.9.26</span></h3>
+    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:10px; background:#fff7ed; color:#c2410c; padding:2px 5px; border-radius:7px; border:1px solid #fed7aa;">v0.9.27</span></h3>
     <div style="font-size:11.5px; line-height:1.5; color:#57534e;">
       <p><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
       <p><b>📏 Dimensionamento Inteligente:</b> Cálculo bidirecional instantâneo entre centímetros reais da cabaça e contagem de fileiras/colunas.</p>
@@ -1127,7 +1136,7 @@
   <div class="modal-card help-modal-card">
     <h3 class="modal-title" style="justify-content: space-between;">
       <span>📖 Guia Completo do Trama Trama</span>
-      <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.26</span>
+      <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.27</span>
     </h3>
 
     <div class="help-search-box">
@@ -1516,7 +1525,6 @@
     });
   });
 
-  // Campos de Dimensionar Trama
   const dimHeightInput = document.getElementById('dimHeight');
   const dimCircInput = document.getElementById('dimCirc');
   const dimRowsInput = document.getElementById('dimRows');
@@ -2057,7 +2065,6 @@
     showToast('Trama 3D atualizada e alinhada na emenda!');
   });
 
-  // Pontos de vista rápidos
   document.getElementById('trama3dViewTopBtn').addEventListener('click', () => {
     if (window.Trama3D) { window.Trama3D.setView('top'); showToast('Vista superior'); }
   });
@@ -3083,7 +3090,7 @@
   let autosaveTimer = null;
   function buildData(name) {
     return { 
-      app:'TramaTrama', version:'0.9.26', name, author:document.getElementById('tramaAuthor').value,
+      app:'TramaTrama', version:'0.9.27', name, author:document.getElementById('tramaAuthor').value,
       savedAt:new Date().toISOString(), bg:backgroundColor, grid:gridVisible, style:renderStyle,
       recRows: recommendedRows, recCols: recommendedCols,
       savedHeight: savedTramaHeight, savedCircum: savedTramaCircum,
@@ -3251,12 +3258,11 @@
   });
 
   document.getElementById('exportPdfBtn').addEventListener('click', async () => {
-      if(!painted.size){showToast('Canvas vazio');return;}
-      if(!window.jspdf || !window.jspdf.jsPDF){showToast('Biblioteca PDF indisponível');return;}
-      showToast('Gerando PDF...');
+      if(!painted.size && !trama3dHasMoldura()){ showToast('Canvas vazio.'); return; }
+      if(!window.jspdf || !window.jspdf.jsPDF){ showToast('Biblioteca PDF indisponível'); return; }
+      showToast('Gerando Projeto em PDF (2 páginas)...');
 
-      const tmp = buildExportCanvas(false);
-      const imgData = tmp.toDataURL('image/jpeg', 0.95);
+      // 1. Coleta dados gerais
       const rawName = document.getElementById('tramaName').value.trim();
       const name = rawName || 'Sem título';
       const author = document.getElementById('tramaAuthor').value.trim() || 'Não informado';
@@ -3264,79 +3270,298 @@
       const dataStr = now.toLocaleDateString('pt-BR');
       const horaStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
+      // Contagem de miçangas
       const counts = new Map();
       for (const color of painted.values()) counts.set(color, (counts.get(color) || 0) + 1);
       const countEntries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
       const totalMicangas = countEntries.reduce((sum, [, n]) => sum + n, 0);
 
-      const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-      pdf.setFont('helvetica', 'bold');
-
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const marginMm = 14;
-      let y = marginMm;
-
-      pdf.setFontSize(18);
-      pdf.text('Trama Trama', marginMm, y); y += 8;
-
-      pdf.setFontSize(10.5); pdf.setTextColor(80);
-      pdf.text(`Nome da trama: ${name}`, marginMm, y); y += 5;
-      pdf.text(`Autoria: ${author}`, marginMm, y); y += 5;
-      pdf.text(`Gerado em: ${dataStr} às ${horaStr}`, marginMm, y); y += 4;
-
-      if (recommendedRows !== null && recommendedCols !== null) {
-        const alturaTxt = savedTramaHeight !== null ? `${formatCm(savedTramaHeight)} cm` : '—';
-        const circTxt = savedTramaCircum !== null ? `${formatCm(savedTramaCircum)} cm` : '—';
-        pdf.text(`Dimensões da cabaça: ${alturaTxt} (altura) × ${circTxt} (circunferência)`, marginMm, y); y += 5;
-        pdf.text(`Estrutura calculada: ${recommendedRows} fileiras × ${recommendedCols} colunas`, marginMm, y); y += 4;
+      // Nós vazios
+      const hasMoldura = trama3dHasMoldura();
+      let totalNosMoldura = 0;
+      let nosVazios = 0;
+      if (hasMoldura) {
+        totalNosMoldura = recommendedRows * recommendedCols;
+        let micangasNaMoldura = 0;
+        for (const key of painted.keys()) {
+          const [r, c] = key.split(',').map(Number);
+          if (isCellInsideMoldura(r, c)) micangasNaMoldura++;
+        }
+        nosVazios = Math.max(0, totalNosMoldura - micangasNaMoldura);
       }
 
-      pdf.setDrawColor(200); pdf.line(marginMm, y, pageW - marginMm, y); y += 8;
+      // 2. Captura dos 4 ângulos 3D (se moldura ativa)
+      let snapTopFront = null, snapRight = null, snapLeft = null, snapBottom = null;
+      if (hasMoldura && window.Trama3D) {
+        try {
+          window.Trama3D.ensureScene(trama3dCanvasWrap);
+          window.Trama3D.build(trama3dBuildPayload());
+          window.Trama3D.setGhost(false);
+          window.Trama3D.setSeamVisible(true);
+          
+          // Captura em resolução quadrada 1:1 nativa (800x800px) evitando distorção/esticamento
+          snapTopFront = window.Trama3D.captureView('topFront', 800);
+          snapRight = window.Trama3D.captureView('right', 800);
+          snapLeft = window.Trama3D.captureView('left', 800);
+          snapBottom = window.Trama3D.captureView('bottom', 800);
+          
+          window.Trama3D.setView('front'); // restaura
+          window.Trama3D.onResize();
+        } catch (err) {
+          console.warn('Erro ao capturar mosaico 3D para o PDF:', err);
+        }
+      }
 
-      const availW = pageW - marginMm * 2;
-      const legendRows = Math.ceil(countEntries.length / 2);
-      const legendReserve = 12 + legendRows * 6 + 12;
-      const availH = pageH - y - marginMm - legendReserve;
-      const imgRatio = tmp.width / tmp.height;
-      let drawW = availW, drawH = availW / imgRatio;
-      if (drawH > availH) { drawH = availH; drawW = availH * imgRatio; }
-      const offsetX = marginMm + (availW - drawW) / 2;
-      pdf.setDrawColor(220); pdf.rect(offsetX - 0.5, y - 0.5, drawW + 1, drawH + 1);
-      pdf.addImage(imgData, 'JPEG', offsetX, y, drawW, drawH);
-      y += drawH + 10;
+      // 3. Inicializa documento jsPDF (A4 em retrato: 210 x 297 mm)
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const marginMm = 15;
+      const contentW = pageW - marginMm * 2; // 180mm exatos
 
-      pdf.setFontSize(12); pdf.setTextColor(20);
-      pdf.text('Legenda e Contagem de Miçangas:', marginMm, y); y += 6;
+      // ==========================================
+      // PÁGINA 1: FICHA TÉCNICA + VISUALIZAÇÃO 3D
+      // ==========================================
+      let y = 11;
 
+      // Cabeçalho institucional
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.setTextColor(124, 45, 18); // tom #7c2d12
+      pdf.text('Trama Trama', marginMm, y);
+      
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(150);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Ficha Técnica do Projeto (Página 1 de 2)', pageW - marginMm, y, { align: 'right' });
+      y += 5.5;
+
+      pdf.setDrawColor(220);
+      pdf.setLineWidth(0.35);
+      pdf.line(marginMm, y, pageW - marginMm, y);
+      y += 4;
+
+      // Bloco de Identificação e Medidas (Distribuído em duas colunas)
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(40);
+      const col2X = marginMm + contentW * 0.48;
+      const metaStartY = y;
+      
+      // Coluna Esquerda
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Nome do Projeto: ', marginMm, metaStartY);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${name}`, marginMm + 29, metaStartY);
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Autoria: ', marginMm, metaStartY + 4.2);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${author}`, marginMm + 14, metaStartY + 4.2);
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Data / Horário: ', marginMm, metaStartY + 8.4);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${dataStr} às ${horaStr}`, marginMm + 24, metaStartY + 8.4);
+
+      // Coluna Direita
+      if (hasMoldura) {
+        const altStr = savedTramaHeight !== null ? `${formatCm(savedTramaHeight)} cm` : '—';
+        const circStr = savedTramaCircum !== null ? `${formatCm(savedTramaCircum)} cm` : '—';
+        
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Dimensões: ', col2X, metaStartY);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${altStr} (alt) × ${circStr} (circ)`, col2X + 21, metaStartY);
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Estrutura: ', col2X, metaStartY + 4.2);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${recommendedRows} fileiras × ${recommendedCols} colunas (${totalNosMoldura} nós)`, col2X + 18, metaStartY + 4.2);
+
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Nós: ', col2X, metaStartY + 8.4);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${totalMicangas} miçangas  •  ${nosVazios} nós vazios`, col2X + 10, metaStartY + 8.4);
+      } else {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('Total de miçangas: ', col2X, metaStartY);
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`${totalMicangas} miçangas (${estimateWeightLabel(totalMicangas)})`, col2X + 31, metaStartY);
+      }
+      y = metaStartY + 12.5;
+
+      pdf.setDrawColor(235);
+      pdf.line(marginMm, y, pageW - marginMm, y);
+      y += 4;
+
+      // Bloco Mosaico 3D (4 ângulos em grid 2x2 de 90x90mm cada, contíguos e sem moldura externa)
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(124, 45, 18);
+      pdf.text('Visualização Esférica 3D do Instrumento:', marginMm, y);
+      y += 3.5;
+
+      if (hasMoldura && snapTopFront && snapRight && snapLeft && snapBottom) {
+        const boxSize = 90; // 90x90 mm por imagem (proporção quadrada 1:1 sem distorção)
+        const gridStartX = marginMm; // 15mm à esquerda, 180mm total de largura (15mm + 180mm = 195mm, respiro de 15mm à direita)
+        const gridStartY = y;
+
+        const viewsInfo = [
+          { title: 'Superior-Frontal', img: snapTopFront, col: 0, row: 0 },
+          { title: 'Lateral Direita', img: snapRight, col: 1, row: 0 },
+          { title: 'Lateral Esquerda', img: snapLeft, col: 0, row: 1 },
+          { title: 'Inferior', img: snapBottom, col: 1, row: 1 }
+        ];
+
+        viewsInfo.forEach((item) => {
+          const ix = gridStartX + item.col * boxSize;
+          const iy = gridStartY + item.row * boxSize;
+
+          // Renderiza a imagem quadrada nativa em 90x90 mm perfeitamente contígua
+          pdf.addImage(item.img, 'PNG', ix, iy, boxSize, boxSize);
+
+          // Etiqueta identificadora discreta no canto superior de cada quadrante
+          pdf.setFontSize(7.5);
+          pdf.setFont('helvetica', 'bold');
+          const tw = pdf.getTextWidth(item.title) + 5;
+          pdf.setFillColor(255, 255, 255);
+          pdf.setDrawColor(220);
+          pdf.roundedRect(ix + 2, iy + 2, tw, 4.5, 1, 1, 'FD');
+          pdf.setTextColor(80);
+          pdf.text(item.title, ix + 2 + tw / 2, iy + 5.2, { align: 'center' });
+        });
+
+        // Sem moldura externa contornando o bloco
+        y += boxSize * 2 + 4;
+      } else {
+        // Aviso amigável quando a moldura não foi definida
+        pdf.setDrawColor(254, 215, 170);
+        pdf.setFillColor(255, 247, 237);
+        pdf.roundedRect(marginMm, y, contentW, 16, 3, 3, 'FD');
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(154, 52, 18);
+        pdf.text('Aviso: Visualização 3D não gerada nesta ficha técnica.', marginMm + 5, y + 6.5);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(120, 113, 108);
+        pdf.text('Defina as medidas em "Dimensionar Trama" (Alt+D) para habilitar o mosaico esférico completo.', marginMm + 5, y + 12);
+        y += 20;
+      }
+
+      pdf.setDrawColor(235);
+      pdf.line(marginMm, y, pageW - marginMm, y);
+      y += 4.5;
+
+      // Tabela / Legenda de Cores
+      pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(10.5);
-      const swatchSize = 4;
-      const legendColGap = availW / 2;
+      pdf.setTextColor(124, 45, 18);
+      pdf.text('Legenda e Lista de Materiais (Miçangas):', marginMm, y);
+      y += 4.5;
+
+      pdf.setFontSize(9);
+      const swatchSize = 3.2;
+      const legendColGap = contentW / 2;
       const legendStartY = y;
+      const maxLegendRows = Math.ceil(countEntries.length / 2);
+
       for (let i = 0; i < countEntries.length; i++) {
         const [color, count] = countEntries[i];
         const col = i % 2, row = Math.floor(i / 2);
         const colX = marginMm + col * legendColGap;
-        const rowY = legendStartY + row * 6;
+        const rowY = legendStartY + row * 4.8;
+
+        // Swatch de cor
         const rgb = hexToRgb(color);
         pdf.setFillColor(rgb.r, rgb.g, rgb.b);
-        pdf.setDrawColor(150);
-        pdf.rect(colX, rowY - swatchSize + 1, swatchSize, swatchSize, 'FD');
-        pdf.setTextColor(30);
-        pdf.text(`${nearestColorName(color)}: ${count} miçangas (${estimateWeightLabel(count)})`, colX + swatchSize + 3, rowY);
+        pdf.setDrawColor(160);
+        pdf.rect(colX, rowY - swatchSize + 0.6, swatchSize, swatchSize, 'FD');
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(40);
+        pdf.text(`${nearestColorName(color)}: ${count} miçangas (${estimateWeightLabel(count)})`, colX + swatchSize + 2.5, rowY);
       }
-      y = legendStartY + legendRows * 6 + 2;
-      pdf.setFontSize(11);
+      y = legendStartY + maxLegendRows * 4.8 + 2.5;
+
+      // Resumo final da Página 1
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(20);
       pdf.text(`Total Geral: ${totalMicangas} miçangas (peso aprox.: ${estimateWeightLabel(totalMicangas)})`, marginMm, y);
 
-      pdf.setFontSize(9); pdf.setTextColor(150);
-      pdf.text('Trama Trama v0.9.26 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 8);
+      // Rodapé institucional Página 1
+      pdf.setFontSize(8);
+      pdf.setTextColor(150);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Trama Trama v0.9.27 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 6);
+      pdf.text('Consulte o Mapa da Trama em tamanho ampliado na Página 2 →', pageW - marginMm, pageH - 6, { align: 'right' });
 
+      // ==========================================
+      // PÁGINA 2: MAPA DA TRAMA (TELA CHEIA ROTACIONADA)
+      // ==========================================
+      pdf.addPage('a4', 'portrait');
+
+      // Gera a trama plana em resolução elevada
+      const flatCanvas = buildExportCanvas(false);
+
+      // Rotaciona a imagem da trama em 90 graus para que seu sentido
+      // panorâmico ocupe a altura total (297 mm) da folha A4 em retrato.
+      const rotCanvas = document.createElement('canvas');
+      rotCanvas.width = flatCanvas.height;
+      rotCanvas.height = flatCanvas.width;
+      const rotCtx = rotCanvas.getContext('2d');
+      rotCtx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
+      rotCtx.rotate(Math.PI / 2);
+      rotCtx.drawImage(flatCanvas, -flatCanvas.width / 2, -flatCanvas.height / 2);
+      const rotImgData = rotCanvas.toDataURL('image/jpeg', 0.95);
+
+      // Cabeçalho discreto da Página 2
+      const p2Margin = 10;
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(10);
+      pdf.setTextColor(124, 45, 18);
+      pdf.text(`Mapa de Execução da Trama — ${name}`, p2Margin, p2Margin + 3);
+
+      pdf.setFontSize(8.5);
+      pdf.setTextColor(130);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text('Página 2 de 2 (Gire a folha na horizontal para tecer na bancada)', pageW - p2Margin, p2Margin + 3, { align: 'right' });
+
+      // Área útil máxima para o mapa
+      const mapTop = p2Margin + 7;
+      const mapBottom = pageH - p2Margin - 5;
+      const mapAvailW = pageW - p2Margin * 2;
+      const mapAvailH = mapBottom - mapTop;
+
+      const rotRatio = rotCanvas.width / rotCanvas.height;
+      let mapDrawW = mapAvailW;
+      let mapDrawH = mapAvailW / rotRatio;
+      if (mapDrawH > mapAvailH) {
+        mapDrawH = mapAvailH;
+        mapDrawW = mapAvailH * rotRatio;
+      }
+
+      const mapOffsetX = p2Margin + (mapAvailW - mapDrawW) / 2;
+      const mapOffsetY = mapTop + (mapAvailH - mapDrawH) / 2;
+
+      // Moldura e estampa do mapa em tela cheia
+      pdf.setDrawColor(210);
+      pdf.setLineWidth(0.3);
+      pdf.rect(mapOffsetX - 0.4, mapOffsetY - 0.4, mapDrawW + 0.8, mapDrawH + 0.8);
+      pdf.addImage(rotImgData, 'JPEG', mapOffsetX, mapOffsetY, mapDrawW, mapDrawH);
+
+      // Rodapé Página 2
+      pdf.setFontSize(8);
+      pdf.setTextColor(160);
+      pdf.text(`Trama Trama v0.9.27 — ${author} — ${dataStr}`, p2Margin, pageH - 5);
+
+      // 4. Salva o PDF
       const sanitizedName = (rawName || 'Trama').replace(/[^\w\-]+/g, '_');
-      const filename = `${sanitizedName}_TramaTrama.pdf`;
+      const filename = `${sanitizedName}_Projeto_TramaTrama.pdf`;
       pdf.save(filename);
-      showToast(`PDF "${filename}" baixado!`);
+      showToast(`Projeto em PDF "${filename}" baixado com sucesso!`);
   });
 
   const imageInput = document.getElementById('imageInput');
@@ -3459,7 +3684,7 @@
               if (clusterSums[j].count > 0) {
                   centroids[j].r = clusterSums[j].r / clusterSums[j].count;
                   centroids[j].g = clusterSums[j].r / clusterSums[j].count;
-                  centroids[j].b = clusterSums[j].b / clusterSums[j].count;
+                  centroids[j].b = clusterSums[j].r / clusterSums[j].count;
               }
           }
 
