@@ -1,0 +1,4220 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover" />
+  <title>Trama Trama 0.9.27 · Apple Design Edition</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700;800&family=SF+Pro+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      /* Apple System Color Palette & Terracotta Warm Accents */
+      --apple-font: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "SF Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      --apple-mono: "SF Mono", "JetBrains Mono", Menlo, Monaco, Consolas, monospace;
+      
+      --bg-canvas: #B5651D;
+      --apple-terracotta: #C2410C;
+      --apple-terracotta-hover: #9A3412;
+      --apple-terracotta-tint: rgba(194, 65, 12, 0.12);
+      
+      --system-bg-material: rgba(255, 255, 255, 0.78);
+      --system-bg-submaterial: rgba(245, 242, 237, 0.82);
+      --system-bg-sheet: rgba(255, 255, 255, 0.94);
+      --system-grouped-bg: rgba(246, 243, 238, 0.75);
+      
+      --text-primary: #1D1D1F;
+      --text-secondary: #6E6E73;
+      --text-tertiary: #86868B;
+      
+      --glass-border: rgba(255, 255, 255, 0.65);
+      --glass-border-subtle: rgba(0, 0, 0, 0.08);
+      --glass-hairline: rgba(60, 60, 67, 0.12);
+      
+      --shadow-dock: 0 16px 38px -6px rgba(0, 0, 0, 0.22), 0 4px 16px -2px rgba(0, 0, 0, 0.08);
+      --shadow-sheet: 0 24px 48px -12px rgba(0, 0, 0, 0.28), 0 8px 20px -4px rgba(0, 0, 0, 0.12);
+      --shadow-button: 0 1px 3px rgba(0, 0, 0, 0.06);
+      
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 18px;
+      --radius-sheet: 24px;
+      --radius-pill: 9999px;
+      
+      --dock-width: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: var(--apple-font);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      height: 100dvh;
+      overflow: hidden;
+      position: fixed;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+    }
+
+    /* Apple Interactive Base */
+    button, input, select {
+      font-size: 12px;
+      font-weight: 500;
+      outline: none;
+      border: 1px solid var(--glass-hairline);
+      border-radius: var(--radius-sm);
+      background: #FFFFFF;
+      color: var(--text-primary);
+      transition: all 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    button {
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    button:active {
+      transform: scale(0.94);
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.96);
+      border-color: rgba(194, 65, 12, 0.35);
+    }
+
+    button.btn-primary {
+      background: var(--apple-terracotta);
+      color: #FFFFFF;
+      border-color: var(--apple-terracotta);
+      font-weight: 600;
+      box-shadow: 0 2px 8px rgba(194, 65, 12, 0.28);
+    }
+
+    button.btn-primary:hover {
+      background: var(--apple-terracotta-hover);
+      border-color: var(--apple-terracotta-hover);
+    }
+
+    button.btn-danger {
+      background: #FF3B30;
+      color: #FFFFFF;
+      border-color: #FF3B30;
+    }
+
+    button.btn-danger:hover {
+      background: #D70015;
+      border-color: #D70015;
+    }
+
+    button:disabled {
+      opacity: 0.36;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .app-shell {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      overflow: hidden;
+    }
+
+    /* Canvas Viewport */
+    .canvas-area {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    #canvasWrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    canvas#gridCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      touch-action: none;
+      cursor: crosshair;
+    }
+
+    /* Apple Dynamic Capsule Badge */
+    .canvas-mode-badge {
+      position: absolute;
+      top: 18px;
+      right: 20px;
+      background: rgba(30, 27, 24, 0.72);
+      color: #FFFFFF;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      pointer-events: none;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      z-index: 30;
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.24);
+    }
+
+    /* Apple Floating Glass Sidebar (Island Dock) */
+    .sidebar {
+      position: absolute;
+      top: 18px;
+      left: 18px;
+      bottom: 18px;
+      display: flex;
+      flex-direction: row;
+      background: var(--system-bg-material);
+      backdrop-filter: blur(32px) saturate(190%);
+      -webkit-backdrop-filter: blur(32px) saturate(190%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-dock);
+      z-index: 40;
+      overflow: hidden;
+      height: calc(100vh - 36px);
+      height: calc(100dvh - 36px);
+      max-height: calc(100vh - 36px);
+      max-height: calc(100dvh - 36px);
+      transition: width 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .icon-rail, .side-panel {
+      width: var(--dock-width);
+      flex: 0 0 var(--dock-width);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 8px 4px;
+      gap: 5px;
+      height: 100%;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: none;
+    }
+
+    .icon-rail::-webkit-scrollbar, .side-panel::-webkit-scrollbar { display: none; }
+
+    .icon-rail {
+      background: rgba(255, 255, 255, 0.45);
+      border-right: 1px solid var(--glass-hairline);
+    }
+
+    .side-panel {
+      background: rgba(255, 255, 255, 0.85);
+      transition: width 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), flex-basis 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .rail-sep {
+      width: 65%;
+      height: 1px;
+      background: var(--glass-hairline);
+      margin: 3px auto;
+      flex-shrink: 0;
+    }
+
+    .rail-btn {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      font-size: 16px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      position: relative;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--text-primary);
+    }
+
+    .rail-btn:hover {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: transparent;
+    }
+
+    .rail-btn.active {
+      background: var(--apple-terracotta);
+      color: #FFFFFF;
+      box-shadow: 0 3px 10px rgba(194, 65, 12, 0.35);
+    }
+
+    .rail-btn-small {
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      font-size: 15px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      border: 1px solid transparent;
+      background: transparent;
+    }
+
+    .rail-btn-small:hover {
+      background: rgba(0, 0, 0, 0.05);
+      border-color: transparent;
+    }
+
+    .rail-btn-small.active {
+      background: var(--apple-terracotta);
+      color: #FFFFFF;
+      box-shadow: 0 3px 10px rgba(194, 65, 12, 0.32);
+    }
+
+    .btn-text-icon {
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .icon-rotate-45 {
+      display: inline-block;
+      transform: rotate(45deg);
+    }
+
+    #recentColorsSection { display: contents; }
+    #recentColorsSection[hidden] { display: none; }
+
+    .save-badge-rail {
+      width: 36px;
+      font-size: 9px;
+      padding: 5px 1px;
+      border-radius: var(--radius-sm);
+      background: rgba(52, 199, 89, 0.15);
+      color: #248A3D;
+      border: 1px solid rgba(52, 199, 89, 0.35);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex-shrink: 0;
+      user-select: none;
+      transition: all 0.2s ease;
+      line-height: 1.1;
+    }
+
+    .save-badge-rail.saving {
+      background: rgba(255, 149, 0, 0.18);
+      color: #C96700;
+      border-color: rgba(255, 149, 0, 0.4);
+    }
+
+    .panel-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      width: 100%;
+    }
+
+    .panel-section[hidden] { display: none !important; }
+
+    .color-grid, .tool-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      width: 100%;
+      align-items: center;
+      padding: 0;
+    }
+
+    .swatch {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      border: 1px solid rgba(0, 0, 0, 0.14);
+      cursor: pointer;
+      padding: 0;
+      box-shadow: inset 0 0 2px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.04);
+      flex-shrink: 0;
+      transition: transform 0.15s ease, outline 0.15s ease;
+    }
+
+    .swatch:hover {
+      transform: scale(1.06);
+    }
+
+    .swatch.selected {
+      outline: 2.5px solid var(--apple-terracotta);
+      outline-offset: 1.5px;
+      transform: scale(1.08);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .clip-preview {
+      border: 1px solid var(--glass-hairline);
+      border-radius: 10px;
+      background: #B5651D;
+      width: 36px;
+      height: 36px;
+      margin: 0 auto;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.15);
+    }
+
+    /* Apple Modal Sheets */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background: var(--system-bg-sheet);
+      border-radius: var(--radius-sheet);
+      padding: 22px;
+      max-width: 440px;
+      width: 90%;
+      max-height: 88vh;
+      overflow-y: auto;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow-sheet);
+      transform: scale(0.96) translateY(12px);
+      transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: relative;
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    /* Apple Sheet Grabber */
+    .modal-grabber {
+      width: 36px;
+      height: 4.5px;
+      background: rgba(60, 60, 67, 0.24);
+      border-radius: var(--radius-pill);
+      margin: -8px auto 14px auto;
+    }
+
+    .modal-title {
+      margin: 0 0 14px 0;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--apple-terracotta);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .apple-inset-group {
+      background: var(--system-grouped-bg);
+      border: 1px solid var(--glass-hairline);
+      border-radius: var(--radius-md);
+      padding: 12px;
+      margin-bottom: 12px;
+    }
+
+    .apple-segmented-control {
+      display: flex;
+      background: rgba(118, 118, 128, 0.12);
+      border-radius: 9px;
+      padding: 2px;
+      gap: 2px;
+      margin-bottom: 8px;
+    }
+
+    .apple-segmented-control button {
+      flex: 1;
+      border: none;
+      background: transparent;
+      padding: 6px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      border-radius: 7px;
+      box-shadow: none;
+    }
+
+    .apple-segmented-control button.active {
+      background: #FFFFFF;
+      color: var(--text-primary);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 11px;
+      width: 100%;
+    }
+
+    .form-group label {
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      min-width: 0;
+      padding: 7px 10px;
+      border: 1px solid var(--glass-hairline);
+      border-radius: 8px;
+      background: #FFFFFF;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--apple-terracotta);
+      box-shadow: 0 0 0 3px var(--apple-terracotta-tint);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .form-row > * {
+      flex: 1;
+      min-width: 0;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    /* 3D Container */
+    #trama3dCanvasWrap {
+      position: absolute;
+      inset: 0;
+      display: none;
+      background: #FFFFFF;
+      z-index: 2;
+    }
+
+    #trama3dCanvasWrap.active { display: block; }
+    #trama3dCanvasWrap canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+
+    #trama3dEmptyState {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 10px;
+      color: var(--text-primary);
+      text-align: center;
+      padding: 24px;
+      z-index: 2;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(20px);
+    }
+
+    /* Toast Notification (Apple Capsule Style) */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast {
+      background: rgba(30, 27, 24, 0.88);
+      color: #FFFFFF;
+      padding: 9px 16px;
+      border-radius: var(--radius-pill);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      opacity: 0;
+      transform: translateY(12px) scale(0.95);
+      transition: all 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+      pointer-events: auto;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* Help Accordion */
+    .help-modal-card {
+      max-width: 640px !important;
+      width: 92%;
+      height: 82vh;
+      max-height: 82vh;
+      display: flex;
+      flex-direction: column;
+      padding: 20px 22px;
+      overflow: hidden !important;
+    }
+
+    .help-search-box {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-shrink: 0;
+    }
+
+    .help-search-box input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 12px;
+      border: 1px solid var(--glass-hairline);
+      border-radius: var(--radius-sm);
+      outline: none;
+      background: var(--system-grouped-bg);
+    }
+
+    .help-search-box input:focus {
+      background: #FFFFFF;
+      border-color: var(--apple-terracotta);
+      box-shadow: 0 0 0 3px var(--apple-terracotta-tint);
+    }
+
+    .help-accordion-container {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      flex: 1 1 0;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding-right: 4px;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(194, 65, 12, 0.4) transparent;
+    }
+
+    .help-accordion-item {
+      border: 1px solid var(--glass-hairline);
+      border-radius: var(--radius-md);
+      background: #FFFFFF;
+      overflow: hidden;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    .help-accordion-item:hover {
+      border-color: rgba(194, 65, 12, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+    }
+
+    .help-accordion-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 12.5px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      min-height: 42px;
+    }
+
+    .help-accordion-header:hover {
+      background: var(--apple-terracotta-tint);
+      color: var(--apple-terracotta);
+    }
+
+    .help-accordion-header .chevron {
+      font-size: 10px;
+      transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .help-accordion-item.open .help-accordion-header .chevron {
+      transform: rotate(180deg);
+      color: var(--apple-terracotta);
+    }
+
+    .help-accordion-content {
+      display: none;
+      padding: 4px 14px 14px 14px;
+      font-size: 12px;
+      line-height: 1.58;
+      color: #3A3A3C;
+      border-top: 1px solid var(--glass-hairline);
+      background: #FFFFFF;
+    }
+
+    .help-accordion-item.open .help-accordion-content { display: block; }
+    .help-accordion-content ul { margin: 6px 0 0 0; padding-left: 18px; }
+    .help-accordion-content li { margin-bottom: 6px; }
+
+    .help-accordion-content kbd {
+      background: rgba(118, 118, 128, 0.12);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 5px;
+      padding: 2px 6px;
+      font-size: 10.5px;
+      font-family: var(--apple-mono) !important;
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+
+    .help-table-shortcuts {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 11.5px;
+    }
+
+    .help-table-shortcuts th, .help-table-shortcuts td {
+      padding: 7px 9px;
+      border-bottom: 1px solid var(--glass-hairline);
+      text-align: left;
+    }
+
+    .help-table-shortcuts th {
+      color: var(--text-secondary);
+      font-weight: 700;
+      background: var(--system-grouped-bg);
+    }
+
+    /* Responsive adjustments for iPad & Mobile */
+    @media (max-width: 860px) {
+      .sidebar {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        bottom: auto;
+        width: auto;
+        max-width: calc(100vw - 20px);
+        height: auto;
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
+        flex-direction: column;
+        border-radius: var(--radius-md);
+      }
+      
+      .icon-rail, .side-panel {
+        width: 100%;
+        flex: 0 0 auto;
+        flex-direction: row;
+        height: auto;
+        min-height: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 6px 8px;
+        align-items: center;
+        justify-content: flex-start;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .icon-rail {
+        border-right: none;
+        border-bottom: 1px solid var(--glass-hairline);
+      }
+
+      .rail-sep {
+        width: 1px;
+        height: 22px;
+        margin: 0 4px;
+      }
+
+      .color-grid, .tool-grid {
+        display: flex;
+        flex-direction: row;
+        width: max-content;
+        gap: 5px;
+        padding: 0;
+        flex-wrap: nowrap;
+      }
+
+      .swatch, .rail-btn, .rail-btn-small {
+        width: 34px;
+        height: 34px;
+        font-size: 14px;
+        border-radius: 8px;
+      }
+
+      .save-badge-rail {
+        width: auto;
+        height: 34px;
+        padding: 0 8px;
+        font-size: 10px;
+        white-space: nowrap;
+      }
+
+      .panel-section {
+        flex-direction: row;
+        width: max-content;
+        min-width: max-content;
+        justify-content: flex-start;
+        flex-wrap: nowrap;
+        gap: 5px;
+      }
+
+      .clip-preview {
+        width: 34px;
+        height: 34px;
+      }
+
+      .canvas-mode-badge {
+        top: auto;
+        bottom: 14px;
+        right: 14px;
+        padding: 0;
+        border-radius: 50%;
+        width: 34px;
+        height: 34px;
+        justify-content: center;
+        font-size: 16px;
+      }
+      
+      .canvas-mode-badge #badgeText { display: none !important; }
+    }
+  </style>
+
+  <!-- jsPDF & Three.js CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  
+  <!-- Motor 3D Three.js -->
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+    let renderer, scene, camera, controls, rafId = null;
+    let beadMesh = null, sphereMesh = null, seamLine = null;
+    let ambientLight = null, keyLight = null, fillLight = null;
+    let ghostMode = false, seamVisible = true;
+    let lastRadius = 10;
+    let container = null;
+    const dummy = new THREE.Object3D();
+
+    let modelGroup = null;
+    let rotSpeed = 0; // 0=parado, 1=lenta, 2=media, 3=rapida
+    let rotAxis = 'h'; // 'h' = horizontal (em torno de Y), 'v' = vertical (em torno de X)
+
+    function buildSphereGeometry(radius) {
+      return new THREE.SphereGeometry(radius * 0.985, 48, 32);
+    }
+
+    function getIdealDistance(radius) {
+      const r = radius || lastRadius || 10;
+      const aspect = (camera && camera.aspect) ? camera.aspect : ((container && container.clientWidth && container.clientHeight) ? container.clientWidth / container.clientHeight : 1);
+      const halfFovRad = (45 / 2) * (Math.PI / 180);
+      const tanHalf = Math.tan(halfFovRad);
+      const distBase = (r * 1.35) / tanHalf;
+      if (aspect < 1) {
+        return distBase / Math.max(aspect, 0.45);
+      } else {
+        return distBase * 1.15;
+      }
+    }
+
+    function ensureScene(wrapEl) {
+      if (renderer) { container = wrapEl; return; }
+      if (!wrapEl) return;
+      container = wrapEl;
+      scene = new THREE.Scene();
+      scene.background = new THREE.Color(0xffffff);
+
+      modelGroup = new THREE.Group();
+      scene.add(modelGroup);
+
+      camera = new THREE.PerspectiveCamera(45, 1, 0.1, 500);
+      camera.position.set(0, 0, 4.2);
+
+      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true });
+      renderer.setPixelRatio(Math.min((window.devicePixelRatio || 1), 2));
+      container.appendChild(renderer.domElement);
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+      controls.dampingFactor = 0.08;
+      controls.minDistance = 1.2;
+      controls.maxDistance = 15;
+      controls.autoRotate = false;
+
+      ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+      scene.add(ambientLight);
+
+      keyLight = new THREE.DirectionalLight(0xffffff, 1.25);
+      keyLight.position.set(4, 5, 4);
+      scene.add(keyLight);
+
+      fillLight = new THREE.DirectionalLight(0xf0f4ff, 0.6);
+      fillLight.position.set(-4, -2, -3);
+      scene.add(fillLight);
+
+      window.addEventListener('resize', onResize);
+      animate();
+    }
+
+    function onResize() {
+      if (!renderer || !container) return;
+      const w = container.clientWidth || 1, h = container.clientHeight || 1;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+
+    function animate() {
+      rafId = requestAnimationFrame(animate);
+      onResize();
+
+      if (modelGroup && rotSpeed > 0) {
+        const step = (rotSpeed === 1 ? 0.004 : (rotSpeed === 2 ? 0.012 : 0.024));
+        if (rotAxis === 'h') {
+          modelGroup.rotation.y += step;
+        } else {
+          modelGroup.rotation.x += step;
+        }
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
+
+    function build(payload) {
+      const { radius, cells, rows, cols, uMin, uSpan, vMin, vSpan, beadDiameterCm } = payload;
+      const radiusChanged = Math.abs(radius - lastRadius) > 1e-6;
+      const isFirstBuild = !beadMesh;
+      lastRadius = radius;
+
+      if (!modelGroup) {
+        modelGroup = new THREE.Group();
+        scene.add(modelGroup);
+      }
+
+      if (sphereMesh) { sphereMesh.geometry.dispose(); sphereMesh.material.dispose(); modelGroup.remove(sphereMesh); }
+      const sphereGeo = buildSphereGeometry(radius);
+      const sphereMat = new THREE.MeshStandardMaterial({
+        color: 0xB5651D,
+        roughness: 0.55,
+        metalness: 0.04,
+        transparent: true,
+        opacity: ghostMode ? 0 : 1,
+        depthWrite: !ghostMode
+      });
+      sphereMesh = new THREE.Mesh(sphereGeo, sphereMat);
+      sphereMesh.visible = !ghostMode;
+      modelGroup.add(sphereMesh);
+
+      if (beadMesh) { beadMesh.geometry.dispose(); beadMesh.material.dispose(); modelGroup.remove(beadMesh); }
+      const beadGeo = new THREE.SphereGeometry((beadDiameterCm || 1) / 2, 14, 12);
+      const beadMat = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.08, vertexColors: true });
+      const count = Math.max(cells.length, 1);
+      beadMesh = new THREE.InstancedMesh(beadGeo, beadMat, count);
+      const colorArr = new Float32Array(count * 3);
+      const tmpColor = new THREE.Color();
+
+      cells.forEach((cell, i) => {
+        const u_norm = (cell.u - uMin) / uSpan;
+        const theta = u_norm * Math.PI * 2;
+        const v_norm = (cell.v - vMin) / vSpan;
+        const phiDeg = 60 - v_norm * 120;
+        const phi = phiDeg * Math.PI / 180;
+        const rr = radius * 1.01;
+        const x = rr * Math.cos(phi) * Math.sin(theta);
+        const y = rr * Math.sin(phi);
+        const z = rr * Math.cos(phi) * Math.cos(theta);
+
+        dummy.position.set(x, y, z);
+        dummy.lookAt(0, y, 0);
+        dummy.updateMatrix();
+        beadMesh.setMatrixAt(i, dummy.matrix);
+        tmpColor.set(cell.color);
+        tmpColor.toArray(colorArr, i * 3);
+      });
+
+      if (cells.length === 0) {
+        dummy.position.set(0, 9999, 0); dummy.updateMatrix(); beadMesh.setMatrixAt(0, dummy.matrix);
+      }
+      beadMesh.geometry.setAttribute('color', new THREE.InstancedBufferAttribute(colorArr, 3));
+      beadMesh.instanceMatrix.needsUpdate = true;
+      modelGroup.add(beadMesh);
+
+      if (seamLine) { seamLine.geometry.dispose(); seamLine.material.dispose(); modelGroup.remove(seamLine); }
+      const seamPts = [];
+      for (let i = 0; i <= 40; i++) {
+        const phiDeg = 60 - (i / 40) * 120;
+        const phi = phiDeg * Math.PI / 180;
+        const rr = radius * 1.015;
+        seamPts.push(new THREE.Vector3(rr * Math.cos(phi) * Math.sin(0), rr * Math.sin(phi), rr * Math.cos(phi) * Math.cos(0)));
+      }
+      const seamGeo = new THREE.BufferGeometry().setFromPoints(seamPts);
+      const seamMat = new THREE.LineBasicMaterial({ color: 0xc2410c, transparent: true, opacity: 0.9, linewidth: 2 });
+      seamLine = new THREE.Line(seamGeo, seamMat);
+      seamLine.visible = seamVisible;
+      modelGroup.add(seamLine);
+
+      camera.near = Math.max(radius * 0.01, 0.05);
+      camera.far = radius * 50;
+      camera.updateProjectionMatrix();
+      controls.minDistance = radius * 1.15;
+      controls.maxDistance = radius * 15;
+      if (isFirstBuild || radiusChanged) {
+        const d = getIdealDistance(radius);
+        camera.position.set(0, radius * 0.3, d);
+        controls.target.set(0, 0, 0);
+      }
+      controls.update();
+    }
+
+    function setGhost(val) {
+      ghostMode = val;
+      if (sphereMesh) {
+        sphereMesh.material.opacity = ghostMode ? 0 : 1;
+        sphereMesh.material.depthWrite = !ghostMode;
+        sphereMesh.visible = !ghostMode;
+      }
+    }
+
+    function setSeamVisible(val) {
+      seamVisible = val;
+      if (seamLine) seamLine.visible = val;
+    }
+
+    function setRotationLevel(level) {
+      rotSpeed = level;
+    }
+
+    function setRotationAxis(axis) {
+      rotAxis = (axis === 'v' ? 'v' : 'h');
+    }
+
+    function resetView() {
+      if (modelGroup) modelGroup.rotation.set(0, 0, 0);
+      if (controls && camera) {
+        controls.target.set(0, 0, 0);
+        const d = getIdealDistance(lastRadius);
+        camera.position.set(0, lastRadius * 0.3, d);
+        camera.lookAt(0, 0, 0);
+        controls.update();
+      }
+    }
+
+    function setView(viewName) {
+      if (!camera || !controls) return;
+      if (modelGroup) modelGroup.rotation.set(0, 0, 0);
+      controls.target.set(0, 0, 0);
+      const d = getIdealDistance(lastRadius);
+      switch (viewName) {
+        case 'top': camera.position.set(0, d, 0.0001); break;
+        case 'topFront': camera.position.set(0, d * 0.7071, d * 0.7071); break;
+        case 'bottom': camera.position.set(0, -d, 0.0001); break;
+        case 'front': camera.position.set(0, 0, d); break;
+        case 'back': camera.position.set(0, 0, -d); break;
+        case 'left': camera.position.set(-d, 0, 0); break;
+        case 'right': camera.position.set(d, 0, 0); break;
+        default: camera.position.set(0, lastRadius * 0.3, d);
+      }
+      camera.lookAt(0, 0, 0);
+      controls.update();
+    }
+
+    function capture() {
+      if (!renderer) return null;
+      renderer.render(scene, camera);
+      return renderer.domElement.toDataURL('image/png');
+    }
+
+    function captureView(viewName, size = 800) {
+      if (!renderer || !scene || !camera || !controls) return null;
+      renderer.setSize(size, size, false);
+      camera.aspect = 1;
+      camera.updateProjectionMatrix();
+      setView(viewName);
+      renderer.render(scene, camera);
+      const dataUrl = renderer.domElement.toDataURL('image/png');
+      onResize();
+      return dataUrl;
+    }
+
+    function recordVideo(durationMs) {
+      return new Promise((resolve, reject) => {
+        if (!renderer || !renderer.domElement.captureStream || typeof MediaRecorder === 'undefined') {
+          reject(new Error('Gravação de vídeo não suportada neste dispositivo.'));
+          return;
+        }
+        try {
+          const stream = renderer.domElement.captureStream(24);
+          const mime = MediaRecorder.isTypeSupported('video/webm;codecs=vp8') ? 'video/webm;codecs=vp8'
+            : (MediaRecorder.isTypeSupported('video/webm') ? 'video/webm' : '');
+          const recorder = mime ? new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 1800000 }) : new MediaRecorder(stream);
+          const chunks = [];
+          recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunks.push(e.data); };
+          recorder.onerror = (e) => reject(e.error || new Error('Erro ao gravar vídeo.'));
+          recorder.onstop = () => resolve(new Blob(chunks, { type: mime || 'video/webm' }));
+          recorder.start();
+          setTimeout(() => { try { recorder.stop(); } catch (e) { reject(e); } }, durationMs || 15000);
+        } catch (err) {
+          reject(err);
+        }
+      });
+    }
+
+    function dispose() {
+      if (rafId) cancelAnimationFrame(rafId);
+      rafId = null;
+    }
+    function pause() { dispose(); }
+    function resume() { if (!rafId && renderer) animate(); }
+
+    window.Trama3D = {
+      ensureScene, build, setGhost, setSeamVisible, setRotationLevel, setRotationAxis,
+      resetView, setView, capture, captureView, onResize, recordVideo, pause, resume
+    };
+  </script>
+</head>
+<body>
+
+<div class="app-shell">
+  <main class="canvas-area">
+    <div id="canvasWrap">
+      <div id="canvasModeBadge" class="canvas-mode-badge" title="Ferramenta Ativa">
+        <span id="badgeIcon">🖐🏽</span>
+        <span id="badgeText">Mão</span>
+      </div>
+      <canvas id="gridCanvas"></canvas>
+      <div id="trama3dCanvasWrap">
+        <div id="trama3dEmptyState">
+          <div style="font-size:38px;">📏🌐</div>
+          <div style="font-weight:700; font-size:15px; color:var(--text-primary); letter-spacing:-0.02em;">Defina as medidas em "Dimensionar Trama" primeiro</div>
+          <div style="font-size:12.5px; max-width:390px; color:var(--text-secondary); line-height:1.45;">
+            A projeção esférica 3D calibra a rede baseada na <b>Altura / Fileiras</b> e na <b>Circunferência / Colunas</b> da sua cabaça.
+          </div>
+          <button id="trama3dGoToDimBtn" class="btn-primary" style="margin-top:8px; padding:8px 18px; border-radius:var(--radius-pill);">Dimensionar Trama</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- DOCK LATERAL FLUTUANTE (APPLE STYLE) -->
+  <aside class="sidebar">
+    <div class="icon-rail" role="toolbar" aria-label="Ferramentas principais">
+      <button class="rail-btn panel-toggle active" data-panel="colorPanel" title="Painel de Pintura e Cores (P ou 1)" aria-label="Pintura" aria-pressed="true">🎨</button>
+      <button class="rail-btn panel-toggle" data-panel="selectPanel" title="Painel de Seleção (S ou 4)" aria-label="Seleção" aria-pressed="false">⬚</button>
+      <button class="rail-btn panel-toggle" data-panel="viewPanel" title="Painel de Visualização" aria-label="Visualização" aria-pressed="false">👁️</button>
+
+      <div class="rail-sep" role="separator"></div>
+      <button id="undoBtn" class="rail-btn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">↶</button>
+      <button id="redoBtn" class="rail-btn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer">↷</button>
+
+      <div class="rail-sep" role="separator"></div>
+      <button class="rail-btn" id="sizeModalBtn" title="Dimensionar Trama (Alt+D)" aria-label="Dimensionar Trama" aria-haspopup="dialog">📏</button>
+      <button class="rail-btn" id="imageModalBtn" title="Converter Imagem em Trama (Alt+I)" aria-label="Converter Imagem" aria-haspopup="dialog">🖼️</button>
+      <button class="rail-btn panel-toggle" data-panel="trama3dPanel" id="trama3dModalBtn" title="Trama 3D (Alt+3)" aria-label="Trama 3D" aria-pressed="false">🌐</button>
+
+      <div class="rail-sep" role="separator"></div>
+      <button class="rail-btn" id="fileModalBtn" title="Arquivo & Exportação (Alt+A)" aria-label="Arquivo e Exportação" aria-haspopup="dialog">📁</button>
+      <button class="rail-btn" id="countModalBtn" title="Contagem & Dimensões (Alt+C)" aria-label="Contagem e Dimensões" aria-haspopup="dialog">📦</button>
+      <button id="newFileRailBtn" class="rail-btn" title="Nova Trama (Ctrl+Alt+N)" aria-label="Nova Trama">📄</button>
+
+      <div class="rail-sep" role="separator"></div>
+      <button id="clearBtn" class="rail-btn btn-danger" title="Apagar Toda a trama" aria-label="Apagar tudo">🗑️</button>
+
+      <div class="rail-sep" role="separator"></div>
+      <div id="saveBadge" class="save-badge-rail" title="Salvamento contínuo" role="status" aria-live="polite">✓ Salvo</div>
+      <button id="helpBtn" class="rail-btn-small" title="Instruções e Guia (F1 ou ?)" aria-label="Ajuda">?</button>
+      <button id="aboutBtn" class="rail-btn-small" title="Sobre o Trama Trama" aria-label="Sobre">ℹ️</button>
+    </div>
+
+    <!-- SUBPAINEL INSPETOR ATIVO -->
+    <div class="side-panel">
+      <!-- PAINEL DE PINTURA -->
+      <div class="panel-section" id="colorPanel">
+        <div class="tool-grid">
+          <button id="brushBtn" class="rail-btn-small" title="Pincel (P ou 1)">🖌️</button>
+          <button id="eraserBtn" class="rail-btn-small" title="Borracha (B, 2 ou Botão Direito)">🧹</button>
+          <button id="handBtnColor" class="rail-btn-small hand-btn active" title="Mão / Arrastar (M, 7 ou Espaço)">🖐🏽</button>
+          <button id="bucketBtn" class="rail-btn-small" title="Balde de Tinta Inteligente (T ou 5)">🪣</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div id="recentColorsSection" hidden>
+          <div id="recentColors" class="color-grid" title="Cores Recentes"></div>
+          <div class="rail-sep"></div>
+        </div>
+        <div class="tool-grid">
+          <button id="replaceBtn" class="rail-btn-small" title="Substituir Cor Global (R ou 6)">🔀</button>
+          <button id="pipetteBtn" class="rail-btn-small" title="Conta-gotas (C, 3 ou I)">🧪</button>
+          <button class="swatch" id="customColorBtn" title="Cor Personalizada">
+            <span style="font-size: 15px; font-weight:700; color:var(--text-secondary);">+</span>
+          </button>
+        </div>
+        <div class="rail-sep"></div>
+        <div id="colorPalette" class="color-grid" title="Paleta Básica"></div>
+        <input id="colorPicker" type="color" value="#ffffff" style="display:none;">
+      </div>
+
+      <!-- PAINEL DE SELEÇÃO -->
+      <div class="panel-section" id="selectPanel" hidden>
+        <div class="tool-grid">
+          <button id="pinSelectBtn" class="rail-btn-small" title="Fixar seleção múltipla (F)">📌</button>
+          <button id="copyBtn" class="rail-btn-small" disabled title="Copiar (Ctrl+C)">📄</button>
+          <button id="pasteBtn" class="rail-btn-small" disabled title="Colar (Ctrl+V ou V)">📋</button>
+          <button id="cutBtn" class="rail-btn-small" disabled title="Recortar (Ctrl+X)">✂️</button>
+          <button id="deleteSelBtn" class="rail-btn-small" disabled title="Apagar (Del ou Backspace)">🗑️</button>
+          <button id="cancelSelectBtn" class="rail-btn-small" title="Cancelar Seleção (Esc)">❌</button>
+        </div>
+        <div class="rail-sep"></div>
+        <canvas id="clipPreviewCanvas" width="48" height="48" class="clip-preview"></canvas>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="rotateClipBtn" class="rail-btn-small" disabled title="Girar 90° (G)">🔄</button>
+          <button id="mirrorHClipBtn" class="rail-btn-small" disabled title="Espelhar Horizontal (H)">↔️</button>
+          <button id="mirrorVClipBtn" class="rail-btn-small" disabled title="Espelhar Vertical (V)">↕️</button>
+        </div>
+      </div>
+
+      <!-- PAINEL DE VISUALIZAÇÃO -->
+      <div class="panel-section" id="viewPanel" hidden>
+        <div class="tool-grid">
+          <button id="handBtn" class="rail-btn-small hand-btn active" title="Mão / Pan (M, 7 ou Espaço)">🖐🏽</button>
+          <button id="zoomIn" class="rail-btn-small" title="Ampliar (+ ou =)">➕</button>
+          <button id="zoomOut" class="rail-btn-small" title="Reduzir (-)">➖</button>
+          <button id="fitScreenBtn" class="rail-btn-small" title="Ajustar à Tela (A ou 0)">⤢</button>
+          <button id="centerBtn" class="rail-btn-small" title="Centralizar Origem (O ou .)">◎</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="panUp" class="rail-btn-small" title="Mover Cima (↑)">▲</button>
+          <button id="panDown" class="rail-btn-small" title="Mover Baixo (↓)">▼</button>
+          <button id="panLeft" class="rail-btn-small" title="Mover Esquerda (←)">◀</button>
+          <button id="panRight" class="rail-btn-small" title="Mover Direita (→)">▶</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="gridToggleBtn" class="rail-btn-small active" title="Mostrar/Ocultar Grade (Alt+G)"><span class="icon-rotate-45">⊞</span></button>
+          <button id="renderToggleBtn" class="rail-btn-small btn-text-icon" title="Alternar 2D/3D (D)">2D</button>
+          <button id="bgToggleBtn" class="rail-btn-small" title="Alternar Fundo Terracota/Branco (Alt+F)">🟠</button>
+        </div>
+      </div>
+
+      <!-- PAINEL TRAMA 3D -->
+      <div class="panel-section" id="trama3dPanel" hidden>
+        <div class="tool-grid">
+          <button id="trama3dRefreshBtn" class="rail-btn-small" title="Atualizar e focar na emenda (U)">🔁</button>
+          <button id="trama3dSeamBtn" class="rail-btn-small active" title="Mostrar linha de emenda (E)">📍</button>
+          <button id="trama3dGhostBtn" class="rail-btn-small" title="Transparência da esfera (F)">⭕</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="trama3dViewTopBtn" class="rail-btn-small" title="Vista superior">⬇️</button>
+          <button id="trama3dViewTopFrontBtn" class="rail-btn-small" title="Vista superior frontal">↘️</button>
+          <button id="trama3dViewBottomBtn" class="rail-btn-small" title="Vista inferior">⬆️</button>
+          <button id="trama3dViewFrontBtn" class="rail-btn-small" title="Vista frontal (emenda)">⤵️</button>
+          <button id="trama3dViewBackBtn" class="rail-btn-small" title="Vista traseira">⤴️</button>
+          <button id="trama3dViewLeftBtn" class="rail-btn-small" title="Lateral esquerda">➡️</button>
+          <button id="trama3dViewRightBtn" class="rail-btn-small" title="Lateral direita">⬅️</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="trama3dRotateBtn" class="rail-btn-small" title="Rotação automática (R ou Espaço)">🔄</button>
+          <button id="trama3dAxisBtn" class="rail-btn-small" title="Eixo de rotação (X)">↔️</button>
+        </div>
+        <div class="rail-sep"></div>
+        <div class="tool-grid">
+          <button id="trama3dCaptureBtn" class="rail-btn-small" title="Baixar foto 3D (P)">📸</button>
+          <button id="trama3dRecordBtn" class="rail-btn-small" title="Gravar vídeo de 15s">🎥</button>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- MODAL SHEET: DIMENSIONAR TRAMA -->
+<div id="dimModal" class="modal-overlay">
+  <div class="modal-card" style="max-width: 380px;">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title">📏 Dimensionar Cabaça</h3>
+    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:14px; line-height:1.45;">
+      Ajuste em centímetros <b>ou</b> em quantidade de miçangas. Os campos atualizam-se reciprocamente em tempo real (fator: ~1,50 cm por nó).
+    </div>
+
+    <div class="apple-inset-group">
+      <div style="font-size:10.5px; font-weight:800; color:var(--apple-terracotta); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        1. Medidas em Centímetros (cm)
+      </div>
+      <div class="form-row" style="margin-bottom:0;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="dimHeight">Altura útil (cm):</label>
+          <input id="dimHeight" type="number" step="0.1" min="0.1" placeholder="Ex: 10.5">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="dimCirc">Circunferência (cm):</label>
+          <input id="dimCirc" type="number" step="0.1" min="0.1" placeholder="Ex: 10.5">
+        </div>
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <div style="font-size:10.5px; font-weight:800; color:var(--apple-terracotta); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px;">
+        2. Grade de Miçangas (Nós)
+      </div>
+      <div class="form-row" style="margin-bottom:0;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="dimRows">Fileiras (altura):</label>
+          <input id="dimRows" type="number" step="1" min="1" placeholder="Ex: 7">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="dimCols">Colunas (volta):</label>
+          <input id="dimCols" type="number" step="1" min="1" placeholder="Ex: 7">
+        </div>
+      </div>
+    </div>
+
+    <button id="calcDimBtn" class="btn-primary" style="width:100%; padding:10px; margin-bottom:12px; border-radius:var(--radius-pill);">Aplicar Moldura Guia</button>
+    
+    <div id="dimResultContainer" class="apple-inset-group" style="display: none; background: rgba(254, 243, 199, 0.4); border-color: rgba(251, 191, 36, 0.5);">
+      <div style="font-weight:700; color:#92400e; margin-bottom:4px; font-size:12px;">Área e Medidas Confirmadas:</div>
+      <div id="dimResultText" style="font-size:13px; font-weight:800; color:var(--apple-terracotta);">-- fileiras × -- colunas</div>
+      <div id="dimResultCmText" style="font-size:11.5px; font-weight:600; color:var(--text-secondary); margin-top:2px;">-- cm × -- cm</div>
+    </div>
+
+    <div class="modal-actions" style="justify-content: space-between;">
+      <button id="clearDimBtn">Remover Guia</button>
+      <button class="btn-primary closeModalBtn">Voltar ao Canvas</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: CONVERSOR DE IMAGEM -->
+<div id="imageModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title">🖼️ Imagem para Trama</h3>
+    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:14px; line-height:1.45;">
+      Converta fotos ou ilustrações em miçangas sobre a malha de 45°.
+    </div>
+
+    <div class="apple-inset-group">
+      <div class="form-group" style="margin-bottom:0;">
+        <label>1. Imagem de Origem:</label>
+        <input type="file" id="imageInput" accept="image/*" style="width: 100%;">
+        <div id="imagePreviewWrap" style="display:none; max-height: 160px; overflow: hidden; align-items: center; justify-content: center; border-radius: 8px; margin-top: 8px; background:#faf6f0; border:1px solid var(--glass-hairline); padding:8px;">
+          <canvas id="imagePreview" style="max-width: 100%; max-height: 140px; display:block; border-radius:4px;"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <label style="font-size:12px; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:6px;">2. Proporção e Tamanho:</label>
+      <div class="apple-segmented-control" style="margin-bottom:10px;">
+        <button type="button" id="dimModeCols" class="active">↔️ Largura (Colunas)</button>
+        <button type="button" id="dimModeRows">↕️ Altura (Fileiras)</button>
+      </div>
+      <div class="form-row" style="margin-bottom:0; align-items:flex-end;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label id="imageDimLabel">Largura (em colunas):</label>
+          <input type="number" id="imageSizeBeads" value="40" min="5" max="200">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label>Estimativa calculada:</label>
+          <div id="imageDimEstimate" style="font-size:12px; font-weight:800; color:var(--apple-terracotta); padding:9px 0;">-- colunas × -- fileiras</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <div class="form-group" style="margin-bottom:0;">
+        <label>3. Redução de Cores:</label>
+        <select id="imageColorMode" style="width: 100%;">
+          <option value="basic">Paleta Básica do App (16 cores)</option>
+          <option value="custom">Detectar Cores Predominantes (K-Means)</option>
+          <option value="bw">Preto e Branco (Alto Contraste)</option>
+        </select>
+      </div>
+      <div class="form-group" id="customColorCountDiv" style="display: none; margin-top: 10px;">
+        <label>Quantidade Máxima de Cores:</label>
+        <div style="display: flex; align-items: center; gap: 10px; margin-top:4px;">
+          <input type="range" id="customColorSlider" min="2" max="32" value="5" style="flex: 1;">
+          <input type="number" id="customColorCount" value="5" min="2" max="32" style="width: 54px;">
+        </div>
+      </div>
+    </div>
+
+    <div style="font-size:11px; color:#92400e; background:rgba(254, 243, 199, 0.45); border:1px solid rgba(251, 191, 36, 0.4); padding:8px 12px; border-radius:8px; margin-bottom:8px;">
+      ✨ <b>Estampa Flutuante:</b> A imagem gerada acompanha seu cursor ancorada pelo topo esquerdo. Clique onde desejar para fixar.
+    </div>
+
+    <div class="modal-actions">
+      <button class="closeModalBtn">Cancelar</button>
+      <button id="generateImageBtn" class="btn-primary" disabled>Gerar Estampa</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: CONTAGEM E MATERIAIS -->
+<div id="countModal" class="modal-overlay">
+  <div class="modal-card" style="max-width: 360px;">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title">📦 Contagem & Dimensões</h3>
+    <div id="dimSummaryContainer" class="apple-inset-group" style="display:none; background: rgba(254, 243, 199, 0.4); border-color: rgba(251, 191, 36, 0.5); font-size:12px;"></div>
+    <div id="colorCountsContainer" style="display:flex; flex-direction:column; gap:8px; font-size:12px; max-height:48vh; overflow-y:auto;"></div>
+    <div class="modal-actions"><button class="btn-primary closeModalBtn">Fechar</button></div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: ARQUIVO E EXPORTAÇÃO -->
+<div id="fileModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title">📁 Arquivo & Exportação</h3>
+    
+    <div class="apple-inset-group">
+      <div class="form-group">
+        <label>Nome do Projeto:</label>
+        <input id="tramaName" type="text" placeholder="Minha trama de xequerê">
+      </div>
+      <div class="form-group" style="margin-bottom:0;">
+        <label>Autoria:</label>
+        <input id="tramaAuthor" type="text" placeholder="Nome do artesão / brincante">
+      </div>
+      <div class="form-row" style="margin-top:12px; margin-bottom:0;">
+        <button id="newTramaBtn">Nova Trama</button>
+        <button id="saveTramaBtn" class="btn-primary">Salvar no Navegador</button>
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <div class="form-group">
+        <label>Projetos Salvos no Dispositivo:</label>
+        <select id="savedTramasSelect"><option value="">— nenhuma salva —</option></select>
+      </div>
+      <div class="form-row" style="margin-bottom:0;">
+        <button id="loadSelectedBtn">Abrir</button>
+        <button id="deleteSelectedBtn" class="btn-danger">Excluir</button>
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <label style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:block;">Backup & Intercâmbio (.json)</label>
+      <div class="form-row" style="margin:0;">
+        <button id="importTramaBtn">Importar .json</button>
+        <button id="exportTramaBtn">Exportar .json</button>
+        <input id="loadTramaFile" type="file" accept="application/json,.json" style="display:none">
+      </div>
+    </div>
+
+    <div class="apple-inset-group">
+      <label style="font-size:12px; font-weight:700; color:var(--text-secondary); margin-bottom:6px; display:block;">Exportação Gráfica & Ficha Técnica</label>
+      <select id="exportFormat" style="margin-bottom:8px;">
+        <option value="jpeg">Imagem JPG (Fundo Terracota/Branco)</option>
+        <option value="png">Imagem PNG (Fundo Transparente)</option>
+      </select>
+      <div class="form-row" style="margin:0;">
+        <button id="exportImgBtn" class="btn-primary">Baixar Imagem</button>
+        <button id="exportPdfBtn" class="btn-primary">Baixar PDF (A4)</button>
+      </div>
+    </div>
+
+    <div class="modal-actions"><button class="closeModalBtn">Voltar ao Canvas</button></div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: SOBRE -->
+<div id="aboutModal" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:11px; background:var(--apple-terracotta-tint); color:var(--apple-terracotta); padding:2px 7px; border-radius:var(--radius-pill);">v0.9.27 Apple Design</span></h3>
+    <div style="font-size:12.5px; line-height:1.55; color:var(--text-secondary);">
+      <p style="margin-bottom:8px;"><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
+      <p style="margin-bottom:8px;"><b>📏 Dimensionamento Inteligente:</b> Cálculo bidirecional instantâneo entre centímetros da cabaça real e nós da grade.</p>
+      <p style="margin-bottom:8px;"><b>🪘 Trama Xequerê:</b> Ciclo de oficinas de confecção do instrumento, articulando reflexões históricas e ritmos afro-brasileiros.</p>
+      <p><b>🎨 Autoria:</b> Idealizado por <b>Rodrig Melo</b>, artista visual, pesquisadora e presidenta da Associação Cultural Aroeira.</p>
+    </div>
+    <div class="modal-actions"><button class="btn-primary closeModalBtn">Entendido</button></div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: GUIA E INSTRUÇÕES COMPLETO -->
+<div id="helpModal" class="modal-overlay">
+  <div class="modal-card help-modal-card">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title" style="justify-content: space-between;">
+      <span>📖 Guia Completo do Trama Trama</span>
+      <span style="font-size:11.5px; font-weight:600; color:var(--text-tertiary);">v0.9.27</span>
+    </h3>
+
+    <div class="help-search-box">
+      <input type="text" id="helpSearchInput" placeholder="🔍 Buscar ferramenta, atalho ou recurso...">
+    </div>
+
+    <div class="help-accordion-container" id="helpAccordion">
+      <!-- Item 1 -->
+      <div class="help-accordion-item open">
+        <button class="help-accordion-header">
+          <span>🌿 1. Visão Geral &amp; Geometria em Losango</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 6px 0;">O <b>Trama Trama</b> adota uma <b>grade rotacionada a 45°</b> que modela com precisão o entrelaçamento físico de fios na cabaça real.</p>
+          <ul>
+            <li><b>Canvas Infinito:</b> Navegue sem limitações de folhas ou bordas rígidas.</li>
+            <li><b>Sincronização 2D/3D:</b> Cada miçanga pintada reflete instantaneamente na esfera 3D para conferência de encaixe.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 2 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🎨 2. Ferramentas de Pintura &amp; Paleta</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>🖌️ Pincel <kbd>P</kbd> ou <kbd>1</kbd>:</b> Pinta as células da grade com clique ou arrasto contínuo.</li>
+            <li><b>🧹 Borracha <kbd>B</kbd> ou <kbd>2</kbd>:</b> Limpa a miçanga. <i>Dica:</i> O botão direito do mouse apaga imediatamente em qualquer ferramenta.</li>
+            <li><b>🖐🏽 Mão / Pan <kbd>M</kbd>, <kbd>7</kbd> ou <kbd>Espaço</kbd>:</b> Move a tela. Segurar a barra de espaço ativa o modo mão temporário.</li>
+            <li><b>🪣 Balde de Tinta Inteligente <kbd>T</kbd> ou <kbd>5</kbd>:</b> Preenche áreas contíguas, a seleção delimitada ou a moldura da cabaça com proteção anti-derramamento.</li>
+            <li><b>🔀 Substituir Cor Global <kbd>R</kbd> ou <kbd>6</kbd>:</b> Troca uma cor específica por outra em todo o desenho com um clique.</li>
+            <li><b>🧪 Conta-gotas <kbd>C</kbd>, <kbd>3</kbd> ou <kbd>I</kbd>:</b> Captura a cor de qualquer miçanga existente.</li>
+            <li><b>Paleta &amp; Cores Recentes:</b> 16 cores calibradas, botão <b>+</b> para hexadecimais livres e histórico automático das 5 últimas cores.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 3 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>⬚ 3. Painel de Seleção &amp; Transformações</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Ativação <kbd>S</kbd> ou <kbd>4</kbd>:</b> Seleção por área retangular.</li>
+            <li><b>📌 Fixar Seleção <kbd>F</kbd>:</b> Selecione células individuais continuamente por toque.</li>
+            <li><b>Copiar (<kbd>Ctrl+C</kbd>), Recortar (<kbd>Ctrl+X</kbd>) e Colar (<kbd>Ctrl+V</kbd>):</b> Manipula blocos da trama com facilidade.</li>
+            <li><b>Manipulação da Estampa Flutuante:</b> Pressione <kbd>G</kbd> para girar 90°, <kbd>H</kbd> para espelhar horizontal e <kbd>V</kbd> para espelhar vertical.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 4 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📏 4. Dimensionar Cabaça com Cálculo Interdependente</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 6px 0;">Calcule as medidas em centímetros ou a contagem de miçangas (fator: ~1,50 cm por nó):</p>
+          <ul>
+            <li><b>Relação Matemática:</b> Fileiras = round(Altura / 1.5), Colunas = round(Circunferência / 1.5).</li>
+            <li><b>Moldura Guia:</b> Delimita a volta exata da cabaça e serve de base para o fechamento 3D.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 5 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🌐 5. Visualizador Esférico Trama 3D (<kbd>Alt+3</kbd>)</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>🔁 Atualizar (<kbd>U</kbd>):</b> Reconstrói a malha e foca na linha de emenda.</li>
+            <li><b>📍 Linha de Emenda (<kbd>E</kbd>):</b> Mostra ou oculta o meridiano de união dos fios.</li>
+            <li><b>⭕ Transparência (<kbd>F</kbd>):</b> Esconde a cabaça para ver ambos os lados da rede vazada.</li>
+            <li><b>Ângulos Rápidos:</b> Superior, Superior-Frontal, Inferior, Frontal, Traseira e Laterais.</li>
+            <li><b>🔄 Giro Automático (<kbd>R</kbd> ou <kbd>Espaço</kbd>):</b> Alterna entre 4 velocidades.</li>
+            <li><b>↔️ Eixo de Rotação (<kbd>X</kbd>):</b> Alterna entre giro horizontal e vertical.</li>
+            <li><b>📸 Imagem (<kbd>P</kbd>) &amp; 🎥 Gravar Vídeo:</b> Salve fotos ou grave clipes de 15 segundos.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 6 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>🖼️ 6. Conversor Matricial de Imagens (<kbd>Alt+I</kbd>)</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <p style="margin: 6px 0;">Transforma qualquer imagem (PNG, JPG, WebP) em miçangas sobre a malha de 45°:</p>
+          <ul>
+            <li><b>Redução K-Means:</b> Extrai com precisão as cores dominantes da imagem.</li>
+            <li><b>Estampa Flutuante:</b> Mova o cursor com a estampa translúcida e clique para aplicar no canvas.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 7 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>👁️ 7. Painel de Visualização &amp; Estilos</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Zoom &amp; Pan:</b> Roda do mouse, botões ou pinça com 2 dedos no celular.</li>
+            <li><b>⤢ Ajustar (<kbd>A</kbd> ou <kbd>0</kbd>):</b> Enquadra perfeitamente o desenho e a moldura na tela.</li>
+            <li><b>◎ Origem (<kbd>O</kbd> ou <kbd>.</kbd>):</b> Centraliza na coordenada (0,0).</li>
+            <li><b>Estilo Miçanga (<kbd>D</kbd>):</b> Alterna entre visual 2D plano e 3D esférico brilhante.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 8 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📦 8. Contagem, Medidas &amp; Peso Estimado (<kbd>Alt+C</kbd>)</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Total e Legenda:</b> Quantidade exata de miçangas de cada cor para compras.</li>
+            <li><b>Estimativa de Peso:</b> Cálculo baseado no padrão de 0,32 g por miçanga.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 9 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>📁 9. Salvamento, Backup &amp; Ficha Técnica PDF (<kbd>Alt+A</kbd>)</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <ul>
+            <li><b>Salvamento Automático (<kbd>Ctrl+S</kbd>):</b> Preservação contínua no navegador.</li>
+            <li><b>Ficha Técnica em PDF (2 páginas A4):</b>
+              <br>• <i>Página 1:</i> Dados cadastrais, tabela de materiais e mosaico com 4 ângulos 3D da cabaça.
+              <br>• <i>Página 2:</i> Mapa da trama em tela cheia rotacionada para acompanhar a montagem na bancada.
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Item 10 -->
+      <div class="help-accordion-item">
+        <button class="help-accordion-header">
+          <span>⌨️ 10. Tabela de Atalhos de Teclado</span>
+          <span class="chevron">▼</span>
+        </button>
+        <div class="help-accordion-content">
+          <table class="help-table-shortcuts">
+            <thead>
+              <tr><th>Atalho</th><th>Função</th><th>Ação</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><kbd>P</kbd> ou <kbd>1</kbd></td><td>Pincel</td><td>Pintura primária</td></tr>
+              <tr><td><kbd>B</kbd> ou <kbd>2</kbd></td><td>Borracha</td><td>Apagar miçanga</td></tr>
+              <tr><td><kbd>C</kbd>, <kbd>3</kbd> ou <kbd>I</kbd></td><td>Conta-gotas</td><td>Capturar cor</td></tr>
+              <tr><td><kbd>S</kbd> ou <kbd>4</kbd></td><td>Seleção</td><td>Área retangular</td></tr>
+              <tr><td><kbd>T</kbd> ou <kbd>5</kbd></td><td>Balde</td><td>Preenchimento inteligente</td></tr>
+              <tr><td><kbd>R</kbd> ou <kbd>6</kbd></td><td>Substituir Cor</td><td>Troca global de tom</td></tr>
+              <tr><td><kbd>M</kbd>, <kbd>7</kbd> ou <kbd>H</kbd></td><td>Mão</td><td>Arrastar tela</td></tr>
+              <tr><td><kbd>Espaço</kbd></td><td>Mão Temporária</td><td>Segure para navegar</td></tr>
+              <tr><td><kbd>F</kbd></td><td>Fixar Seleção</td><td>Seleção contínua</td></tr>
+              <tr><td><kbd>Ctrl+C</kbd> / <kbd>X</kbd> / <kbd>V</kbd></td><td>Copiar / Recortar / Colar</td><td>Estampas</td></tr>
+              <tr><td><kbd>G</kbd> / <kbd>H</kbd> / <kbd>V</kbd></td><td>Transformar Estampa</td><td>Girar 90°, Espelhar H/V</td></tr>
+              <tr><td><kbd>Del</kbd> / <kbd>Backspace</kbd></td><td>Apagar Seleção</td><td>Limpa área marcada</td></tr>
+              <tr><td><kbd>Esc</kbd></td><td>Cancelar / Fechar</td><td>Desfaz seleção ou fecha modais</td></tr>
+              <tr><td><kbd>A</kbd> ou <kbd>0</kbd></td><td>Ajustar</td><td>Enquadra todo o desenho</td></tr>
+              <tr><td><kbd>D</kbd></td><td>Estilo Miçanga</td><td>Alterna 2D e 3D</td></tr>
+              <tr><td><kbd>Alt+D</kbd> / <kbd>I</kbd> / <kbd>A</kbd> / <kbd>C</kbd> / <kbd>3</kbd></td><td>Modais</td><td>Dimensões, Imagem, Arquivo, Contagem, 3D</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions" style="justify-content: space-between;">
+      <button id="helpExpandAllBtn" style="font-size:12px;">Expandir Todos</button>
+      <button class="btn-primary closeModalBtn">Pronto para tecer!</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SHEET: CONFIRMAÇÃO -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal-card" style="max-width:340px;">
+    <div class="modal-grabber"></div>
+    <h3 class="modal-title" id="confirmModalTitle">Confirmação</h3>
+    <p id="confirmModalMessage" style="font-size:12px; color:var(--text-secondary); margin-bottom:14px;">Tem certeza?</p>
+    <div class="modal-actions">
+      <button id="confirmCancelBtn">Cancelar</button>
+      <button id="confirmOkBtn" class="btn-primary">Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+(() => {
+  // Elementos do DOM
+  const canvas = document.getElementById('gridCanvas');
+  const ctx = canvas.getContext('2d', { alpha: false });
+  const colorPicker = document.getElementById('colorPicker');
+  const customColorBtn = document.getElementById('customColorBtn');
+  
+  // Ferramentas
+  const brushBtn = document.getElementById('brushBtn');
+  const eraserBtn = document.getElementById('eraserBtn');
+  const pipetteBtn = document.getElementById('pipetteBtn');
+  const bucketBtn = document.getElementById('bucketBtn');
+  const replaceBtn = document.getElementById('replaceBtn');
+  const handBtns = document.querySelectorAll('.hand-btn');
+  
+  // Seleção
+  const selectBtn = document.querySelector('[data-panel="selectPanel"]');
+  const cancelSelectBtn = document.getElementById('cancelSelectBtn');
+  const pinSelectBtn = document.getElementById('pinSelectBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const cutBtn = document.getElementById('cutBtn');
+  const deleteSelBtn = document.getElementById('deleteSelBtn');
+  const pasteBtn = document.getElementById('pasteBtn');
+  
+  // Badges e visualização
+  const canvasModeBadge = document.getElementById('canvasModeBadge');
+  const badgeIcon = document.getElementById('badgeIcon');
+  const badgeText = document.getElementById('badgeText');
+  const saveBadge = document.getElementById('saveBadge');
+  const clipPreviewCanvas = document.getElementById('clipPreviewCanvas');
+
+  const zoomInBtn = document.getElementById('zoomIn');
+  const zoomOutBtn = document.getElementById('zoomOut');
+  const fitScreenBtn = document.getElementById('fitScreenBtn');
+  const centerBtn = document.getElementById('centerBtn');
+  const gridToggleBtn = document.getElementById('gridToggleBtn');
+  const renderToggleBtn = document.getElementById('renderToggleBtn');
+  const bgToggleBtn = document.getElementById('bgToggleBtn');
+  const panUpBtn = document.getElementById('panUp'), panDownBtn = document.getElementById('panDown');
+  const panLeftBtn = document.getElementById('panLeft'), panRightBtn = document.getElementById('panRight');
+
+  // Cores & Containers
+  const colorPaletteEl = document.getElementById('colorPalette');
+  const recentColorsEl = document.getElementById('recentColors');
+  const recentColorsSection = document.getElementById('recentColorsSection');
+  const colorCountsContainer = document.getElementById('colorCountsContainer');
+  const dimSummaryContainer = document.getElementById('dimSummaryContainer');
+
+  // Constantes e Estados
+  const angle = Math.PI / 4; 
+  const baseCellSize = 40; 
+  const BEAD_GRID_FACTOR = 1.5; // cm por nó/miçanga
+  let zoom = 1;
+  let pan = { x: 0, y: 0 };
+  let dpr = window.devicePixelRatio || 1;
+  const painted = new Map(); 
+
+  let currentToolMode = 'hand';
+  let renderStyle = '2d';
+  let backgroundColor = '#B5651D';
+  let gridVisible = true;
+  
+  let isSelecting = false;
+  let selectedCells = new Set();
+  let screenSelectionStart = null;
+  let screenSelectionCurrent = null;
+
+  let clipboard = null, pastePreviewCell = null;
+  let pinMultiSelectMode = false;
+  let isSpacePanning = false;
+  let toolBeforeSpace = null;
+
+  // Dimensões recomendadas da trama
+  let recommendedRows = null;
+  let recommendedCols = null;
+  let savedTramaHeight = null;
+  let savedTramaCircum = null;
+
+  // Touch State
+  const touchPointers = new Map();
+  const pendingTouchPaint = new Map();
+  const TOUCH_PAINT_DELAY = 120;
+
+  const COLOR_NAMES = [
+    ['#FFFFFF', 'Branco'], ['#FF0000', 'Vermelho'], ['#FF4000', 'Vermelho-alaranjado'],
+    ['#FF8000', 'Laranja'], ['#FFC000', 'Amarelo-alaranjado'], ['#FFFF00', 'Amarelo'],
+    ['#00FF00', 'Amarelo-esverdeado (Lima)'], ['#008000', 'Verde'], ['#808000', 'Verde Oliva'],
+    ['#00FFFF', 'Azul-esverdeado (Ciano)'], ['#0000FF', 'Azul'], ['#000080', 'Azul Marinho (Navy)'],
+    ['#4000FF', 'Azul-arroxeado'], ['#8000FF', 'Violeta'], ['#FF00FF', 'Magenta'], ['#000000', 'Preto']
+  ];
+
+  const BASIC_COLORS = [
+    '#ffffff', '#ff0000', '#ff4000', '#ff8000', '#ffc000', '#ffff00', '#00ff00', '#008000',
+    '#808000', '#00ffff', '#0000ff', '#000080', '#4000ff', '#8000ff', '#ff00ff', '#000000'
+  ];
+  let recentColors = [];
+
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.className = 'toast'; toast.textContent = message;
+    document.getElementById('toastContainer').appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 260);
+    }, 2800);
+  }
+
+  function formatCm(val) {
+    if (val === null || val === undefined || isNaN(val)) return '';
+    return Number.isInteger(val) ? val.toString() : parseFloat(val.toFixed(2)).toString();
+  }
+
+  const modals = document.querySelectorAll('.modal-overlay');
+  
+  function handleModalClose(modal) {
+    modal.classList.remove('active');
+    if (modal.id === 'dimModal' && recommendedRows !== null && recommendedCols !== null) {
+      fitScreenBtn.click();
+    }
+  }
+
+  document.querySelectorAll('.closeModalBtn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      handleModalClose(e.target.closest('.modal-overlay'));
+    });
+  });
+
+  modals.forEach(modal => {
+    modal.addEventListener('click', (e) => { 
+      if(e.target === modal) handleModalClose(modal);
+    });
+  });
+
+  const dimHeightInput = document.getElementById('dimHeight');
+  const dimCircInput = document.getElementById('dimCirc');
+  const dimRowsInput = document.getElementById('dimRows');
+  const dimColsInput = document.getElementById('dimCols');
+  const dimResultContainer = document.getElementById('dimResultContainer');
+  const dimResultText = document.getElementById('dimResultText');
+  const dimResultCmText = document.getElementById('dimResultCmText');
+  const calcDimBtn = document.getElementById('calcDimBtn');
+  const clearDimBtn = document.getElementById('clearDimBtn');
+
+  let isSyncingDim = false;
+
+  // Interdependência: cm -> fileiras / colunas
+  dimHeightInput.addEventListener('input', () => {
+    if (isSyncingDim) return;
+    isSyncingDim = true;
+    const h = parseFloat(dimHeightInput.value);
+    if (!isNaN(h) && h > 0) {
+      dimRowsInput.value = Math.max(1, Math.round(h / BEAD_GRID_FACTOR));
+    } else {
+      dimRowsInput.value = '';
+    }
+    isSyncingDim = false;
+  });
+
+  dimCircInput.addEventListener('input', () => {
+    if (isSyncingDim) return;
+    isSyncingDim = true;
+    const c = parseFloat(dimCircInput.value);
+    if (!isNaN(c) && c > 0) {
+      dimColsInput.value = Math.max(1, Math.round(c / BEAD_GRID_FACTOR));
+    } else {
+      dimColsInput.value = '';
+    }
+    isSyncingDim = false;
+  });
+
+  // Interdependência: fileiras / colunas -> cm
+  dimRowsInput.addEventListener('input', () => {
+    if (isSyncingDim) return;
+    isSyncingDim = true;
+    const r = parseInt(dimRowsInput.value, 10);
+    if (!isNaN(r) && r > 0) {
+      dimHeightInput.value = formatCm(r * BEAD_GRID_FACTOR);
+    } else {
+      dimHeightInput.value = '';
+    }
+    isSyncingDim = false;
+  });
+
+  dimColsInput.addEventListener('input', () => {
+    if (isSyncingDim) return;
+    isSyncingDim = true;
+    const col = parseInt(dimColsInput.value, 10);
+    if (!isNaN(col) && col > 0) {
+      dimCircInput.value = formatCm(col * BEAD_GRID_FACTOR);
+    } else {
+      dimCircInput.value = '';
+    }
+    isSyncingDim = false;
+  });
+
+  function openDimModal() {
+    if (savedTramaHeight !== null) dimHeightInput.value = formatCm(savedTramaHeight);
+    if (savedTramaCircum !== null) dimCircInput.value = formatCm(savedTramaCircum);
+    if (recommendedRows !== null) dimRowsInput.value = recommendedRows;
+    if (recommendedCols !== null) dimColsInput.value = recommendedCols;
+    
+    if (recommendedRows !== null && recommendedCols !== null) {
+      dimResultText.textContent = `${recommendedRows} fileiras × ${recommendedCols} colunas`;
+      dimResultCmText.textContent = `${formatCm(savedTramaHeight)} cm (altura) × ${formatCm(savedTramaCircum)} cm (circunferência)`;
+      dimResultContainer.style.display = 'block';
+    }
+    document.getElementById('dimModal').classList.add('active');
+  }
+
+  document.getElementById('sizeModalBtn').addEventListener('click', openDimModal);
+  document.getElementById('trama3dGoToDimBtn').addEventListener('click', openDimModal);
+
+  calcDimBtn.addEventListener('click', () => {
+    let r = parseInt(dimRowsInput.value, 10);
+    let c = parseInt(dimColsInput.value, 10);
+    let h = parseFloat(dimHeightInput.value);
+    let circ = parseFloat(dimCircInput.value);
+
+    if ((isNaN(r) || r <= 0) && !isNaN(h) && h > 0) {
+      r = Math.max(1, Math.round(h / BEAD_GRID_FACTOR));
+      dimRowsInput.value = r;
+    }
+    if ((isNaN(c) || c <= 0) && !isNaN(circ) && circ > 0) {
+      c = Math.max(1, Math.round(circ / BEAD_GRID_FACTOR));
+      dimColsInput.value = c;
+    }
+
+    if ((isNaN(h) || h <= 0) && !isNaN(r) && r > 0) {
+      h = r * BEAD_GRID_FACTOR;
+      dimHeightInput.value = formatCm(h);
+    }
+    if ((isNaN(circ) || circ <= 0) && !isNaN(c) && c > 0) {
+      circ = c * BEAD_GRID_FACTOR;
+      dimCircInput.value = formatCm(circ);
+    }
+
+    if (isNaN(r) || isNaN(c) || r <= 0 || c <= 0) {
+      showToast('Por favor, informe valores válidos maiores que zero.');
+      return;
+    }
+
+    recommendedRows = r;
+    recommendedCols = c;
+    savedTramaHeight = h;
+    savedTramaCircum = circ;
+
+    dimResultText.textContent = `${recommendedRows} fileiras × ${recommendedCols} colunas`;
+    dimResultCmText.textContent = `${formatCm(savedTramaHeight)} cm (altura) × ${formatCm(savedTramaCircum)} cm (circunferência)`;
+    dimResultContainer.style.display = 'block';
+    
+    draw();
+    scheduleAutoSave();
+    showToast('Moldura guia aplicada ao canvas!');
+  });
+
+  clearDimBtn.addEventListener('click', () => {
+    recommendedRows = null;
+    recommendedCols = null;
+    savedTramaHeight = null;
+    savedTramaCircum = null;
+    dimHeightInput.value = '';
+    dimCircInput.value = '';
+    dimRowsInput.value = '';
+    dimColsInput.value = '';
+    dimResultContainer.style.display = 'none';
+    draw();
+    scheduleAutoSave();
+    showToast('Moldura guia removida.');
+  });
+
+  document.getElementById('imageModalBtn').addEventListener('click', () => {
+    if (recommendedCols !== null && (!imageSizeBeadsInput.value || imageSizeBeadsInput.value === '40')) {
+      imageSizeBeadsInput.value = recommendedCols;
+    }
+    updateImageEstimate();
+    document.getElementById('imageModal').classList.add('active');
+  });
+  document.getElementById('fileModalBtn').addEventListener('click', () => document.getElementById('fileModal').classList.add('active'));
+  document.getElementById('countModalBtn').addEventListener('click', () => { updateDimSummary(); updateColorCounts(); document.getElementById('countModal').classList.add('active'); });
+  document.getElementById('aboutBtn').addEventListener('click', () => document.getElementById('aboutModal').classList.add('active'));
+  document.getElementById('helpBtn').addEventListener('click', () => document.getElementById('helpModal').classList.add('active'));
+
+  const accordionItems = document.querySelectorAll('.help-accordion-item');
+  accordionItems.forEach(item => {
+    const header = item.querySelector('.help-accordion-header');
+    header.addEventListener('click', () => item.classList.toggle('open'));
+  });
+
+  const helpExpandAllBtn = document.getElementById('helpExpandAllBtn');
+  let allExpanded = false;
+  helpExpandAllBtn.addEventListener('click', () => {
+    allExpanded = !allExpanded;
+    accordionItems.forEach(item => item.classList.toggle('open', allExpanded));
+    helpExpandAllBtn.textContent = allExpanded ? 'Recolher Todos' : 'Expandir Todos';
+  });
+
+  const helpSearchInput = document.getElementById('helpSearchInput');
+  helpSearchInput.addEventListener('input', (e) => {
+    const term = e.target.value.toLowerCase().trim();
+    accordionItems.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      if (!term || text.includes(term)) {
+        item.style.display = 'block';
+        if (term) item.classList.add('open');
+      } else {
+        item.style.display = 'none';
+      }
+    });
+  });
+
+  let onConfirmCallback = null;
+  function showConfirm(title, message, callback) {
+    document.getElementById('confirmModalTitle').textContent = title;
+    document.getElementById('confirmModalMessage').textContent = message;
+    onConfirmCallback = callback;
+    document.getElementById('confirmModal').classList.add('active');
+  }
+  document.getElementById('confirmCancelBtn').addEventListener('click', () => document.getElementById('confirmModal').classList.remove('active'));
+  document.getElementById('confirmOkBtn').addEventListener('click', () => {
+    document.getElementById('confirmModal').classList.remove('active');
+    if (onConfirmCallback) onConfirmCallback();
+  });
+
+  const panelToggles = document.querySelectorAll('.panel-toggle');
+  const panelSections = document.querySelectorAll('.side-panel .panel-section');
+  
+  function switchPanel(targetId, autoSetTool = true) {
+    const wasTrama3d = !document.getElementById('trama3dPanel').hidden;
+    panelSections.forEach(sec => sec.hidden = (sec.id !== targetId));
+    panelToggles.forEach(t => {
+      const isActive = t.dataset.panel === targetId;
+      t.classList.toggle('active', isActive);
+      t.setAttribute('aria-pressed', String(isActive));
+    });
+
+    try {
+      if (targetId === 'trama3dPanel') {
+        trama3dActivate();
+      } else if (wasTrama3d) {
+        trama3dDeactivate();
+      }
+    } catch (err) {
+      console.error('Erro ao alternar modo 3D:', err);
+    }
+
+    if (autoSetTool) {
+      if(targetId === 'colorPanel') {
+        if(!['brush', 'eraser', 'pipette', 'bucket', 'replace', 'hand'].includes(currentToolMode)) setToolMode('hand');
+      } else if(targetId === 'selectPanel') {
+        if (currentToolMode !== 'paste') setToolMode('select');
+      }
+    }
+  }
+
+  panelToggles.forEach(btn => {
+    btn.addEventListener('click', () => switchPanel(btn.dataset.panel, true));
+  });
+
+  function hexToRgb(hex) {
+    let h = (hex || '#000').replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c+c).join('');
+    const num = parseInt(h, 16);
+    return { r: (num>>16)&255, g: (num>>8)&255, b: num&255 };
+  }
+
+  function rgbToHex(r, g, b) {
+    return "#" + (1 << 24 | r << 16 | g << 8 | b).toString(16).slice(1).toUpperCase();
+  }
+  
+  function nearestColorName(hex) {
+    const target = hexToRgb(hex);
+    if (isNaN(target.r) || isNaN(target.g) || isNaN(target.b)) return hex;
+    let best = null, bestDist = Infinity;
+    for (const [refHex, name] of COLOR_NAMES) {
+      const ref = hexToRgb(refHex);
+      const dist = (ref.r - target.r) ** 2 + (ref.g - target.g) ** 2 + (ref.b - target.b) ** 2;
+      if (dist < bestDist) { bestDist = dist; best = name; }
+    }
+    return best || hex;
+  }
+
+  function buildColorPalette() {
+    colorPaletteEl.innerHTML = '';
+    BASIC_COLORS.forEach(hex => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch'; btn.style.background = hex; btn.dataset.hex = hex;
+      btn.title = nearestColorName(hex);
+      btn.addEventListener('click', () => selectColor(hex));
+      colorPaletteEl.appendChild(btn);
+    });
+  }
+
+  function selectColor(hex) {
+    colorPicker.value = hex;
+    registerRecentColor(hex);
+    highlightPaletteSelection();
+    setToolMode('brush');
+  }
+
+  customColorBtn.addEventListener('click', () => colorPicker.click());
+  colorPicker.addEventListener('change', () => selectColor(colorPicker.value));
+
+  function registerRecentColor(hex) {
+    recentColors = recentColors.filter(c => c.toLowerCase() !== hex.toLowerCase());
+    recentColors.unshift(hex);
+    if (recentColors.length > 5) recentColors.length = 5;
+    renderRecentColors();
+  }
+
+  function renderRecentColors() {
+    recentColorsEl.innerHTML = '';
+    recentColorsSection.hidden = recentColors.length === 0;
+    recentColors.forEach(hex => {
+      const btn = document.createElement('button');
+      btn.className = 'swatch'; btn.style.background = hex; btn.dataset.hex = hex;
+      btn.title = nearestColorName(hex);
+      btn.addEventListener('click', () => selectColor(hex));
+      recentColorsEl.appendChild(btn);
+    });
+  }
+
+  function highlightPaletteSelection() {
+    const cur = colorPicker.value.toLowerCase();
+    document.querySelectorAll('.swatch[data-hex]').forEach(el => {
+      el.classList.toggle('selected', el.dataset.hex.toLowerCase() === cur);
+    });
+  }
+
+  const BEAD_AVG_WEIGHT_G = 0.32;
+  function estimateWeightLabel(totalBeads) {
+    const grams = totalBeads * BEAD_AVG_WEIGHT_G;
+    if (grams < 1) return '<1g';
+    const rounded = Math.round(grams);
+    if (rounded >= 1000) return `~${(rounded/1000).toFixed(1).replace('.',',')}kg`;
+    return `~${rounded}g`;
+  }
+
+  function updateDimSummary() {
+    if (recommendedRows === null || recommendedCols === null) {
+      dimSummaryContainer.style.display = 'none';
+      return;
+    }
+    dimSummaryContainer.style.display = 'block';
+    const alturaTxt = savedTramaHeight !== null ? `${formatCm(savedTramaHeight)} cm` : '—';
+    const circTxt = savedTramaCircum !== null ? `${formatCm(savedTramaCircum)} cm` : '—';
+    dimSummaryContainer.innerHTML = `
+      <div style="font-weight:700; color:var(--apple-terracotta); margin-bottom:4px;">📏 Dimensões da Cabaça</div>
+      <div>Altura: <b>${alturaTxt}</b> &nbsp;•&nbsp; Circunferência: <b>${circTxt}</b></div>
+      <div style="margin-top:4px;">Estrutura: <b>${recommendedRows} fileiras × ${recommendedCols} colunas</b></div>
+    `;
+  }
+
+  function updateColorCounts() {
+    const counts = new Map();
+    for (const color of painted.values()) counts.set(color, (counts.get(color) || 0) + 1);
+    
+    colorCountsContainer.innerHTML = '';
+    if (counts.size === 0) {
+      colorCountsContainer.innerHTML = '<i>Nenhuma miçanga pintada ainda.</i>';
+      return;
+    }
+    const total = Array.from(counts.values()).reduce((a, b) => a + b, 0);
+    colorCountsContainer.innerHTML += `<div style="font-weight:800; border-bottom:1px solid var(--glass-hairline); padding-bottom:8px; margin-bottom:4px;">Total Geral: ${total} miçangas (${estimateWeightLabel(total)})</div>`;
+    
+    for (const [color, count] of counts.entries()) {
+      const row = document.createElement('div');
+      row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '8px';
+      row.innerHTML = `<span style="width:16px;height:16px;border-radius:5px;border:1px solid rgba(0,0,0,0.18);background:${color}"></span> <span>${nearestColorName(color)}: ${count} (${estimateWeightLabel(count)})</span>`;
+      colorCountsContainer.appendChild(row);
+    }
+  }
+
+  function setToolMode(mode) {
+    currentToolMode = mode;
+    brushBtn.classList.toggle('active', mode === 'brush');
+    eraserBtn.classList.toggle('active', mode === 'eraser');
+    pipetteBtn.classList.toggle('active', mode === 'pipette');
+    bucketBtn.classList.toggle('active', mode === 'bucket');
+    replaceBtn.classList.toggle('active', mode === 'replace');
+    pasteBtn.classList.toggle('active', mode === 'paste');
+    handBtns.forEach(btn => btn.classList.toggle('active', mode === 'hand'));
+
+    if(['brush', 'eraser', 'pipette', 'bucket', 'replace'].includes(mode)) switchPanel('colorPanel', false);
+    else if (mode === 'select' || mode === 'paste') switchPanel('selectPanel', false);
+
+    if (mode !== 'select') isSelecting = false;
+    if (mode !== 'paste') pastePreviewCell = null;
+
+    if (mode !== 'select' && mode !== 'paste') {
+      pinMultiSelectMode = false;
+      pinSelectBtn.classList.remove('active');
+    }
+
+    canvas.style.cursor = mode === 'hand' ? 'grab' : 'crosshair';
+
+    const icons = { 'brush': '🖌️', 'eraser': '🧹', 'pipette': '🧪', 'select': '⬚', 'paste': '📋', 'bucket': '🪣', 'replace': '🔀', 'hand': '🖐🏽' };
+    const names = { 'brush': 'Pincel', 'eraser': 'Borracha', 'pipette': 'Pipeta', 'select': 'Seleção', 'paste': 'Colar', 'bucket': 'Balde', 'replace': 'Substituir', 'hand': 'Mão' };
+    badgeIcon.textContent = icons[mode] || '🖐🏽';
+    badgeText.textContent = names[mode] || 'Mão';
+    
+    draw();
+  }
+
+  brushBtn.addEventListener('click', () => setToolMode('brush'));
+  eraserBtn.addEventListener('click', () => setToolMode('eraser'));
+  pipetteBtn.addEventListener('click', () => setToolMode('pipette'));
+  bucketBtn.addEventListener('click', () => setToolMode('bucket'));
+  replaceBtn.addEventListener('click', () => setToolMode('replace'));
+  handBtns.forEach(btn => btn.addEventListener('click', () => setToolMode('hand')));
+
+  let trama3dRevision = 0;
+  let trama3dLastBuiltRevision = -1;
+  let trama3dGhost = false;
+  let trama3dSeam = true;
+  let trama3dRotationLevel = 0; // 0 = parado, 1 = lenta, 2 = media, 3 = rapida
+  let trama3dRotationAxis = 'h'; // 'h' = horizontal ↔️, 'v' = vertical ↕️
+  let trama3dPollTimer = null;
+  const trama3dCanvasWrap = document.getElementById('trama3dCanvasWrap');
+  const trama3dEmptyState = document.getElementById('trama3dEmptyState');
+
+  function trama3dHasMoldura() {
+    return recommendedRows !== null && recommendedCols !== null && recommendedRows > 0 && recommendedCols > 0;
+  }
+
+  function trama3dBuildPayload() {
+    const rows = recommendedRows, cols = recommendedCols;
+    const circum = savedTramaCircum || (cols * BEAD_GRID_FACTOR);
+    const radius = circum / (2 * Math.PI);
+    const beadDiameterCm = 1;
+
+    const uMin = -1, uSpan = 2 * cols;
+    const vMin = 0, vSpan = 2 * rows;
+
+    const cells = [];
+    for (const [key, color] of painted.entries()) {
+      const [r, c] = key.split(',').map(Number);
+      const u = c - r, v = c + r;
+      if (u < uMin || u > uMin + uSpan || v < vMin || v > vMin + vSpan) continue;
+      cells.push({ u, v, color });
+    }
+    return { radius, rows, cols, uMin, uSpan, vMin, vSpan, cells, beadDiameterCm };
+  }
+
+  function trama3dRebuild(force) {
+    if (!trama3dHasMoldura()) return;
+    if (!force && trama3dRevision === trama3dLastBuiltRevision) return;
+    if (!window.Trama3D) return;
+    try {
+      const payload = trama3dBuildPayload();
+      window.Trama3D.build(payload);
+      trama3dLastBuiltRevision = trama3dRevision;
+    } catch (err) {
+      console.error('Erro ao reconstruir Trama 3D:', err);
+    }
+  }
+
+  function trama3dRefreshUI() {
+    trama3dEmptyState.style.display = trama3dHasMoldura() ? 'none' : 'flex';
+  }
+
+  let trama3dActivationToken = 0;
+
+  function trama3dActivate() {
+    const myToken = ++trama3dActivationToken;
+    trama3dCanvasWrap.classList.add('active');
+    canvas.style.display = 'none';
+    canvasModeBadge.style.display = 'none';
+    trama3dRefreshUI();
+    if (!trama3dHasMoldura()) return;
+    requestAnimationFrame(() => {
+      if (myToken !== trama3dActivationToken) return;
+      if (!trama3dCanvasWrap.classList.contains('active')) return;
+      if (!window.Trama3D) return;
+      try {
+        window.Trama3D.ensureScene(trama3dCanvasWrap);
+        window.Trama3D.resume();
+        window.Trama3D.onResize();
+        window.Trama3D.setGhost(trama3dGhost);
+        window.Trama3D.setSeamVisible(trama3dSeam);
+        window.Trama3D.setRotationLevel(trama3dRotationLevel);
+        window.Trama3D.setRotationAxis(trama3dRotationAxis);
+        trama3dRebuild(true);
+      } catch (err) {
+        console.error('Erro ao ativar Trama 3D:', err);
+        showToast('Não foi possível abrir o modo 3D.');
+      }
+    });
+    clearInterval(trama3dPollTimer);
+    trama3dPollTimer = setInterval(() => {
+      if (!trama3dCanvasWrap.classList.contains('active')) { clearInterval(trama3dPollTimer); return; }
+      try { trama3dRebuild(false); } catch (err) { console.error('Erro ao atualizar Trama 3D:', err); }
+    }, 700);
+  }
+
+  function trama3dDeactivate() {
+    trama3dActivationToken++;
+    trama3dCanvasWrap.classList.remove('active');
+    canvas.style.display = '';
+    canvasModeBadge.style.display = '';
+    clearInterval(trama3dPollTimer);
+    trama3dPollTimer = null;
+    if (window.Trama3D) {
+      try { window.Trama3D.pause(); } catch (err) { console.error('Erro ao pausar Trama 3D:', err); }
+    }
+  }
+
+  const rotateBtn = document.getElementById('trama3dRotateBtn');
+  function updateRotateBtnStyle() {
+    rotateBtn.classList.remove('active');
+    rotateBtn.style.background = '';
+    rotateBtn.style.color = '';
+    rotateBtn.style.borderColor = '';
+
+    if (trama3dRotationLevel === 0) {
+      rotateBtn.title = 'Rotação automática: Parada (R ou Espaço)';
+      showToast('Giro automático: Parado');
+    } else if (trama3dRotationLevel === 1) {
+      rotateBtn.style.background = '#fed7aa';
+      rotateBtn.style.color = '#9a3412';
+      rotateBtn.style.borderColor = '#fdba74';
+      rotateBtn.title = 'Rotação automática: Lenta (R ou Espaço)';
+      showToast('Giro automático: Lento 🐢');
+    } else if (trama3dRotationLevel === 2) {
+      rotateBtn.style.background = '#f97316';
+      rotateBtn.style.color = '#ffffff';
+      rotateBtn.style.borderColor = '#ea580c';
+      rotateBtn.title = 'Rotação automática: Média (R ou Espaço)';
+      showToast('Giro automático: Médio 🐇');
+    } else if (trama3dRotationLevel === 3) {
+      rotateBtn.classList.add('active');
+      rotateBtn.title = 'Rotação automática: Rápida (R ou Espaço)';
+      showToast('Giro automático: Rápido ⚡');
+    }
+  }
+
+  rotateBtn.addEventListener('click', () => {
+    trama3dRotationLevel = (trama3dRotationLevel + 1) % 4;
+    updateRotateBtnStyle();
+    if (window.Trama3D) window.Trama3D.setRotationLevel(trama3dRotationLevel);
+  });
+
+  const axisBtn = document.getElementById('trama3dAxisBtn');
+  axisBtn.addEventListener('click', () => {
+    trama3dRotationAxis = (trama3dRotationAxis === 'h' ? 'v' : 'h');
+    axisBtn.textContent = trama3dRotationAxis === 'h' ? '↔️' : '↕️';
+    axisBtn.title = `Eixo de rotação: ${trama3dRotationAxis === 'h' ? 'Horizontal ↔️' : 'Vertical ↕️'} (X)`;
+    if (window.Trama3D) window.Trama3D.setRotationAxis(trama3dRotationAxis);
+    showToast(`Eixo de rotação: ${trama3dRotationAxis === 'h' ? 'Horizontal ↔️' : 'Vertical ↕️'}`);
+  });
+
+  document.getElementById('trama3dGhostBtn').addEventListener('click', (e) => {
+    trama3dGhost = !trama3dGhost;
+    e.currentTarget.classList.toggle('active', trama3dGhost);
+    if (window.Trama3D) window.Trama3D.setGhost(trama3dGhost);
+    showToast(trama3dGhost ? 'Transparência ativada (cabaça invisível)' : 'Transparência desativada');
+  });
+
+  document.getElementById('trama3dSeamBtn').addEventListener('click', (e) => {
+    trama3dSeam = !trama3dSeam;
+    e.currentTarget.classList.toggle('active', trama3dSeam);
+    if (window.Trama3D) window.Trama3D.setSeamVisible(trama3dSeam);
+    showToast(trama3dSeam ? 'Linha de emenda visível' : 'Linha de emenda oculta');
+  });
+
+  document.getElementById('trama3dRefreshBtn').addEventListener('click', () => {
+    if (!trama3dHasMoldura()) { showToast('Defina as medidas em 📏 Dimensionar Trama primeiro.'); return; }
+    trama3dRebuild(true);
+    if (window.Trama3D) window.Trama3D.resetView();
+    showToast('Trama 3D atualizada e alinhada na emenda!');
+  });
+
+  document.getElementById('trama3dViewTopBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('top'); showToast('Vista superior'); }
+  });
+  document.getElementById('trama3dViewTopFrontBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('topFront'); showToast('Vista superior frontal'); }
+  });
+  document.getElementById('trama3dViewBottomBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('bottom'); showToast('Vista inferior'); }
+  });
+  document.getElementById('trama3dViewFrontBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('front'); showToast('Vista frontal (emenda)'); }
+  });
+  document.getElementById('trama3dViewBackBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('back'); showToast('Vista traseira'); }
+  });
+  document.getElementById('trama3dViewLeftBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('left'); showToast('Vista lateral esquerda'); }
+  });
+  document.getElementById('trama3dViewRightBtn').addEventListener('click', () => {
+    if (window.Trama3D) { window.Trama3D.setView('right'); showToast('Vista lateral direita'); }
+  });
+
+  document.getElementById('trama3dCaptureBtn').addEventListener('click', () => {
+    if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Defina a moldura para capturar.'); return; }
+    const dataUrl = window.Trama3D.capture();
+    if (!dataUrl) return;
+    const a = document.createElement('a');
+    a.href = dataUrl;
+    a.download = `trama3d_${(document.getElementById('tramaName').value || 'trama').replace(/\s+/g, '_')}.png`;
+    a.click();
+    showToast('Foto salva!');
+  });
+
+  document.getElementById('trama3dRecordBtn').addEventListener('click', async (e) => {
+    if (!window.Trama3D || !trama3dHasMoldura()) { showToast('Defina a moldura para gravar.'); return; }
+    const btn = e.currentTarget;
+    const previousLevel = trama3dRotationLevel;
+    if (previousLevel === 0) {
+      trama3dRotationLevel = 1;
+      updateRotateBtnStyle();
+      if (window.Trama3D) window.Trama3D.setRotationLevel(1);
+    }
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = '⏺️ 15s';
+    try {
+      const blob = await window.Trama3D.recordVideo(15000);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `trama3d_${(document.getElementById('tramaName').value || 'trama').replace(/\s+/g, '_')}.webm`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+      showToast('Vídeo salvo!');
+    } catch (err) {
+      showToast('Gravação de vídeo não suportada neste navegador.');
+    } finally {
+      if (previousLevel === 0) {
+        trama3dRotationLevel = 0;
+        updateRotateBtnStyle();
+        if (window.Trama3D) window.Trama3D.setRotationLevel(0);
+      }
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  function adjustColor(hex, factor) {
+    const { r, g, b } = hexToRgb(hex);
+    if (factor > 1) {
+      const amt = factor - 1;
+      return `rgb(${Math.min(255,r+(255-r)*amt)},${Math.min(255,g+(255-g)*amt)},${Math.min(255,b+(255-b)*amt)})`;
+    } else {
+      return `rgb(${Math.max(0,r*factor)},${Math.max(0,g*factor)},${Math.max(0,b*factor)})`;
+    }
+  }
+
+  function draw3DBead(targetCtx, x, y, size, colorHex) {
+    const cx = x + size/2, cy = y + size/2, r = size*0.42;
+    targetCtx.save();
+    targetCtx.fillStyle = 'rgba(0,0,0,0.28)';
+    targetCtx.beginPath(); targetCtx.arc(cx+r*0.12, cy+r*0.15, r, 0, Math.PI*2); targetCtx.fill();
+    const grad = targetCtx.createRadialGradient(cx-r*0.3, cy-r*0.35, r*0.05, cx, cy, r);
+    grad.addColorStop(0, adjustColor(colorHex, 1.45));
+    grad.addColorStop(0.55, colorHex);
+    grad.addColorStop(1, adjustColor(colorHex, 0.45));
+    targetCtx.fillStyle = grad;
+    targetCtx.beginPath(); targetCtx.arc(cx, cy, r, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.strokeStyle = adjustColor(colorHex, 0.45);
+    targetCtx.lineWidth = Math.max(0.5, size*0.035); targetCtx.stroke();
+    targetCtx.fillStyle = 'rgba(255,255,255,0.8)';
+    targetCtx.beginPath(); targetCtx.ellipse(cx-r*0.32, cy-r*0.35, r*0.22, r*0.14, -Math.PI/4, 0, Math.PI*2); targetCtx.fill();
+    targetCtx.restore();
+  }
+
+  function screenToLogical(sx, sy) {
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2;
+    const x1 = (sx - cx - pan.x)/zoom, y1 = (sy - cy - pan.y)/zoom;
+    const ca = Math.cos(-angle), sa = Math.sin(-angle);
+    return { x: ca*x1 - sa*y1 + cx, y: sa*x1 + ca*y1 + cy };
+  }
+  
+  function logicalToScreen(lx, ly) {
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2;
+    const x2 = lx - cx, y2 = ly - cy;
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    return { x: (ca*x2 - sa*y2)*zoom + cx + pan.x, y: (sa*x2 + ca*y2)*zoom + cy + pan.y };
+  }
+
+  function logicalToCell(lx, ly) { return { r: Math.floor(ly/baseCellSize), c: Math.floor(lx/baseCellSize) }; }
+  function screenToCell(sx, sy) { const l = screenToLogical(sx,sy); return logicalToCell(l.x, l.y); }
+
+  function processSelectionBox() {
+    if (!screenSelectionStart || !screenSelectionCurrent) return;
+    
+    const x1 = Math.min(screenSelectionStart.x, screenSelectionCurrent.x);
+    const x2 = Math.max(screenSelectionStart.x, screenSelectionCurrent.x);
+    const y1 = Math.min(screenSelectionStart.y, screenSelectionCurrent.y);
+    const y2 = Math.max(screenSelectionStart.y, screenSelectionCurrent.y);
+
+    if (x2 - x1 < 3 && y2 - y1 < 3) {
+      const cell = screenToCell(screenSelectionStart.x, screenSelectionStart.y);
+      selectedCells.add(`${cell.r},${cell.c}`);
+      return;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const corners = [ 
+      screenToLogical(0,0), screenToLogical(rect.width,0), 
+      screenToLogical(0,rect.height), screenToLogical(rect.width,rect.height) 
+    ];
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (const p of corners) { 
+      minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); 
+      maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); 
+    }
+    
+    const cMin = Math.floor((minX-baseCellSize)/baseCellSize) - 2; 
+    const cMax = Math.floor((maxX+baseCellSize)/baseCellSize) + 2;
+    const rMin = Math.floor((minY-baseCellSize)/baseCellSize) - 2; 
+    const rMax = Math.floor((maxY+baseCellSize)/baseCellSize) + 2;
+
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const lx = c * baseCellSize + baseCellSize/2;
+        const ly = r * baseCellSize + baseCellSize/2;
+        const s = logicalToScreen(lx, ly);
+        if (s.x >= x1 && s.x <= x2 && s.y >= y1 && s.y <= y2) {
+          selectedCells.add(`${r},${c}`);
+        }
+      }
+    }
+  }
+
+  function draw() {
+    canvas.style.width = '100%'; canvas.style.height = '100%';
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = Math.round(rect.width * dpr); canvas.height = Math.round(rect.height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    ctx.fillStyle = backgroundColor; ctx.fillRect(0, 0, rect.width, rect.height);
+    const cx = rect.width/2, cy = rect.height/2;
+    
+    ctx.save();
+    ctx.translate(cx + pan.x, cy + pan.y); ctx.rotate(angle); ctx.scale(zoom, zoom); ctx.translate(-cx, -cy);
+
+    const corners = [ screenToLogical(0,0), screenToLogical(rect.width,0), screenToLogical(0,rect.height), screenToLogical(rect.width,rect.height) ];
+    let minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (const p of corners) { minX=Math.min(minX,p.x); minY=Math.min(minY,p.y); maxX=Math.max(maxX,p.x); maxY=Math.max(maxY,p.y); }
+    const cMin = Math.floor((minX-baseCellSize)/baseCellSize), cMax = Math.floor((maxX+baseCellSize)/baseCellSize);
+    const rMin = Math.floor((minY-baseCellSize)/baseCellSize), rMax = Math.floor((maxY+baseCellSize)/baseCellSize);
+
+    let strokeColor = (backgroundColor.toLowerCase() === '#ffffff') ? '#d6d3d1' : 'rgba(0,0,0,0.15)';
+    ctx.lineWidth = Math.max(0.4, 0.5/zoom);
+
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const x = c*baseCellSize, y = r*baseCellSize;
+        ctx.fillStyle = backgroundColor; 
+        ctx.fillRect(x,y,baseCellSize,baseCellSize);
+        if(gridVisible){ 
+          ctx.strokeStyle = strokeColor; 
+          ctx.strokeRect(x,y,baseCellSize,baseCellSize); 
+        }
+      }
+    }
+
+    // Moldura guia da cabaça
+    if (recommendedRows !== null && recommendedCols !== null) {
+      ctx.save();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); 
+      const S = baseCellSize;
+      const C = recommendedCols;
+      const R = recommendedRows;
+      
+      const minXBound = logicalToScreen(0, S).x; 
+      const maxXBound = logicalToScreen(C*S, -(C-1)*S).x; 
+      const minYBound = logicalToScreen(0, 0).y; 
+      const maxYBound = logicalToScreen(R*S, R*S).y; 
+
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.85)'; 
+      ctx.lineWidth = 1.5; 
+
+      ctx.beginPath();
+      ctx.moveTo(-99999, minYBound); ctx.lineTo(99999, minYBound);
+      ctx.moveTo(-99999, maxYBound); ctx.lineTo(99999, maxYBound);
+      ctx.moveTo(minXBound, -99999); ctx.lineTo(minXBound, 99999);
+      ctx.moveTo(maxXBound, -99999); ctx.lineTo(maxXBound, 99999);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Miçangas pintadas
+    for (let r=rMin; r<=rMax; r++) {
+      for (let c=cMin; c<=cMax; c++) {
+        const color = painted.get(`${r},${c}`);
+        if(color) {
+          const x = c*baseCellSize, y = r*baseCellSize;
+          if(renderStyle === '3d') {
+            draw3DBead(ctx, x, y, baseCellSize, color);
+          } else {
+            ctx.fillStyle = color; 
+            ctx.fillRect(x,y,baseCellSize,baseCellSize);
+            if(gridVisible){ 
+              ctx.strokeStyle = strokeColor; 
+              ctx.strokeRect(x,y,baseCellSize,baseCellSize); 
+            }
+          }
+        }
+      }
+    }
+
+    // Células Selecionadas
+    if (selectedCells.size > 0) {
+      ctx.strokeStyle = '#c2410c'; ctx.fillStyle = 'rgba(194,65,12,0.4)'; 
+      ctx.lineWidth = Math.max(0.8, 1.5/zoom); ctx.setLineDash([4/zoom, 4/zoom]);
+      for (const key of selectedCells) {
+        const [r, c] = key.split(',').map(Number);
+        const sx = c * baseCellSize, sy = r * baseCellSize;
+        ctx.fillRect(sx, sy, baseCellSize, baseCellSize); 
+        ctx.strokeRect(sx, sy, baseCellSize, baseCellSize);
+      }
+      ctx.setLineDash([]);
+    }
+
+    // Estampa Flutuante
+    if (currentToolMode === 'paste' && clipboard && pastePreviewCell) {
+      ctx.globalAlpha = 0.78;
+      for (const [relKey, color] of clipboard.cells.entries()) {
+        const [dr, dc] = relKey.split(',').map(Number);
+        const x = (pastePreviewCell.c + dc)*baseCellSize, y = (pastePreviewCell.r + dr)*baseCellSize;
+        if(renderStyle==='3d') draw3DBead(ctx, x, y, baseCellSize, color);
+        else { ctx.fillStyle=color; ctx.fillRect(x,y,baseCellSize,baseCellSize); }
+      }
+      ctx.globalAlpha = 1;
+      
+      ctx.strokeStyle = '#c2410c';
+      ctx.lineWidth = Math.max(1, 1.8/zoom);
+      ctx.setLineDash([6/zoom, 4/zoom]);
+      
+      const S = baseCellSize;
+      const c0 = pastePreviewCell.c, r0 = pastePreviewCell.r;
+      const du = clipboard.uSpan || (clipboard.w * 2);
+      const dv = clipboard.vSpan || (clipboard.h * 2);
+      
+      ctx.beginPath();
+      ctx.moveTo(c0 * S, r0 * S);
+      ctx.lineTo((c0 + du/2) * S, (r0 - du/2) * S);
+      ctx.lineTo((c0 + (du + dv)/2) * S, (r0 + (dv - du)/2) * S);
+      ctx.lineTo((c0 + dv/2) * S, (r0 + dv/2) * S);
+      ctx.closePath();
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    
+    ctx.restore();
+
+    if (isSelecting && screenSelectionStart && screenSelectionCurrent) {
+      const x = Math.min(screenSelectionStart.x, screenSelectionCurrent.x);
+      const y = Math.min(screenSelectionStart.y, screenSelectionCurrent.y);
+      const w = Math.abs(screenSelectionStart.x - screenSelectionCurrent.x);
+      const h = Math.abs(screenSelectionStart.y - screenSelectionCurrent.y);
+
+      ctx.strokeStyle = '#c2410c';
+      ctx.fillStyle = 'rgba(194,65,12,0.18)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 4]);
+      ctx.fillRect(x, y, w, h);
+      ctx.strokeRect(x, y, w, h);
+      ctx.setLineDash([]);
+    }
+  }
+
+  let undoStack=[], redoStack=[];
+  const UNDO_CAP = 200;
+  function pushUndo(entry) {
+    undoStack.push(entry);
+    if (undoStack.length > UNDO_CAP) undoStack.shift();
+    redoStack = [];
+  }
+
+  function applyPaintAt(sx, sy, color, forceErase=false) {
+    const {r,c} = screenToCell(sx,sy); const key = `${r},${c}`;
+    if (currentToolMode==='pipette' && !forceErase) {
+      const pc = painted.get(key);
+      if(pc){ selectColor(pc); showToast(`Cor capturada!`); }
+      return false;
+    }
+    const prev = painted.get(key) || null;
+    if (prev===color) return false;
+    if (color===null) painted.delete(key); else painted.set(key, color);
+    pushUndo({key, prev, next:color}); scheduleAutoSave();
+    return true;
+  }
+
+  function isCellInsideMoldura(r, c) {
+    if (recommendedRows === null || recommendedCols === null) return false;
+    const u = c - r;
+    const v = c + r;
+    return u >= -1 && u <= (2 * recommendedCols - 1) && v >= 0 && v <= (2 * recommendedRows);
+  }
+
+  function performColorReplace(startCell, newColor) {
+    const startKey = `${startCell.r},${startCell.c}`;
+    const targetColor = painted.get(startKey);
+    
+    if (!targetColor) {
+      showToast("Selecione uma miçanga pintada para substituir.");
+      return;
+    }
+    if (targetColor === newColor) return;
+
+    const changes = [];
+    for (const [key, color] of painted.entries()) {
+      if (color === targetColor) {
+        if(newColor) painted.set(key, newColor); else painted.delete(key);
+        changes.push({key, prev: targetColor, next: newColor});
+      }
+    }
+    
+    if (changes.length) {
+      pushUndo({changes}); scheduleAutoSave(); draw();
+      showToast(`Substituídas ${changes.length} miçangas!`);
+      setToolMode('hand');
+    }
+  }
+
+  function performBucketFill(startCell, newColor) {
+    const hasSel = selectedCells.size > 0;
+    const changes = [];
+
+    // Cenário 1: Seleção ativa delimitada
+    if (hasSel) {
+      for (const key of selectedCells) {
+        const prev = painted.get(key) || null;
+        if (prev !== newColor) {
+          if(newColor) painted.set(key, newColor); else painted.delete(key);
+          changes.push({key, prev, next: newColor});
+        }
+      }
+      
+      if (changes.length) {
+        pushUndo({changes}); scheduleAutoSave(); draw();
+        showToast('Seleção preenchida!');
+      }
+      return;
+    }
+
+    const startKey = `${startCell.r},${startCell.c}`;
+    const targetColor = painted.get(startKey) || null;
+    if (targetColor === newColor) return;
+
+    const inMoldura = isCellInsideMoldura(startCell.r, startCell.c);
+
+    // Cenário 2: Preenchendo área vazia/fundo
+    if (targetColor === null) {
+      if (inMoldura) {
+        const stack = [startCell];
+        const visited = new Set([startKey]);
+        const fillCells = [];
+
+        while (stack.length > 0) {
+          const {r, c} = stack.pop();
+          const k = `${r},${c}`;
+          const curColor = painted.get(k) || null;
+
+          if (curColor === null) {
+            fillCells.push({r, c, k});
+
+            const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
+            for (const n of neighbors) {
+              if (isCellInsideMoldura(n.r, n.c)) {
+                const nk = `${n.r},${n.c}`;
+                if (!visited.has(nk)) {
+                  visited.add(nk);
+                  stack.push(n);
+                }
+              }
+            }
+          }
+        }
+
+        if (fillCells.length > 0) {
+          for (const cell of fillCells) {
+            if (newColor) painted.set(cell.k, newColor);
+            else painted.delete(cell.k);
+            changes.push({key: cell.k, prev: null, next: newColor});
+          }
+          pushUndo({changes}); scheduleAutoSave(); draw();
+          showToast(`Área da régua preenchida (${fillCells.length} miçangas)!`);
+        }
+        return;
+      }
+
+      if (painted.size === 0) {
+        showToast('Área aberta! O balde precisa de um contorno fechado ou da régua para não derramar.');
+        return;
+      }
+
+      let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+      for (const k of painted.keys()) {
+        const [pr, pc] = k.split(',').map(Number);
+        if (pr < minR) minR = pr; if (pr > maxR) maxR = pr;
+        if (pc < minC) minC = pc; if (pc > maxC) maxC = pc;
+      }
+
+      if (startCell.r < minR || startCell.r > maxR || startCell.c < minC || startCell.c > maxC) {
+        showToast('Área aberta! O balde precisa de um contorno fechado para não derramar.');
+        return;
+      }
+
+      const stack = [startCell];
+      const visited = new Set([startKey]);
+      const fillCells = [];
+      let leaked = false;
+      const MAX_CONTINGENT_CELLS = 5000;
+
+      while (stack.length > 0) {
+        const {r, c} = stack.pop();
+        const k = `${r},${c}`;
+        const curColor = painted.get(k) || null;
+
+        if (curColor === null) {
+          fillCells.push({r, c, k});
+
+          if (fillCells.length > MAX_CONTINGENT_CELLS) {
+            leaked = true;
+            break;
+          }
+
+          const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
+          for (const n of neighbors) {
+            if (n.r < minR || n.r > maxR || n.c < minC || n.c > maxC) {
+              leaked = true;
+              break;
+            }
+            const nk = `${n.r},${n.c}`;
+            if (!visited.has(nk)) {
+              visited.add(nk);
+              stack.push(n);
+            }
+          }
+          if (leaked) break;
+        }
+      }
+
+      if (leaked) {
+        showToast('Área aberta! O contorno possui abertura e derramaria na grade infinita.');
+        return;
+      }
+
+      if (fillCells.length > 0) {
+        for (const cell of fillCells) {
+          if (newColor) painted.set(cell.k, newColor);
+          else painted.delete(cell.k);
+          changes.push({key: cell.k, prev: null, next: newColor});
+        }
+        pushUndo({changes}); scheduleAutoSave(); draw();
+        showToast(`Contingente fechado preenchido (${fillCells.length} miçangas)!`);
+      }
+      return;
+    }
+
+    // Cenário 3: Preenchimento sobre miçangas já pintadas
+    const stack = [startCell];
+    const visited = new Set([startKey]);
+
+    while (stack.length > 0) {
+      const {r, c} = stack.pop();
+      const k = `${r},${c}`;
+      const curColor = painted.get(k) || null;
+      
+      if (curColor === targetColor) {
+        if(newColor) painted.set(k, newColor); else painted.delete(k);
+        changes.push({key: k, prev: curColor, next: newColor});
+        
+        const neighbors = [ {r: r+1, c}, {r: r-1, c}, {r, c: c+1}, {r, c: c-1} ];
+        for (const n of neighbors) {
+          if (inMoldura && !isCellInsideMoldura(n.r, n.c)) continue;
+          const nk = `${n.r},${n.c}`;
+          if (!visited.has(nk)) {
+            visited.add(nk);
+            stack.push(n);
+          }
+        }
+      }
+    }
+    
+    if (changes.length) {
+      pushUndo({changes}); scheduleAutoSave(); draw();
+      showToast(`${changes.length} miçangas preenchidas!`);
+    }
+  }
+
+  function toggleMultiSelectCell(px, py) {
+    const cell = screenToCell(px, py);
+    const key = `${cell.r},${cell.c}`;
+    if (selectedCells.has(key)) {
+      selectedCells.delete(key);
+      return 'remove';
+    } else {
+      selectedCells.add(key);
+      return 'add';
+    }
+  }
+
+  let pointerDownInfo = null, isPanning=false;
+  canvas.addEventListener('contextmenu', e => e.preventDefault());
+  
+  canvas.addEventListener('pointerdown', e => {
+    try { canvas.setPointerCapture(e.pointerId); } catch(err) {}
+    const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+
+    if (e.pointerType === 'touch') {
+      const pos = { x: e.clientX, y: e.clientY };
+      touchPointers.set(e.pointerId, { current: pos, prev: pos });
+
+      if (touchPointers.size === 2) {
+        isPanning = true;
+        for (const [pid, timeoutId] of pendingTouchPaint) { clearTimeout(timeoutId); pendingTouchPaint.delete(pid); }
+        return;
+      }
+      if (touchPointers.size === 1) {
+        if (currentToolMode==='hand') {
+          isPanning = true;
+          pointerDownInfo = { type: 'pan', sx: e.clientX, sy: e.clientY };
+          return;
+        }
+        if (currentToolMode==='paste') { commitClipboardAt(screenToCell(px,py)); return; }
+        if (currentToolMode==='bucket') {
+          performBucketFill(screenToCell(px,py), colorPicker.value);
+          return;
+        }
+        if (currentToolMode==='replace') { performColorReplace(screenToCell(px,py), colorPicker.value); return; }
+        if (currentToolMode==='select') {
+          if (pinMultiSelectMode) {
+            const mode = toggleMultiSelectCell(px, py);
+            pointerDownInfo = { type: 'multi-select', mode };
+            updateSelectionState();
+            draw();
+            return;
+          }
+          selectedCells.clear();
+          isSelecting = true; 
+          screenSelectionStart = {x: px, y: py}; 
+          screenSelectionCurrent = {x: px, y: py};
+          draw();
+          return;
+        }
+        const pointerId = e.pointerId;
+        const timeoutId = setTimeout(() => {
+          pendingTouchPaint.delete(pointerId);
+          if (touchPointers.size !== 1 || !touchPointers.has(pointerId)) return;
+          const color = currentToolMode==='eraser' ? null : colorPicker.value;
+          if (applyPaintAt(px, py, color)) draw();
+        }, TOUCH_PAINT_DELAY);
+        pendingTouchPaint.set(pointerId, timeoutId);
+      }
+      return;
+    }
+
+    if (e.button===1 || currentToolMode==='hand') {
+      e.preventDefault(); 
+      pointerDownInfo = {type:'pan', sx:e.clientX, sy:e.clientY}; 
+      isPanning = true;
+      canvas.style.cursor = 'grabbing';
+      return;
+    }
+
+    if (currentToolMode==='paste') { commitClipboardAt(screenToCell(px,py)); return; }
+    if (currentToolMode==='bucket') { 
+      const fillColor = (e.button === 2) ? null : colorPicker.value;
+      performBucketFill(screenToCell(px,py), fillColor); 
+      return; 
+    }
+    if (currentToolMode==='replace') { performColorReplace(screenToCell(px,py), colorPicker.value); return; }
+    
+    if (currentToolMode==='select') { 
+      if ((e.shiftKey || pinMultiSelectMode) && e.button === 0) {
+        const mode = toggleMultiSelectCell(px, py);
+        pointerDownInfo = { type: 'multi-select', mode };
+        updateSelectionState();
+        draw();
+        return;
+      }
+      
+      selectedCells.clear(); 
+      isSelecting=true; 
+      screenSelectionStart = {x: px, y: py}; 
+      screenSelectionCurrent = {x: px, y: py};
+      draw(); 
+      return; 
+    }
+    
+    const color = (e.button===2 || currentToolMode==='eraser') ? null : colorPicker.value;
+    if(applyPaintAt(px,py, color, e.button===2)) draw();
+    pointerDownInfo={type:(e.button===2||currentToolMode==='eraser')?'erase':'draw'};
+  });
+
+  canvas.addEventListener('pointermove', e => {
+    if (e.pointerType === 'touch') {
+      if (!touchPointers.has(e.pointerId)) return;
+      const ptrData = touchPointers.get(e.pointerId);
+      ptrData.prev = ptrData.current;
+      ptrData.current = { x: e.clientX, y: e.clientY };
+
+      if (touchPointers.size === 2 && isPanning) {
+        const pts = Array.from(touchPointers.values());
+        const ptr1 = pts[0], ptr2 = pts[1];
+        const prevCentroidX = (ptr1.prev.x + ptr2.prev.x)/2, prevCentroidY = (ptr1.prev.y + ptr2.prev.y)/2;
+        const curCentroidX = (ptr1.current.x + ptr2.current.x)/2, curCentroidY = (ptr1.current.y + ptr2.current.y)/2;
+        pan.x += curCentroidX - prevCentroidX; pan.y += curCentroidY - prevCentroidY;
+
+        const rect = canvas.getBoundingClientRect();
+        const prevDist = Math.hypot(ptr1.prev.x-ptr2.prev.x, ptr1.prev.y-ptr2.prev.y);
+        const curDist = Math.hypot(ptr1.current.x-ptr2.current.x, ptr1.current.y-ptr2.current.y);
+        if (prevDist > 1 && curDist > 1) {
+          const focalX = curCentroidX - rect.left, focalY = curCentroidY - rect.top;
+          const before = screenToLogical(focalX, focalY);
+          zoom = Math.max(0.03, Math.min(10, zoom * (curDist/prevDist)));
+          const after = logicalToScreen(before.x, before.y);
+          pan.x += (focalX - after.x); pan.y += (focalY - after.y);
+        }
+        draw();
+        return;
+      }
+      if (touchPointers.size === 1) {
+        const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+        if (currentToolMode==='hand' && isPanning && pointerDownInfo) {
+          pan.x += (e.clientX - pointerDownInfo.sx);
+          pan.y += (e.clientY - pointerDownInfo.sy);
+          pointerDownInfo.sx = e.clientX;
+          pointerDownInfo.sy = e.clientY;
+          draw();
+          return;
+        }
+        if (currentToolMode==='paste') { pastePreviewCell=screenToCell(px,py); draw(); return; }
+        if (currentToolMode==='select' && isSelecting) { screenSelectionCurrent = {x:px, y:py}; draw(); return; }
+        
+        if (pendingTouchPaint.has(e.pointerId)) { clearTimeout(pendingTouchPaint.get(e.pointerId)); pendingTouchPaint.delete(e.pointerId); }
+        if (pointerDownInfo && pointerDownInfo.type === 'multi-select' && currentToolMode === 'select') {
+          const cell = screenToCell(px, py);
+          const key = `${cell.r},${cell.c}`;
+          if (pointerDownInfo.mode === 'add') selectedCells.add(key);
+          else selectedCells.delete(key);
+          updateSelectionState();
+          draw();
+          return;
+        }
+        if (currentToolMode==='select') return;
+        const color = currentToolMode==='eraser' ? null : colorPicker.value;
+        if (applyPaintAt(px, py, color)) draw();
+      }
+      return;
+    }
+
+    if(isPanning && pointerDownInfo){
+      pan.x += (e.clientX - pointerDownInfo.sx); pan.y += (e.clientY - pointerDownInfo.sy);
+      pointerDownInfo.sx = e.clientX; pointerDownInfo.sy = e.clientY; draw(); return;
+    }
+    const rect = canvas.getBoundingClientRect(), px = e.clientX-rect.left, py = e.clientY-rect.top;
+    
+    if (currentToolMode==='paste') { pastePreviewCell=screenToCell(px,py); draw(); return; }
+    if (currentToolMode==='select' && isSelecting) { screenSelectionCurrent = {x:px, y:py}; draw(); return; }
+    
+    if (pointerDownInfo && pointerDownInfo.type === 'multi-select' && currentToolMode === 'select') {
+      const cell = screenToCell(px, py);
+      const key = `${cell.r},${cell.c}`;
+      if (pointerDownInfo.mode === 'add') selectedCells.add(key);
+      else selectedCells.delete(key);
+      updateSelectionState();
+      draw();
+      return;
+    }
+
+    if (!pointerDownInfo) return;
+    if(applyPaintAt(px,py, pointerDownInfo.type==='erase'?null:colorPicker.value)) draw();
+  });
+
+  canvas.addEventListener('pointerup', e => {
+    try { canvas.releasePointerCapture(e.pointerId); } catch(err) {}
+
+    if (e.pointerType === 'touch') {
+      if (currentToolMode === 'select' && isSelecting) {
+        const rect = canvas.getBoundingClientRect();
+        screenSelectionCurrent = {x: e.clientX-rect.left, y: e.clientY-rect.top};
+        isSelecting = false;
+        processSelectionBox();
+        screenSelectionStart = null;
+        screenSelectionCurrent = null;
+        updateSelectionState(); 
+        draw();
+        touchPointers.delete(e.pointerId);
+        return;
+      }
+      if (pendingTouchPaint.has(e.pointerId)) {
+        clearTimeout(pendingTouchPaint.get(e.pointerId));
+        pendingTouchPaint.delete(e.pointerId);
+        if (!isPanning) {
+          const rect = canvas.getBoundingClientRect();
+          const color = currentToolMode==='eraser' ? null : colorPicker.value;
+          if (applyPaintAt(e.clientX-rect.left, e.clientY-rect.top, color)) draw();
+        }
+      }
+      touchPointers.delete(e.pointerId);
+      if (touchPointers.size < 2) isPanning = false;
+      pointerDownInfo = null;
+      canvas.style.cursor = currentToolMode === 'hand' ? 'grab' : 'crosshair';
+      return;
+    }
+
+    if(isSelecting && currentToolMode === 'select') {
+      const rect = canvas.getBoundingClientRect();
+      screenSelectionCurrent = {x: e.clientX-rect.left, y: e.clientY-rect.top};
+      isSelecting = false;
+      processSelectionBox();
+      screenSelectionStart = null;
+      screenSelectionCurrent = null;
+      updateSelectionState(); 
+      draw();
+    }
+    pointerDownInfo=null; isPanning=false;
+    canvas.style.cursor = currentToolMode === 'hand' ? 'grab' : 'crosshair';
+  });
+
+  canvas.addEventListener('wheel', e => {
+    e.preventDefault();
+    const rect=canvas.getBoundingClientRect(), mx=e.clientX-rect.left, my=e.clientY-rect.top;
+    const before = screenToLogical(mx,my);
+    zoom = Math.max(0.03, Math.min(10, zoom * Math.exp(-e.deltaY*0.0012)));
+    const after = logicalToScreen(before.x, before.y);
+    pan.x += (mx-after.x); pan.y += (my-after.y); draw();
+  }, {passive:false});
+
+  function updateSelectionState() {
+    const hasSel = selectedCells.size > 0;
+    copyBtn.disabled = !hasSel;
+    cutBtn.disabled = !hasSel;
+    deleteSelBtn.disabled = !hasSel;
+    
+    const hs = !!clipboard; 
+    pasteBtn.disabled = !hs; 
+    document.getElementById('rotateClipBtn').disabled = !hs;
+    document.getElementById('mirrorHClipBtn').disabled = !hs; 
+    document.getElementById('mirrorVClipBtn').disabled = !hs;
+  }
+  
+  function deleteSelectionData() {
+    if(selectedCells.size === 0) return;
+    const changes = [];
+    for (const k of selectedCells) {
+      const prev = painted.get(k) || null;
+      if (prev) { painted.delete(k); changes.push({key:k, prev, next:null}); }
+    }
+    if(changes.length){ pushUndo({changes}); scheduleAutoSave(); }
+    draw();
+  }
+
+  copyBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    const rawCells = [];
+    let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+
+    for (const key of selectedCells) {
+      const [r, c] = key.split(',').map(Number);
+      const color = painted.get(key);
+      if (color) {
+        const u = c - r;
+        const v = c + r;
+        minU = Math.min(minU, u); maxU = Math.max(maxU, u);
+        minV = Math.min(minV, v); maxV = Math.max(maxV, v);
+        rawCells.push({ r, c, color, u, v });
+      }
+    }
+    if (rawCells.length === 0) { showToast('Seleção vazia!'); return; }
+
+    const anchorC = Math.round((minV + minU) / 2);
+    const anchorR = Math.round((minV - minU) / 2);
+
+    const cells = new Map();
+    for (const item of rawCells) {
+      cells.set(`${item.r - anchorR},${item.c - anchorC}`, item.color);
+    }
+
+    clipboard = {
+      w: Math.max(1, Math.round((maxU - minU) / 2) + 1),
+      h: Math.max(1, Math.round((maxV - minV) / 2) + 1),
+      uSpan: Math.max(2, maxU - minU + 2),
+      vSpan: Math.max(2, maxV - minV + 2),
+      cells
+    };
+
+    renderClipPreview();
+    updateSelectionState();
+    showToast(`Área copiada! Clique no canvas para estampar.`);
+  });
+
+  cutBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    copyBtn.click();
+    deleteSelectionData();
+    selectedCells.clear();
+    updateSelectionState();
+    setToolMode('paste'); 
+    showToast(`Recortado! Mova e clique para colar.`);
+  });
+
+  deleteSelBtn.addEventListener('click', () => {
+    if(selectedCells.size === 0) return;
+    deleteSelectionData();
+    showToast(`Área apagada!`);
+  });
+
+  cancelSelectBtn.addEventListener('click', () => { 
+    selectedCells.clear();
+    screenSelectionStart = null;
+    screenSelectionCurrent = null;
+    setToolMode('hand'); 
+    updateSelectionState(); 
+    draw(); 
+  });
+
+  pinSelectBtn.addEventListener('click', () => {
+    pinMultiSelectMode = !pinMultiSelectMode;
+    pinSelectBtn.classList.toggle('active', pinMultiSelectMode);
+    if (pinMultiSelectMode && currentToolMode !== 'select') setToolMode('select');
+    showToast(pinMultiSelectMode ? 'Seleção múltipla ativada' : 'Seleção múltipla desativada');
+  });
+  
+  pasteBtn.addEventListener('click', () => { if(clipboard) setToolMode('paste'); });
+
+  function commitClipboardAt(cell) {
+    if(!clipboard) return;
+    const changes=[];
+    for(const [rk, c] of clipboard.cells.entries()){
+      const [dr,dc]=rk.split(',').map(Number), r=cell.r+dr, col=cell.c+dc, key=`${r},${col}`, prev=painted.get(key)||null;
+      if(prev!==c){ painted.set(key,c); changes.push({key,prev,next:c}); }
+    }
+    if(changes.length){ pushUndo({changes}); scheduleAutoSave(); showToast('Estampa aplicada!'); }
+    draw();
+    setToolMode('hand');
+  }
+
+  function transformClipboard(type) {
+    if(!clipboard) return;
+    const transformed = [];
+    let minU = Infinity, maxU = -Infinity, minV = Infinity, maxV = -Infinity;
+
+    for (const [rk, color] of clipboard.cells.entries()) {
+      const [dr, dc] = rk.split(',').map(Number);
+      let newDr = dr, newDc = dc;
+
+      if (type === 'rot') {
+        newDc = -dr; newDr = dc;
+      } else if (type === 'mh') {
+        newDc = dr; newDr = dc;
+      } else if (type === 'mv') {
+        newDc = -dr; newDr = -dc;
+      }
+
+      const u = newDc - newDr;
+      const v = newDc + newDr;
+      minU = Math.min(minU, u); maxU = Math.max(maxU, u);
+      minV = Math.min(minV, v); maxV = Math.max(maxV, v);
+      transformed.push({ dr: newDr, dc: newDc, color, u, v });
+    }
+
+    const anchorC = Math.round((minV + minU) / 2);
+    const anchorR = Math.round((minV - minU) / 2);
+
+    const newCells = new Map();
+    for (const item of transformed) {
+      newCells.set(`${item.dr - anchorR},${item.dc - anchorC}`, item.color);
+    }
+
+    clipboard = {
+      w: Math.max(1, Math.round((maxU - minU) / 2) + 1),
+      h: Math.max(1, Math.round((maxV - minV) / 2) + 1),
+      uSpan: Math.max(2, maxU - minU + 2),
+      vSpan: Math.max(2, maxV - minV + 2),
+      cells: newCells
+    };
+
+    renderClipPreview();
+    draw();
+  }
+  document.getElementById('rotateClipBtn').addEventListener('click', ()=>transformClipboard('rot'));
+  document.getElementById('mirrorHClipBtn').addEventListener('click', ()=>transformClipboard('mh'));
+  document.getElementById('mirrorVClipBtn').addEventListener('click', ()=>transformClipboard('mv'));
+
+  function renderClipPreview() {
+    if(!clipboard) { clipPreviewCanvas.getContext('2d').clearRect(0,0,48,48); return; }
+    const pctx = clipPreviewCanvas.getContext('2d'), W=48, H=48;
+    pctx.fillStyle = backgroundColor; pctx.fillRect(0,0,W,H);
+
+    let minDr = Infinity, maxDr = -Infinity, minDc = Infinity, maxDc = -Infinity;
+    for (const rk of clipboard.cells.keys()) {
+      const [dr, dc] = rk.split(',').map(Number);
+      if (dr < minDr) minDr = dr; if (dr > maxDr) maxDr = dr;
+      if (dc < minDc) minDc = dc; if (dc > maxDc) maxDc = dc;
+    }
+    if (!isFinite(minDr)) { pctx.clearRect(0,0,48,48); return; }
+
+    const bboxW = (maxDc - minDc) + 1, bboxH = (maxDr - minDr) + 1;
+    const diag = (bboxW + bboxH) * 0.707;
+    const cell = Math.min((W-8) / Math.max(1, diag), (H-8) / Math.max(1, diag));
+    const centerDc = (minDc + maxDc) / 2, centerDr = (minDr + maxDr) / 2;
+
+    pctx.save();
+    pctx.translate(W/2, H/2);
+    pctx.rotate(angle);
+    pctx.translate(-centerDc * cell, -centerDr * cell);
+    for(const [rk,c] of clipboard.cells.entries()){
+      const [dr,dc]=rk.split(',').map(Number);
+      if(renderStyle==='3d') draw3DBead(pctx, dc*cell - cell/2, dr*cell - cell/2, cell, c);
+      else { pctx.fillStyle=c; pctx.fillRect(dc*cell - cell/2, dr*cell - cell/2, cell, cell); }
+    }
+    pctx.restore();
+  }
+
+  zoomInBtn.addEventListener('click', () => { zoom = Math.min(10, zoom*1.2); draw(); });
+  zoomOutBtn.addEventListener('click', () => { zoom = Math.max(0.03, zoom/1.2); draw(); });
+  
+  function getTightBounds() {
+    let hasContent = false;
+    let mx=Infinity, MX=-Infinity, my=Infinity, MY=-Infinity;
+    const ca=Math.cos(angle), sa=Math.sin(angle);
+
+    function addPoint(px, py) {
+      const rx = px*ca - py*sa, ry = px*sa + py*ca;
+      mx=Math.min(mx,rx); MX=Math.max(MX,rx); my=Math.min(my,ry); MY=Math.max(MY,ry);
+      hasContent = true;
+    }
+
+    for(const k of painted.keys()){
+      const [r,c]=k.split(',').map(Number), x=c*baseCellSize, y=r*baseCellSize;
+      addPoint(x, y); addPoint(x+baseCellSize, y); addPoint(x, y+baseCellSize); addPoint(x+baseCellSize, y+baseCellSize);
+    }
+    
+    if (recommendedRows !== null && recommendedCols !== null) {
+      const S = baseCellSize, C = recommendedCols, R = recommendedRows;
+      addPoint(0, S); addPoint(C*S, -(C-1)*S); addPoint(0, 0); addPoint(R*S, R*S);
+    }
+
+    if(!hasContent) return null;
+    const cxR=(mx+MX)/2, cyR=(my+MY)/2;
+    return {w:MX-mx, h:MY-my, cxL: ca*cxR + sa*cyR, cyL: -sa*cxR + ca*cyR};
+  }
+
+  function centerCanvas() {
+    const b = getTightBounds(); if(!b){ pan={x:0,y:0}; draw(); return; }
+    const cx = canvas.clientWidth/2, cy = canvas.clientHeight/2, ca=Math.cos(angle), sa=Math.sin(angle);
+    const x1 = ca*(b.cxL-cx) - sa*(b.cyL-cy), y1 = sa*(b.cxL-cx) + ca*(b.cyL-cy);
+    pan.x = -(x1*zoom); pan.y = -(y1*zoom);
+  }
+  centerBtn.addEventListener('click', () => { centerCanvas(); draw(); });
+  fitScreenBtn.addEventListener('click', () => {
+    const b = getTightBounds(); if(!b){ zoom=1; pan={x:0,y:0}; draw(); return; }
+    zoom = Math.max(0.03, Math.min(10, Math.min((canvas.clientWidth*.85)/b.w, (canvas.clientHeight*.85)/b.h)));
+    centerCanvas(); draw();
+  });
+
+  const pStep = 28;
+  function panBy(dx, dy) { pan.x += dx; pan.y += dy; draw(); }
+  function attachHoldToRepeat(button, fn) {
+    let intervalId = null, timeoutId = null;
+    function stop() { if(timeoutId) clearTimeout(timeoutId); if(intervalId) clearInterval(intervalId); timeoutId=null; intervalId=null; }
+    button.addEventListener('pointerdown', e => { e.preventDefault(); fn(); timeoutId = setTimeout(()=>{ intervalId = setInterval(fn, 60); }, 350); });
+    button.addEventListener('pointerup', stop);
+    button.addEventListener('pointerleave', stop);
+    button.addEventListener('pointercancel', stop);
+  }
+  attachHoldToRepeat(panUpBtn, ()=>panBy(0, pStep));
+  attachHoldToRepeat(panDownBtn, ()=>panBy(0, -pStep));
+  attachHoldToRepeat(panLeftBtn, ()=>panBy(pStep, 0));
+  attachHoldToRepeat(panRightBtn, ()=>panBy(-pStep, 0));
+
+  gridToggleBtn.addEventListener('click', () => { gridVisible=!gridVisible; gridToggleBtn.classList.toggle('active', gridVisible); draw(); });
+  renderToggleBtn.addEventListener('click', () => { renderStyle = renderStyle==='2d'?'3d':'2d'; renderToggleBtn.textContent = renderStyle==='2d'?'2D':'3D'; draw(); renderClipPreview(); });
+  bgToggleBtn.addEventListener('click', () => {
+    const isTerra = backgroundColor.toLowerCase() !== '#ffffff';
+    backgroundColor = isTerra ? '#FFFFFF' : '#B5651D';
+    bgToggleBtn.textContent = isTerra ? '⚪' : '🟠';
+    draw(); renderClipPreview();
+  });
+
+  document.getElementById('undoBtn').addEventListener('click', () => {
+    const l=undoStack.pop(); if(!l)return;
+    (l.changes||[l]).forEach(({key,prev}) => prev?painted.set(key,prev):painted.delete(key));
+    redoStack.push(l); draw(); scheduleAutoSave();
+  });
+  document.getElementById('redoBtn').addEventListener('click', () => {
+    const l=redoStack.pop(); if(!l)return;
+    (l.changes||[l]).forEach(({key,next}) => next?painted.set(key,next):painted.delete(key));
+    undoStack.push(l); draw(); scheduleAutoSave();
+  });
+  document.getElementById('clearBtn').addEventListener('click', () => {
+    if(painted.size) showConfirm('Apagar Trama', 'Limpar todo o desenho?', () => { painted.clear(); undoStack=[]; redoStack=[]; draw(); scheduleAutoSave(); });
+  });
+
+  let autosaveTimer = null;
+  function buildData(name) {
+    return { 
+      app:'TramaTrama', version:'0.9.27', name, author:document.getElementById('tramaAuthor').value,
+      savedAt:new Date().toISOString(), bg:backgroundColor, grid:gridVisible, style:renderStyle,
+      recRows: recommendedRows, recCols: recommendedCols,
+      savedHeight: savedTramaHeight, savedCircum: savedTramaCircum,
+      painted:Array.from(painted.entries()) 
+    };
+  }
+  function scheduleAutoSave() {
+    trama3dRevision++;
+    saveBadge.className = 'save-badge-rail saving'; saveBadge.textContent = 'Salvando';
+    clearTimeout(autosaveTimer);
+    autosaveTimer = setTimeout(() => {
+      try {
+        localStorage.setItem('tt_autosave', JSON.stringify(buildData(document.getElementById('tramaName').value)));
+        saveBadge.className = 'save-badge-rail'; saveBadge.textContent = '✓ Salvo';
+      } catch(e) {
+        saveBadge.className = 'save-badge-rail'; saveBadge.textContent = '⚠ Não salvo';
+      }
+    }, 600);
+  }
+
+  function getSaves() { try{return JSON.parse(localStorage.getItem('tt_saves'))||{};}catch(e){return {};} }
+  function setSaves(s) {
+    try {
+      localStorage.setItem('tt_saves', JSON.stringify(s));
+    } catch(e) {
+      showToast('Não foi possível salvar esta Trama no navegador.');
+      return;
+    }
+    refreshSaves();
+  }
+  function refreshSaves() {
+    const s = getSaves(), sel = document.getElementById('savedTramasSelect'); sel.innerHTML='';
+    const k = Object.keys(s).sort();
+    if(!k.length) { sel.innerHTML='<option value="">— nenhuma salva —</option>'; return; }
+    k.forEach(n => { const o = document.createElement('option'); o.value = n; o.textContent = `${n} (${new Date(s[n].savedAt).toLocaleDateString()})`; sel.appendChild(o); });
+  }
+
+  function isValidTramaData(d) {
+    if (!d || typeof d !== 'object') return false;
+    if (!Array.isArray(d.painted)) return false;
+    for (const entry of d.painted) {
+      if (!Array.isArray(entry) || entry.length !== 2) return false;
+      if (typeof entry[0] !== 'string' || typeof entry[1] !== 'string') return false;
+    }
+    return true;
+  }
+
+  function loadData(d) {
+    if (!isValidTramaData(d)) { showToast('Arquivo de Trama inválido.'); return; }
+    painted.clear(); d.painted.forEach(([k,v])=>painted.set(k,v));
+    document.getElementById('tramaName').value = d.name||''; document.getElementById('tramaAuthor').value = d.author||'';
+    backgroundColor = d.bg||'#B5651D'; gridVisible = d.grid!==false; renderStyle = d.style||'2d';
+    gridToggleBtn.classList.toggle('active', gridVisible); renderToggleBtn.textContent = renderStyle.toUpperCase();
+    bgToggleBtn.textContent = (backgroundColor.toLowerCase() === '#ffffff') ? '⚪' : '🟠';
+    
+    recommendedRows = d.recRows !== undefined ? d.recRows : null;
+    recommendedCols = d.recCols !== undefined ? d.recCols : null;
+    savedTramaHeight = d.savedHeight !== undefined ? d.savedHeight : null;
+    savedTramaCircum = d.savedCircum !== undefined ? d.savedCircum : null;
+    
+    if (recommendedRows !== null && recommendedCols !== null) {
+      dimResultText.textContent = `${recommendedRows} fileiras × ${recommendedCols} colunas`;
+      dimResultCmText.textContent = `${formatCm(savedTramaHeight)} cm (altura) × ${formatCm(savedTramaCircum)} cm (circunferência)`;
+      dimResultContainer.style.display = 'block';
+    } else {
+      dimResultContainer.style.display = 'none';
+      dimHeightInput.value = '';
+      dimCircInput.value = '';
+      dimRowsInput.value = '';
+      dimColsInput.value = '';
+    }
+
+    undoStack=[]; redoStack=[]; setToolMode('hand'); centerCanvas(); fitScreenBtn.click();
+  }
+
+  function handleNewTrama() {
+    const action = () => { 
+      painted.clear(); 
+      loadData({painted:[], recRows:null, recCols:null, savedHeight:null, savedCircum:null}); 
+      showToast('Nova trama iniciada!'); 
+      setToolMode('hand');
+    };
+    if (painted.size > 0) {
+      showConfirm('Nova Trama', 'Iniciar uma nova trama? Alterações não salvas serão perdidas.', action);
+    } else {
+      action();
+    }
+  }
+
+  document.getElementById('newTramaBtn').addEventListener('click', () => {
+    document.getElementById('fileModal').classList.remove('active');
+    handleNewTrama();
+  });
+  document.getElementById('newFileRailBtn').addEventListener('click', handleNewTrama);
+
+  document.getElementById('saveTramaBtn').addEventListener('click', () => {
+    const n = document.getElementById('tramaName').value || 'trama-1', s = getSaves();
+    s[n] = buildData(n); setSaves(s); document.getElementById('savedTramasSelect').value = n; showToast('Salvo no navegador!');
+  });
+  document.getElementById('loadSelectedBtn').addEventListener('click', () => {
+    const n = document.getElementById('savedTramasSelect').value, s = getSaves();
+    if(s[n]) { loadData(s[n]); document.getElementById('fileModal').classList.remove('active'); showToast('Carregada!'); }
+  });
+  document.getElementById('deleteSelectedBtn').addEventListener('click', () => {
+    const n = document.getElementById('savedTramasSelect').value, s = getSaves();
+    if(s[n]) showConfirm('Excluir', `Excluir "${n}"?`, () => { delete s[n]; setSaves(s); showToast('Excluída!'); });
+  });
+
+  document.getElementById('exportTramaBtn').addEventListener('click', () => {
+    const name = document.getElementById('tramaName').value || 'trama';
+    const b = new Blob([JSON.stringify(buildData(name), null, 2)], {type:'application/json'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `${name}.json`; a.click();
+  });
+  document.getElementById('importTramaBtn').addEventListener('click', () => document.getElementById('loadTramaFile').click());
+  document.getElementById('loadTramaFile').addEventListener('change', e => {
+    const f = e.target.files[0]; if(!f)return;
+    const r = new FileReader(); r.onload = () => { try { const d = JSON.parse(r.result); if(!isValidTramaData(d)){ showToast('Arquivo inválido.'); return; } loadData(d); document.getElementById('fileModal').classList.remove('active'); showToast('Importado com sucesso!'); } catch(e){showToast('Erro ao abrir.');}}; r.readAsText(f);
+  });
+
+  function buildExportCanvas(transparent) {
+    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    for (const key of painted.keys()) {
+      const [r, c] = key.split(',').map(Number);
+      if (r < minR) minR = r; if (r > maxR) maxR = r;
+      if (c < minC) minC = c; if (c > maxC) maxC = c;
+    }
+    const ca = Math.cos(angle), sa = Math.sin(angle);
+    let minX=Infinity, MX=-Infinity, minY=Infinity, MY=-Infinity;
+    for (const key of painted.keys()) {
+      const [r, c] = key.split(',').map(Number), x0 = c * baseCellSize, y0 = r * baseCellSize;
+      [[x0, y0], [x0 + baseCellSize, y0], [x0, y0 + baseCellSize], [x0 + baseCellSize, y0 + baseCellSize]].forEach(([x,y])=>{
+        const rx = x * ca - y * sa, ry = x * sa + y * ca;
+        if (rx < minX) minX = rx; if (rx > MX) MX = rx;
+        if (ry < minY) minY = ry; if (ry > MY) MY = ry;
+      });
+    }
+    const PAD=80, w = Math.round((MX-minX+PAD*2)*2), h = Math.round((MY-minY+PAD*2)*2);
+    const tmp = document.createElement('canvas'); tmp.width = w; tmp.height = h; const tctx = tmp.getContext('2d');
+    if (!transparent) { tctx.fillStyle = backgroundColor; tctx.fillRect(0, 0, w, h); }
+    tctx.translate(w/2, h/2); tctx.rotate(angle); tctx.scale(2, 2); tctx.translate(-(ca*(minX+MX)/2 + sa*(minY+MY)/2), -(-sa*(minX+MX)/2 + ca*(minY+MY)/2));
+
+    const stroke = backgroundColor.toLowerCase() === '#ffffff' ? '#d6d3d1' : 'rgba(0,0,0,0.15)';
+    tctx.lineWidth = 0.25;
+    for (let r = minR-2; r <= maxR+2; r++) {
+      for (let c = minC-2; c <= maxC+2; c++) {
+        const p = painted.get(`${r},${c}`), x = c*baseCellSize, y = r*baseCellSize;
+        if (transparent && !p) continue;
+        if (renderStyle === '3d') {
+          if (!transparent) { tctx.fillStyle = backgroundColor; tctx.fillRect(x, y, baseCellSize, baseCellSize); if (gridVisible) { tctx.strokeStyle = stroke; tctx.strokeRect(x,y,baseCellSize,baseCellSize); } }
+          if (p) draw3DBead(tctx, x, y, baseCellSize, p);
+        } else {
+          tctx.fillStyle = p || backgroundColor; tctx.fillRect(x, y, baseCellSize, baseCellSize);
+          if (gridVisible && !transparent) { tctx.strokeStyle = stroke; tctx.strokeRect(x,y,baseCellSize,baseCellSize); }
+        }
+      }
+    }
+    return tmp;
+  }
+
+  document.getElementById('exportImgBtn').addEventListener('click', () => {
+    if(!painted.size){showToast('Canvas vazio');return;}
+    const trans = document.getElementById('exportFormat').value === 'png', tmp = buildExportCanvas(trans);
+    const baseName = (document.getElementById('tramaName').value.trim() || 'trama').replace(/[^\w\-]+/g, '_');
+    tmp.toBlob(b => { const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=`${baseName}.`+(trans?'png':'jpg'); a.click(); }, trans?'image/png':'image/jpeg', 0.95);
+  });
+
+  document.getElementById('exportPdfBtn').addEventListener('click', async () => {
+    if(!painted.size && !trama3dHasMoldura()){ showToast('Canvas vazio.'); return; }
+    if(!window.jspdf || !window.jspdf.jsPDF){ showToast('Biblioteca PDF indisponível'); return; }
+    showToast('Gerando Ficha Técnica em PDF (2 páginas)...');
+
+    const rawName = document.getElementById('tramaName').value.trim();
+    const name = rawName || 'Sem título';
+    const author = document.getElementById('tramaAuthor').value.trim() || 'Não informado';
+    const now = new Date();
+    const dataStr = now.toLocaleDateString('pt-BR');
+    const horaStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+
+    const counts = new Map();
+    for (const color of painted.values()) counts.set(color, (counts.get(color) || 0) + 1);
+    const countEntries = Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+    const totalMicangas = countEntries.reduce((sum, [, n]) => sum + n, 0);
+
+    const hasMoldura = trama3dHasMoldura();
+    let totalNosMoldura = 0;
+    let nosVazios = 0;
+    if (hasMoldura) {
+      totalNosMoldura = recommendedRows * recommendedCols;
+      let micangasNaMoldura = 0;
+      for (const key of painted.keys()) {
+        const [r, c] = key.split(',').map(Number);
+        if (isCellInsideMoldura(r, c)) micangasNaMoldura++;
+      }
+      nosVazios = Math.max(0, totalNosMoldura - micangasNaMoldura);
+    }
+
+    let snapTopFront = null, snapRight = null, snapLeft = null, snapBottom = null;
+    if (hasMoldura && window.Trama3D) {
+      try {
+        window.Trama3D.ensureScene(trama3dCanvasWrap);
+        window.Trama3D.build(trama3dBuildPayload());
+        window.Trama3D.setGhost(false);
+        window.Trama3D.setSeamVisible(true);
+        
+        snapTopFront = window.Trama3D.captureView('topFront', 800);
+        snapRight = window.Trama3D.captureView('right', 800);
+        snapLeft = window.Trama3D.captureView('left', 800);
+        snapBottom = window.Trama3D.captureView('bottom', 800);
+        
+        window.Trama3D.setView('front');
+        window.Trama3D.onResize();
+      } catch (err) {
+        console.warn('Erro ao capturar mosaico 3D:', err);
+      }
+    }
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const marginMm = 15;
+    const contentW = pageW - marginMm * 2;
+
+    // PÁGINA 1
+    let y = 12;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(16);
+    pdf.setTextColor(194, 65, 12);
+    pdf.text('Trama Trama', marginMm, y);
+    
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(130);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Ficha Técnica do Projeto · Página 1 de 2', pageW - marginMm, y, { align: 'right' });
+    y += 6;
+
+    pdf.setDrawColor(220);
+    pdf.setLineWidth(0.35);
+    pdf.line(marginMm, y, pageW - marginMm, y);
+    y += 5;
+
+    pdf.setFontSize(9.5);
+    pdf.setTextColor(40);
+    const col2X = marginMm + contentW * 0.48;
+    const metaStartY = y;
+    
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Projeto: ', marginMm, metaStartY);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${name}`, marginMm + 18, metaStartY);
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Autoria: ', marginMm, metaStartY + 4.5);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${author}`, marginMm + 16, metaStartY + 4.5);
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('Data: ', marginMm, metaStartY + 9);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text(`${dataStr} às ${horaStr}`, marginMm + 12, metaStartY + 9);
+
+    if (hasMoldura) {
+      const altStr = savedTramaHeight !== null ? `${formatCm(savedTramaHeight)} cm` : '—';
+      const circStr = savedTramaCircum !== null ? `${formatCm(savedTramaCircum)} cm` : '—';
+      
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Dimensões: ', col2X, metaStartY);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${altStr} (alt) × ${circStr} (circ)`, col2X + 21, metaStartY);
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Estrutura: ', col2X, metaStartY + 4.5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${recommendedRows} fileiras × ${recommendedCols} colunas (${totalNosMoldura} nós)`, col2X + 18, metaStartY + 4.5);
+
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Nós: ', col2X, metaStartY + 9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${totalMicangas} miçangas • ${nosVazios} nós vazios`, col2X + 10, metaStartY + 9);
+    } else {
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('Total de miçangas: ', col2X, metaStartY);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(`${totalMicangas} miçangas (${estimateWeightLabel(totalMicangas)})`, col2X + 31, metaStartY);
+    }
+    y = metaStartY + 14;
+
+    pdf.setDrawColor(235);
+    pdf.line(marginMm, y, pageW - marginMm, y);
+    y += 4.5;
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10.5);
+    pdf.setTextColor(194, 65, 12);
+    pdf.text('Visualização Esférica 3D da Cabaça:', marginMm, y);
+    y += 4;
+
+    if (hasMoldura && snapTopFront && snapRight && snapLeft && snapBottom) {
+      const boxSize = 90;
+      const gridStartX = marginMm;
+      const gridStartY = y;
+
+      const viewsInfo = [
+        { title: 'Superior-Frontal', img: snapTopFront, col: 0, row: 0 },
+        { title: 'Lateral Direita', img: snapRight, col: 1, row: 0 },
+        { title: 'Lateral Esquerda', img: snapLeft, col: 0, row: 1 },
+        { title: 'Inferior', img: snapBottom, col: 1, row: 1 }
+      ];
+
+      viewsInfo.forEach((item) => {
+        const ix = gridStartX + item.col * boxSize;
+        const iy = gridStartY + item.row * boxSize;
+        pdf.addImage(item.img, 'PNG', ix, iy, boxSize, boxSize);
+
+        pdf.setFontSize(7.5);
+        pdf.setFont('helvetica', 'bold');
+        const tw = pdf.getTextWidth(item.title) + 5;
+        pdf.setFillColor(255, 255, 255);
+        pdf.setDrawColor(210);
+        pdf.roundedRect(ix + 2, iy + 2, tw, 4.5, 1, 1, 'FD');
+        pdf.setTextColor(70);
+        pdf.text(item.title, ix + 2 + tw / 2, iy + 5.2, { align: 'center' });
+      });
+
+      y += boxSize * 2 + 5;
+    } else {
+      pdf.setDrawColor(254, 215, 170);
+      pdf.setFillColor(255, 247, 237);
+      pdf.roundedRect(marginMm, y, contentW, 16, 3, 3, 'FD');
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(154, 52, 18);
+      pdf.text('Visualização 3D não gerada nesta ficha.', marginMm + 5, y + 6.5);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(120, 113, 108);
+      pdf.text('Defina as medidas em "Dimensionar Cabaça" (Alt+D) para habilitar o mosaico 3D completo.', marginMm + 5, y + 12);
+      y += 20;
+    }
+
+    pdf.setDrawColor(235);
+    pdf.line(marginMm, y, pageW - marginMm, y);
+    y += 5;
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10.5);
+    pdf.setTextColor(194, 65, 12);
+    pdf.text('Legenda & Lista de Materiais:', marginMm, y);
+    y += 5;
+
+    pdf.setFontSize(9);
+    const swatchSize = 3.2;
+    const legendColGap = contentW / 2;
+    const legendStartY = y;
+    const maxLegendRows = Math.ceil(countEntries.length / 2);
+
+    for (let i = 0; i < countEntries.length; i++) {
+      const [color, count] = countEntries[i];
+      const col = i % 2, row = Math.floor(i / 2);
+      const colX = marginMm + col * legendColGap;
+      const rowY = legendStartY + row * 4.8;
+
+      const rgb = hexToRgb(color);
+      pdf.setFillColor(rgb.r, rgb.g, rgb.b);
+      pdf.setDrawColor(160);
+      pdf.rect(colX, rowY - swatchSize + 0.6, swatchSize, swatchSize, 'FD');
+
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(40);
+      pdf.text(`${nearestColorName(color)}: ${count} miçangas (${estimateWeightLabel(count)})`, colX + swatchSize + 2.5, rowY);
+    }
+    y = legendStartY + maxLegendRows * 4.8 + 3;
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(9.5);
+    pdf.setTextColor(20);
+    pdf.text(`Total Consolidado: ${totalMicangas} miçangas (${estimateWeightLabel(totalMicangas)})`, marginMm, y);
+
+    pdf.setFontSize(8);
+    pdf.setTextColor(150);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Trama Trama v0.9.27 Apple Design · Trama Xequerê por Rodrig Melo', marginMm, pageH - 7);
+    pdf.text('Consulte o Mapa da Trama em tamanho expandido na Página 2 →', pageW - marginMm, pageH - 7, { align: 'right' });
+
+    // PÁGINA 2: MAPA DA TRAMA ROTACIONADO 90°
+    pdf.addPage('a4', 'portrait');
+
+    const flatCanvas = buildExportCanvas(false);
+    const rotCanvas = document.createElement('canvas');
+    rotCanvas.width = flatCanvas.height;
+    rotCanvas.height = flatCanvas.width;
+    const rotCtx = rotCanvas.getContext('2d');
+    rotCtx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
+    rotCtx.rotate(Math.PI / 2);
+    rotCtx.drawImage(flatCanvas, -flatCanvas.width / 2, -flatCanvas.height / 2);
+    const rotImgData = rotCanvas.toDataURL('image/jpeg', 0.95);
+
+    const p2Margin = 10;
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(10);
+    pdf.setTextColor(194, 65, 12);
+    pdf.text(`Mapa de Execução da Trama — ${name}`, p2Margin, p2Margin + 3);
+
+    pdf.setFontSize(8.5);
+    pdf.setTextColor(130);
+    pdf.setFont('helvetica', 'normal');
+    pdf.text('Página 2 de 2 (Gire na horizontal para tecer na bancada)', pageW - p2Margin, p2Margin + 3, { align: 'right' });
+
+    const mapTop = p2Margin + 7;
+    const mapBottom = pageH - p2Margin - 6;
+    const mapAvailW = pageW - p2Margin * 2;
+    const mapAvailH = mapBottom - mapTop;
+
+    const rotRatio = rotCanvas.width / rotCanvas.height;
+    let mapDrawW = mapAvailW;
+    let mapDrawH = mapAvailW / rotRatio;
+    if (mapDrawH > mapAvailH) {
+      mapDrawH = mapAvailH;
+      mapDrawW = mapAvailH * rotRatio;
+    }
+
+    const mapOffsetX = p2Margin + (mapAvailW - mapDrawW) / 2;
+    const mapOffsetY = mapTop + (mapAvailH - mapDrawH) / 2;
+
+    pdf.setDrawColor(210);
+    pdf.setLineWidth(0.3);
+    pdf.rect(mapOffsetX - 0.4, mapOffsetY - 0.4, mapDrawW + 0.8, mapDrawH + 0.8);
+    pdf.addImage(rotImgData, 'JPEG', mapOffsetX, mapOffsetY, mapDrawW, mapDrawH);
+
+    pdf.setFontSize(8);
+    pdf.setTextColor(150);
+    pdf.text(`Trama Trama v0.9.27 Apple Design — ${author} — ${dataStr}`, p2Margin, pageH - 5);
+
+    const sanitizedName = (rawName || 'Trama').replace(/[^\w\-]+/g, '_');
+    const filename = `${sanitizedName}_FichaTecnica_TramaTrama.pdf`;
+    pdf.save(filename);
+    showToast(`PDF "${filename}" salvo com sucesso!`);
+  });
+
+  const imageInput = document.getElementById('imageInput');
+  const imagePreviewWrap = document.getElementById('imagePreviewWrap');
+  const imagePreview = document.getElementById('imagePreview');
+  const imageColorModeSelect = document.getElementById('imageColorMode');
+  const customColorCountDiv = document.getElementById('customColorCountDiv');
+  const customColorCount = document.getElementById('customColorCount');
+  const customColorSlider = document.getElementById('customColorSlider');
+  const generateImageBtn = document.getElementById('generateImageBtn');
+  const dimModeColsBtn = document.getElementById('dimModeCols');
+  const dimModeRowsBtn = document.getElementById('dimModeRows');
+  const imageDimLabel = document.getElementById('imageDimLabel');
+  const imageSizeBeadsInput = document.getElementById('imageSizeBeads');
+  const imageDimEstimate = document.getElementById('imageDimEstimate');
+
+  let loadedImg = null;
+  let imageDimMode = 'cols'; 
+
+  function setImageDimMode(mode) {
+    imageDimMode = mode;
+    dimModeColsBtn.classList.toggle('active', mode === 'cols');
+    dimModeRowsBtn.classList.toggle('active', mode === 'rows');
+    imageDimLabel.textContent = mode === 'cols' ? 'Largura (em colunas):' : 'Altura (em fileiras):';
+    updateImageEstimate();
+  }
+  dimModeColsBtn.addEventListener('click', () => setImageDimMode('cols'));
+  dimModeRowsBtn.addEventListener('click', () => setImageDimMode('rows'));
+
+  function updateImageEstimate() {
+    if (!loadedImg) { imageDimEstimate.textContent = '-- colunas × -- fileiras'; return; }
+    const sizeVal = Math.max(5, parseInt(imageSizeBeadsInput.value) || 40);
+    let cols, rows;
+    if (imageDimMode === 'cols') {
+      cols = sizeVal;
+      rows = Math.max(1, Math.round(cols * (loadedImg.height / loadedImg.width)));
+    } else {
+      rows = sizeVal;
+      cols = Math.max(1, Math.round(rows * (loadedImg.width / loadedImg.height)));
+    }
+    imageDimEstimate.textContent = `${cols} colunas × ${rows} fileiras`;
+  }
+  imageSizeBeadsInput.addEventListener('input', updateImageEstimate);
+
+  imageColorModeSelect.addEventListener('change', (e) => {
+    customColorCountDiv.style.display = e.target.value === 'custom' ? 'block' : 'none';
+  });
+
+  customColorSlider.addEventListener('input', (e) => { customColorCount.value = e.target.value; });
+  customColorCount.addEventListener('input', (e) => { customColorSlider.value = e.target.value; });
+
+  imageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImg = img;
+        const maxW = 300, maxH = 160;
+        const scale = Math.min(maxW / img.width, maxH / img.height, 1);
+        imagePreview.width = img.width * scale;
+        imagePreview.height = img.height * scale;
+        const pCtx = imagePreview.getContext('2d');
+        pCtx.clearRect(0, 0, imagePreview.width, imagePreview.height);
+        pCtx.drawImage(img, 0, 0, imagePreview.width, imagePreview.height);
+        imagePreviewWrap.style.display = 'flex';
+        generateImageBtn.disabled = false;
+        updateImageEstimate();
+      };
+      img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function getClosestBasicColor(r, g, b) {
+    let bestDist = Infinity, bestHex = '#000000';
+    BASIC_COLORS.forEach(hex => {
+      const c = hexToRgb(hex);
+      const dist = (c.r - r)**2 + (c.g - g)**2 + (c.b - b)**2;
+      if (dist < bestDist) { bestDist = dist; bestHex = hex; }
+    });
+    return bestHex;
+  }
+
+  function kMeansQuantize(pixels, k, maxIters = 8) {
+    if (pixels.length === 0) return {};
+    if (k > pixels.length) k = pixels.length;
+
+    let centroids = [];
+    for(let i = 0; i < k; i++) {
+      const p = pixels[Math.floor(Math.random() * pixels.length)];
+      centroids.push({r: p.r, g: p.g, b: p.b});
+    }
+
+    let assignments = new Int32Array(pixels.length);
+
+    for (let iter = 0; iter < maxIters; iter++) {
+      let clusterSums = Array(k).fill(0).map(() => ({r:0, g:0, b:0, count:0}));
+      let changed = false;
+
+      for (let i = 0; i < pixels.length; i++) {
+        let p = pixels[i];
+        let minDist = Infinity, bestC = 0;
+        for (let j = 0; j < k; j++) {
+          let c = centroids[j];
+          let dist = (p.r - c.r)**2 + (p.g - c.g)**2 + (p.b - c.b)**2;
+          if (dist < minDist) { minDist = dist; bestC = j; }
+        }
+        if (assignments[i] !== bestC) changed = true;
+        assignments[i] = bestC;
+
+        clusterSums[bestC].r += p.r;
+        clusterSums[bestC].g += p.g;
+        clusterSums[bestC].b += p.b;
+        clusterSums[bestC].count++;
+      }
+
+      for (let j = 0; j < k; j++) {
+        if (clusterSums[j].count > 0) {
+          centroids[j].r = clusterSums[j].r / clusterSums[j].count;
+          centroids[j].g = clusterSums[j].g / clusterSums[j].count;
+          centroids[j].b = clusterSums[j].b / clusterSums[j].count;
+        }
+      }
+
+      if (!changed) break; 
+    }
+
+    let resultMap = {};
+    for (let i = 0; i < pixels.length; i++) {
+      let c = centroids[assignments[i]];
+      resultMap[pixels[i].key] = rgbToHex(Math.round(c.r), Math.round(c.g), Math.round(c.b));
+    }
+    return resultMap;
+  }
+
+  generateImageBtn.addEventListener('click', () => {
+    if (!loadedImg) { showToast('Selecione uma imagem primeiro!'); return; }
+
+    const sizeVal = Math.max(5, parseInt(imageSizeBeadsInput.value) || 40);
+    const mode = imageColorModeSelect.value;
+    const targetColorCount = parseInt(customColorCount.value) || 5;
+
+    const originalText = generateImageBtn.innerHTML;
+    generateImageBtn.innerHTML = 'Gerando estampa...';
+    generateImageBtn.disabled = true;
+
+    setTimeout(() => {
+      let wBeads, hBeads;
+      if (imageDimMode === 'cols') {
+        wBeads = sizeVal;
+        hBeads = Math.max(1, Math.round(wBeads * (loadedImg.height / loadedImg.width)));
+      } else {
+        hBeads = sizeVal;
+        wBeads = Math.max(1, Math.round(hBeads * (loadedImg.width / loadedImg.height)));
+      }
+
+      const imgCanvas = document.createElement('canvas');
+      imgCanvas.width = loadedImg.width;
+      imgCanvas.height = loadedImg.height;
+      const imgCtx = imgCanvas.getContext('2d');
+      imgCtx.drawImage(loadedImg, 0, 0);
+      const imgData = imgCtx.getImageData(0, 0, imgCanvas.width, imgCanvas.height);
+
+      let collectedPixels = []; 
+      const uMax = 2 * wBeads;
+      const vMax = 2 * hBeads;
+
+      for (let v = 0; v <= vMax; v++) {
+        for (let u = 0; u <= uMax; u++) {
+          if ((u + v) % 2 !== 0) continue;
+
+          const c = (v + u) / 2;
+          const r = (v - u) / 2;
+
+          const xNorm = u / (2 * wBeads);
+          const yNorm = v / (2 * hBeads);
+
+          const img_x = Math.min(loadedImg.width - 1, Math.max(0, Math.floor(xNorm * loadedImg.width)));
+          const img_y = Math.min(loadedImg.height - 1, Math.max(0, Math.floor(yNorm * loadedImg.height)));
+
+          const idx = (img_y * loadedImg.width + img_x) * 4;
+          const a_val = imgData.data[idx+3];
+
+          if (a_val > 64) { 
+            const r_val = imgData.data[idx];
+            const g_val = imgData.data[idx+1];
+            const b_val = imgData.data[idx+2];
+            collectedPixels.push({ r: r_val, g: g_val, b: b_val, key: `${r},${c}` });
+          }
+        }
+      }
+
+      const stampCells = new Map();
+
+      if (mode === 'custom' && collectedPixels.length > 0) {
+        const quantizedMap = kMeansQuantize(collectedPixels, Math.max(2, Math.min(32, targetColorCount)));
+        for (const px of collectedPixels) {
+          stampCells.set(px.key, quantizedMap[px.key]);
+        }
+      } else {
+        for (const px of collectedPixels) {
+          let finalColor = '#000000';
+          if (mode === 'basic') {
+            finalColor = getClosestBasicColor(px.r, px.g, px.b);
+          } else if (mode === 'bw') {
+            const lum = 0.299*px.r + 0.587*px.g + 0.114*px.b;
+            finalColor = lum > 127 ? '#ffffff' : '#000000';
+          }
+          stampCells.set(px.key, finalColor);
+        }
+      }
+
+      clipboard = {
+        w: wBeads,
+        h: hBeads,
+        uSpan: 2 * wBeads,
+        vSpan: 2 * hBeads,
+        cells: stampCells
+      };
+
+      generateImageBtn.innerHTML = originalText;
+      generateImageBtn.disabled = false;
+      document.getElementById('imageModal').classList.remove('active');
+      
+      renderClipPreview();
+      updateSelectionState();
+      setToolMode('paste');
+      showToast(`✨ Estampa gerada! Mova e clique no canvas para fixar.`);
+    }, 50); 
+  });
+
+  // Atalhos de teclado
+  window.addEventListener('keydown', e => {
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+    
+    if (e.altKey && !e.ctrlKey && !e.metaKey) {
+      const altKey = e.key.toLowerCase();
+      if (altKey === 'd') { e.preventDefault(); openDimModal(); return; }
+      if (altKey === 'i') { e.preventDefault(); document.getElementById('imageModalBtn').click(); return; }
+      if (altKey === 'a') { e.preventDefault(); document.getElementById('fileModalBtn').click(); return; }
+      if (altKey === 'c') { e.preventDefault(); document.getElementById('countModalBtn').click(); return; }
+      if (altKey === '3') { e.preventDefault(); document.getElementById('trama3dModalBtn').click(); return; }
+      if (altKey === 'g') { e.preventDefault(); gridToggleBtn.click(); return; }
+      if (altKey === 'f') { e.preventDefault(); bgToggleBtn.click(); return; }
+    }
+
+    if (!document.getElementById('trama3dPanel').hidden) {
+      const k3d = e.key.toLowerCase();
+      if (k3d === 'r' || e.code === 'Space') { e.preventDefault(); document.getElementById('trama3dRotateBtn').click(); return; }
+      if (k3d === 'x') { e.preventDefault(); document.getElementById('trama3dAxisBtn').click(); return; }
+      if (k3d === 'f') { e.preventDefault(); document.getElementById('trama3dGhostBtn').click(); return; }
+      if (k3d === 'e') { e.preventDefault(); document.getElementById('trama3dSeamBtn').click(); return; }
+      if (k3d === 'u' || e.key === 'Enter') { e.preventDefault(); document.getElementById('trama3dRefreshBtn').click(); return; }
+      if (k3d === 'p') { e.preventDefault(); document.getElementById('trama3dCaptureBtn').click(); return; }
+      if (e.key === 'Escape') { e.preventDefault(); switchPanel('colorPanel', true); return; }
+    }
+
+    if (currentToolMode === 'paste' && clipboard) {
+      const pk = e.key.toLowerCase();
+      if (pk === 'g' || pk === 'r') { e.preventDefault(); transformClipboard('rot'); return; }
+      if (pk === 'h') { e.preventDefault(); transformClipboard('mh'); return; }
+      if (pk === 'v' && !e.ctrlKey && !e.metaKey) { e.preventDefault(); transformClipboard('mv'); return; }
+    }
+
+    const keyLow = e.key.toLowerCase();
+    if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+      if(keyLow==='p' || e.key==='1') setToolMode('brush'); 
+      else if(keyLow==='b' || e.key==='2') setToolMode('eraser');
+      else if(keyLow==='c' || e.key==='3' || keyLow==='i') setToolMode('pipette'); 
+      else if(keyLow==='s' || e.key==='4') setToolMode('select');
+      else if(keyLow==='t' || e.key==='5') setToolMode('bucket');
+      else if(keyLow==='r' || e.key==='6') setToolMode('replace');
+      else if(keyLow==='m' || e.key==='7' || keyLow==='h') setToolMode('hand');
+      else if(keyLow==='f') pinSelectBtn.click();
+      else if(keyLow==='a' || e.key==='0') fitScreenBtn.click();
+      else if(keyLow==='o' || e.key==='.') centerBtn.click();
+      else if(keyLow==='d') renderToggleBtn.click();
+      else if(e.key==='+' || e.key==='=') zoomInBtn.click();
+      else if(e.key==='-') zoomOutBtn.click();
+      else if(e.key==='?') document.getElementById('helpBtn').click();
+    }
+
+    if (e.key === 'F1') { e.preventDefault(); document.getElementById('helpBtn').click(); return; }
+
+    if (e.code === 'Space' && !e.repeat && !isSpacePanning && document.getElementById('trama3dPanel').hidden) {
+      e.preventDefault();
+      isSpacePanning = true;
+      toolBeforeSpace = currentToolMode;
+      setToolMode('hand');
+      return;
+    }
+
+    if(e.key==='ArrowUp') { e.preventDefault(); panBy(0, pStep); }
+    if(e.key==='ArrowDown') { e.preventDefault(); panBy(0, -pStep); }
+    if(e.key==='ArrowLeft') { e.preventDefault(); panBy(pStep, 0); }
+    if(e.key==='ArrowRight') { e.preventDefault(); panBy(-pStep, 0); }
+    
+    if ((e.ctrlKey || e.metaKey) && !e.altKey) {
+      const cKey = e.key.toLowerCase();
+      if (cKey === 'c') { if(currentToolMode === 'select' && !copyBtn.disabled) copyBtn.click(); }
+      else if (cKey === 'x') { if(currentToolMode === 'select' && !cutBtn.disabled) cutBtn.click(); }
+      else if (cKey === 'v') { if(clipboard && !pasteBtn.disabled) pasteBtn.click(); }
+      else if (cKey === 's') { e.preventDefault(); document.getElementById('saveTramaBtn').click(); }
+      else if (cKey === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) document.getElementById('redoBtn').click();
+        else document.getElementById('undoBtn').click();
+      }
+    }
+
+    if ((e.ctrlKey || e.metaKey) && e.altKey && e.key.toLowerCase() === 'n') {
+      e.preventDefault();
+      handleNewTrama();
+    }
+
+    if(e.key === 'Escape') {
+      e.preventDefault();
+      let modalClosed = false;
+      document.querySelectorAll('.modal-overlay').forEach(m => {
+        if (m.classList.contains('active')) {
+          handleModalClose(m);
+          modalClosed = true;
+        }
+      });
+      if (modalClosed) return;
+
+      if (currentToolMode === 'paste') setToolMode('select');
+      else if (selectedCells.size > 0 || isSelecting) cancelSelectBtn.click();
+      else if (currentToolMode === 'select') setToolMode('hand');
+      else if (!document.getElementById('trama3dPanel').hidden) switchPanel('colorPanel', true);
+    }
+
+    if(e.key === 'Delete' || e.key === 'Backspace') {
+      if (selectedCells.size > 0 && currentToolMode === 'select') {
+        e.preventDefault();
+        deleteSelBtn.click();
+      }
+    }
+  });
+
+  window.addEventListener('keyup', e => {
+    if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName)) return;
+    if (e.code === 'Space' && isSpacePanning) {
+      e.preventDefault();
+      isSpacePanning = false;
+      if (toolBeforeSpace) {
+        setToolMode(toolBeforeSpace);
+        toolBeforeSpace = null;
+      }
+    }
+  });
+
+  window.addEventListener('blur', () => {
+    if (isSpacePanning) {
+      isSpacePanning = false;
+      if (toolBeforeSpace) setToolMode(toolBeforeSpace);
+      toolBeforeSpace = null;
+    }
+    isPanning = false;
+    pointerDownInfo = null;
+  });
+
+  canvas.addEventListener('pointercancel', () => {
+    isPanning = false;
+    pointerDownInfo = null;
+    canvas.style.cursor = currentToolMode === 'hand' ? 'grab' : 'crosshair';
+  });
+
+  // Inicialização
+  buildColorPalette(); renderRecentColors(); refreshSaves(); updateSelectionState();
+  try { const raw=localStorage.getItem('tt_autosave'); if(raw){ const d=JSON.parse(raw); if(isValidTramaData(d)) loadData(d); } } catch(e){}
+  window.addEventListener('resize', draw);
+  fitScreenBtn.click();
+})();
+</script>
+</body>
+</html>
