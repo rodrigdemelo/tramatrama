@@ -3,7 +3,7 @@
 <head>
  <meta charset="utf-8" />
  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no" />
- <title>Trama Trama 0.9.28 / Trama Xequerê</title>
+ <title>Trama Trama 0.9.29 / Trama Xequerê</title>
  <link rel="preconnect" href="https://fonts.googleapis.com">
  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -301,6 +301,176 @@
  #toastContainer { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 8px; z-index: 200; pointer-events: none; }
  .toast { background: #7c2d12; color: #fff; padding: 8px 14px; border-radius: 7px; font-size: 12px; font-weight: 600; opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
  .toast.show { opacity: 1; transform: translateY(0); }
+
+ /* ESTILOS DO TUTORIAL PASSO A PASSO INTERATIVO (v0.9.29) */
+ @keyframes tourPulseGlow {
+ 0%, 100% {
+ box-shadow: 0 0 0 3px rgba(194, 65, 12, 0.95), 0 0 16px rgba(249, 115, 22, 0.85);
+ transform: scale(1.08);
+ }
+ 50% {
+ box-shadow: 0 0 0 6px rgba(251, 146, 60, 0.45), 0 0 24px rgba(194, 65, 12, 1);
+ transform: scale(1.14);
+ }
+ }
+ .tour-highlight-btn {
+ animation: tourPulseGlow 1.5s infinite ease-in-out !important;
+ z-index: 60 !important;
+ border-color: #c2410c !important;
+ background: #fff7ed !important;
+ color: #9a3412 !important;
+ }
+ #tutorialModal {
+ background: rgba(41, 37, 36, 0.32);
+ backdrop-filter: blur(2px);
+ }
+ .tutorial-modal-card {
+ max-width: 465px !important;
+ width: 92%;
+ padding: 20px 22px !important;
+ border: 1px solid #fed7aa;
+ box-shadow: 0 24px 48px -8px rgba(0, 0, 0, 0.35);
+ }
+ .tutorial-top-bar {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ margin-bottom: 10px;
+ }
+ .tutorial-step-badge {
+ font-size: 10.5px;
+ font-weight: 800;
+ text-transform: uppercase;
+ letter-spacing: 0.6px;
+ background: #fff7ed;
+ color: #c2410c;
+ border: 1px solid #fed7aa;
+ padding: 3px 9px;
+ border-radius: 99px;
+ }
+ .tutorial-progress-track {
+ width: 100%;
+ height: 6px;
+ background: #f5f5f4;
+ border-radius: 99px;
+ overflow: hidden;
+ margin-bottom: 16px;
+ border: 1px solid #e7e5e4;
+ }
+ .tutorial-progress-fill {
+ height: 100%;
+ background: linear-gradient(90deg, #c2410c, #f97316);
+ width: 12.5%;
+ transition: width 0.25s ease;
+ border-radius: 99px;
+ }
+ .tutorial-hero {
+ display: flex;
+ align-items: center;
+ gap: 13px;
+ background: #faf6f0;
+ border: 1px solid #e7e5e4;
+ padding: 12px 14px;
+ border-radius: 11px;
+ margin-bottom: 13px;
+ }
+ .tutorial-hero-icon {
+ font-size: 30px;
+ width: 50px;
+ height: 50px;
+ border-radius: 12px;
+ background: #ffffff;
+ border: 1px solid #fed7aa;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ flex-shrink: 0;
+ box-shadow: 0 4px 10px rgba(194, 65, 12, 0.08);
+ }
+ .tutorial-hero-title {
+ margin: 0;
+ font-size: 14.5px;
+ font-weight: 800;
+ color: #7c2d12;
+ line-height: 1.25;
+ }
+ .tutorial-hero-sub {
+ margin: 3px 0 0 0;
+ font-size: 11px;
+ color: #78716c;
+ font-weight: 600;
+ }
+ .tutorial-body {
+ font-size: 12px;
+ line-height: 1.58;
+ color: #44403c;
+ margin-bottom: 13px;
+ }
+ .tutorial-body ul {
+ margin: 7px 0 0 0;
+ padding-left: 18px;
+ }
+ .tutorial-body li {
+ margin-bottom: 5px;
+ }
+ .tutorial-tip-box {
+ background: #fff7ed;
+ border: 1px solid #fed7aa;
+ border-radius: 8px;
+ padding: 9px 12px;
+ font-size: 11.2px;
+ color: #9a3412;
+ line-height: 1.45;
+ margin-bottom: 12px;
+ }
+ .tutorial-action-row {
+ display: flex;
+ justify-content: flex-start;
+ margin-bottom: 6px;
+ }
+ .tutorial-try-btn {
+ background: #faf6f0;
+ border: 1px dashed #c2410c;
+ color: #c2410c;
+ font-weight: 700;
+ padding: 6px 11px;
+ border-radius: 7px;
+ font-size: 11.5px;
+ }
+ .tutorial-try-btn:hover {
+ background: #ffedd5;
+ }
+ .tutorial-dots {
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 6px;
+ margin: 12px 0 4px 0;
+ }
+ .tutorial-dot {
+ width: 8px;
+ height: 8px;
+ border-radius: 50%;
+ background: #d6d3d1;
+ border: none;
+ padding: 0;
+ cursor: pointer;
+ transition: all 0.2s ease;
+ }
+ .tutorial-dot.active {
+ width: 20px;
+ border-radius: 99px;
+ background: var(--primary);
+ }
+ .tutorial-footer {
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ margin-top: 14px;
+ padding-top: 12px;
+ border-top: 1px solid #f0ede8;
+ gap: 8px;
+ }
 
  /* ESTILOS ESPECÍFICOS DO GUIA DE AJUDA ACCORDION */
  .help-modal-card {
@@ -807,9 +977,9 @@
  <!-- BARRA DE FERRAMENTAS FLUTUANTE (DOCK) -->
  <aside class="sidebar">
  <div class="icon-rail" role="toolbar" aria-label="Ferramentas principais">
- <button class="rail-btn panel-toggle active" data-panel="colorPanel" title="Painel de Pintura e Cores (Atalho: P ou 1)" aria-label="Painel de Pintura e Cores" aria-pressed="true">🎨</button>
- <button class="rail-btn panel-toggle" data-panel="selectPanel" title="Painel de Seleção (Atalho: S ou 4)" aria-label="Painel de Seleção" aria-pressed="false">⬚</button>
- <button class="rail-btn panel-toggle" data-panel="viewPanel" title="Painel de Visualização" aria-label="Painel de Visualização" aria-pressed="false">👁️</button>
+ <button class="rail-btn panel-toggle active" id="colorPanelBtn" data-panel="colorPanel" title="Painel de Pintura e Cores (Atalho: P ou 1)" aria-label="Painel de Pintura e Cores" aria-pressed="true">🎨</button>
+ <button class="rail-btn panel-toggle" id="selectPanelBtn" data-panel="selectPanel" title="Painel de Seleção (Atalho: S ou 4)" aria-label="Painel de Seleção" aria-pressed="false">⬚</button>
+ <button class="rail-btn panel-toggle" id="viewPanelBtn" data-panel="viewPanel" title="Painel de Visualização" aria-label="Painel de Visualização" aria-pressed="false">👁️</button>
 
  <div class="rail-sep" role="separator"></div>
  <button id="undoBtn" class="rail-btn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer">↶</button>
@@ -830,7 +1000,8 @@
 
  <div class="rail-sep" role="separator"></div>
  <div id="saveBadge" class="save-badge-rail" title="Salvamento contínuo (Ctrl+S)" role="status" aria-live="polite">✓ Salvo</div>
- <button id="helpBtn" class="rail-btn-small" title="Instruções e Guia (F1 ou ?)" aria-label="Abrir Ajuda e Guia">?</button>
+ <button id="tutorialBtn" class="rail-btn-small" title="Tutorial Passo a Passo para Iniciantes (Alt+T)" aria-label="Abrir Tutorial Passo a Passo">🎓</button>
+ <button id="helpBtn" class="rail-btn-small" title="Instruções e Guia Completo (F1 ou ?)" aria-label="Abrir Ajuda e Guia">?</button>
  <button id="aboutBtn" class="rail-btn-small" title="Sobre o Trama Trama" aria-label="Sobre o Trama Trama">!</button>
  </div>
 
@@ -935,6 +1106,49 @@
  </div>
  </div>
  </aside>
+</div>
+
+<!-- Modal: Tutorial Passo a Passo Interativo para Iniciantes (v0.9.29) -->
+<div id="tutorialModal" class="modal-overlay" role="dialog" aria-labelledby="tutorialStepTitle">
+ <div class="modal-card tutorial-modal-card">
+ <div class="tutorial-top-bar">
+ <span id="tutorialStepBadge" class="tutorial-step-badge">Passo 1 de 8</span>
+ <button id="tutorialCloseTopBtn" class="closeModalBtn" style="padding: 3px 8px; font-size: 11px;" title="Fechar Tutorial (Esc)">✕ Pular</button>
+ </div>
+
+ <div class="tutorial-progress-track">
+ <div id="tutorialProgressFill" class="tutorial-progress-fill"></div>
+ </div>
+
+ <div class="tutorial-hero">
+ <div id="tutorialHeroIcon" class="tutorial-hero-icon">🪘</div>
+ <div>
+ <h3 id="tutorialStepTitle" class="tutorial-hero-title">Bem-vindo(a) ao Trama Trama!</h3>
+ <p id="tutorialStepSub" class="tutorial-hero-sub">Seu ateliê digital para desenhar saias de Xequerê</p>
+ </div>
+ </div>
+
+ <div id="tutorialStepBody" class="tutorial-body"></div>
+
+ <div id="tutorialStepTip" class="tutorial-tip-box"></div>
+
+ <div class="tutorial-action-row">
+ <button id="tutorialTryBtn" class="tutorial-try-btn" type="button">✨ Experimentar agora</button>
+ </div>
+
+ <div id="tutorialDots" class="tutorial-dots"></div>
+
+ <div class="tutorial-footer">
+ <label style="display:flex; align-items:center; gap:5px; font-size:10.5px; color:#78716c; cursor:pointer;">
+ <input type="checkbox" id="tutorialDontShowAgain" style="margin:0;">
+ Não abrir automaticamente ao iniciar
+ </label>
+ <div style="display:flex; gap:7px;">
+ <button id="tutorialPrevBtn" type="button">← Anterior</button>
+ <button id="tutorialNextBtn" type="button" class="btn-primary">Próximo →</button>
+ </div>
+ </div>
+ </div>
 </div>
 
 <!-- Modal: Dimensionar Trama com Campos Interdependentes -->
@@ -1124,9 +1338,10 @@
 <!-- Modal: Sobre -->
 <div id="aboutModal" class="modal-overlay">
  <div class="modal-card">
- <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:10px; background:#fff7ed; color:#c2410c; padding:2px 5px; border-radius:7px; border:1px solid #fed7aa;">v0.9.28</span></h3>
+ <h3 class="modal-title">ℹ️ Sobre o Trama Trama <span style="font-size:10px; background:#fff7ed; color:#c2410c; padding:2px 5px; border-radius:7px; border:1px solid #fed7aa;">v0.9.29</span></h3>
  <div style="font-size:11.5px; line-height:1.5; color:#57534e;">
  <p><b>💻 O Aplicativo:</b> Ambiente digital para artesãos e brincantes do Xequerê planejarem tramas geométricas em tela cheia.</p>
+ <p><b>🎓 Tutorial Guiado:</b> Passo a passo interativo para iniciantes aprenderem rapidamente a dimensionar, pintar e visualizar sua cabaça em 3D.</p>
  <p><b>📏 Dimensionamento Inteligente:</b> Cálculo bidirecional instantâneo entre centímetros reais da cabaça e contagem de fileiras/colunas.</p>
  <p><b>🪘 Trama Xequerê:</b> Ciclo de oficinas de confecção do instrumento, articulando reflexões históricas e ritmos afro-brasileiros.</p>
  <p><b>🎨 Autoria:</b> Idealizado por <b>Rodrig Melo</b>, artista visual, pesquisadora e presidenta da Associação Cultural Aroeira.</p>
@@ -1140,7 +1355,7 @@
  <div class="modal-card help-modal-card">
  <h3 class="modal-title" style="justify-content: space-between;">
  <span>📖 Guia Completo do Trama Trama</span>
- <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.28</span>
+ <span style="font-size:11px; font-weight:600; color:#78716c;">v0.9.29</span>
  </h3>
 
  <div class="help-search-box">
@@ -1357,6 +1572,7 @@
  <tr><td><kbd>D</kbd></td><td>Estilo Miçanga</td><td>Alterna entre visual 2<b>D</b> e 3<b>D</b></td></tr>
  <tr><td><kbd>+</kbd> / <kbd>-</kbd></td><td>Zoom In / Out</td><td>Aproximar ou afastar tela</td></tr>
  <tr><td><kbd>Setas</kbd></td><td>Deslocar Visão</td><td>Movimenta a tela nas 4 direções</td></tr>
+ <tr><td><kbd>Alt</kbd> + <kbd>T</kbd></td><td>Tutorial Guiado</td><td>Abre o <b>T</b>utorial Passo a Passo para iniciantes</td></tr>
  <tr><td><kbd>Alt</kbd> + <kbd>D</kbd></td><td>Modal Dimensionar</td><td><b>D</b>imensionar medidas da cabaça</td></tr>
  <tr><td><kbd>Alt</kbd> + <kbd>I</kbd></td><td>Modal Imagem</td><td>Converter <b>I</b>magem matricial</td></tr>
  <tr><td><kbd>Alt</kbd> + <kbd>A</kbd></td><td>Modal Arquivo</td><td>Menu geral de <b>A</b>rquivo e backup</td></tr>
@@ -1479,7 +1695,7 @@
  const pendingTouchPaint = new Map();
  const TOUCH_PAINT_DELAY = 120;
 
- // Cache de Sprites para Miçangas 3D no Canvas 2D (ganho expressivo de FPS)
+ // Cache de Sprites para Miçangas 3D no Canvas 2D
  const beadSpriteCache = new Map();
 
  const COLOR_NAMES = [
@@ -1496,7 +1712,7 @@
  ];
  let recentColors = [];
 
- // Agendador de Redesenho (evita múltiplos draws no mesmo frame de 16ms)
+ // Agendador de Redesenho
  let drawScheduled = false;
  function scheduleDraw() {
  if (!drawScheduled) {
@@ -1527,7 +1743,11 @@
  const modals = document.querySelectorAll('.modal-overlay');
  
  function handleModalClose(modal) {
+ if (!modal) return;
  modal.classList.remove('active');
+ if (modal.id === 'tutorialModal') {
+ clearTourHighlights();
+ }
  if (modal.id === 'dimModal' && recommendedRows !== null && recommendedCols !== null) {
  fitScreenBtn.click();
  }
@@ -1557,7 +1777,6 @@
 
  let isSyncingDim = false;
 
- // Interdependência: cm -> fileiras / colunas
  dimHeightInput.addEventListener('input', () => {
  if (isSyncingDim) return;
  isSyncingDim = true;
@@ -1582,7 +1801,6 @@
  isSyncingDim = false;
  });
 
- // Interdependência: fileiras / colunas -> cm
  dimRowsInput.addEventListener('input', () => {
  if (isSyncingDim) return;
  isSyncingDim = true;
@@ -1693,6 +1911,278 @@
  document.getElementById('countModalBtn').addEventListener('click', () => { updateDimSummary(); updateColorCounts(); document.getElementById('countModal').classList.add('active'); });
  document.getElementById('aboutBtn').addEventListener('click', () => document.getElementById('aboutModal').classList.add('active'));
  document.getElementById('helpBtn').addEventListener('click', () => document.getElementById('helpModal').classList.add('active'));
+
+ // =========================================================
+ // TUTORIAL PASSO A PASSO PARA INICIANTES (v0.9.29)
+ // =========================================================
+ const tutorialModal = document.getElementById('tutorialModal');
+ const tutorialStepBadge = document.getElementById('tutorialStepBadge');
+ const tutorialProgressFill = document.getElementById('tutorialProgressFill');
+ const tutorialHeroIcon = document.getElementById('tutorialHeroIcon');
+ const tutorialStepTitle = document.getElementById('tutorialStepTitle');
+ const tutorialStepSub = document.getElementById('tutorialStepSub');
+ const tutorialStepBody = document.getElementById('tutorialStepBody');
+ const tutorialStepTip = document.getElementById('tutorialStepTip');
+ const tutorialTryBtn = document.getElementById('tutorialTryBtn');
+ const tutorialDots = document.getElementById('tutorialDots');
+ const tutorialPrevBtn = document.getElementById('tutorialPrevBtn');
+ const tutorialNextBtn = document.getElementById('tutorialNextBtn');
+ const tutorialDontShowAgain = document.getElementById('tutorialDontShowAgain');
+
+ let currentTutorialStep = 0;
+
+ const TUTORIAL_STEPS = [
+ {
+ icon: '🪘',
+ title: '1. Bem-vindo(a) ao Trama Trama!',
+ sub: 'Sua bancada digital para desenhar saias de Xequerê',
+ body: `
+ <p style="margin:0 0 6px 0;">O <b>Trama Trama</b> foi pensado para facilitar o planejamento visual das redes de miçangas do Xequerê (Agbê).</p>
+ <ul>
+ <li><b>Malha a 45°:</b> Cada quadradinho inclinado representa um <b>nó / miçanga</b> real da sua trama.</li>
+ <li><b>Barra Lateral Dupla:</b> À esquerda ficam os módulos principais e, ao lado, as ferramentas do painel escolhido.</li>
+ </ul>
+ `,
+ tip: '💡 <b>Olhe para a esquerda:</b> O botão destacado com brilho laranja mostra onde estamos em cada etapa deste tour!',
+ panel: 'colorPanel',
+ highlightIds: ['tutorialBtn', 'colorPanelBtn'],
+ tryLabel: null,
+ onTry: null
+ },
+ {
+ icon: '📏',
+ title: '2. Comece pelas Medidas da Cabaça',
+ sub: 'Ferramenta Dimensionar Trama (Atalho: Alt+D)',
+ body: `
+ <p style="margin:0 0 6px 0;">Antes de desenhar, você pode informar a <b>Altura útil</b> e a <b>Circunferência</b> da sua cabaça em centímetros (ou direto o número de fileiras e colunas).</p>
+ <ul>
+ <li>O aplicativo calcula automaticamente quantas miçangas cabem na volta completa (~1,50 cm por nó).</li>
+ <li>Uma <b>Moldura Guia Laranja</b> aparecerá na tela mostrando onde a trama começa e termina.</li>
+ </ul>
+ `,
+ tip: '✨ <b>Quer testar agora?</b> Clique no botão abaixo para aplicar uma Moldura Guia de exemplo (12 fileiras × 24 colunas) ou abrir o medidor!',
+ panel: 'colorPanel',
+ highlightIds: ['sizeModalBtn'],
+ tryLabel: '📏 Criar Moldura Guia de Exemplo (12×24)',
+ onTry: () => {
+ recommendedRows = 12;
+ recommendedCols = 24;
+ savedTramaHeight = 18;
+ savedTramaCircum = 36;
+ scheduleDraw();
+ scheduleAutoSave();
+ fitScreenBtn.click();
+ showToast('Moldura Guia 12×24 aplicada ao fundo! Veja as linhas laranjas.');
+ }
+ },
+ {
+ icon: '🖌️',
+ title: '3. Pintando suas Miçangas',
+ sub: 'Pincel, Borracha, Balde e Paleta de Cores',
+ body: `
+ <p style="margin:0 0 6px 0;">No <b>Painel de Pintura (🎨)</b> você dá vida aos caminhos geométricos do seu Xequerê:</p>
+ <ul>
+ <li><b>🖌️ Pincel (Tecla P):</b> Clique ou arraste continuamente para pintar várias miçangas de uma só vez.</li>
+ <li><b>🧹 Borracha (Tecla B):</b> Apaga miçangas (dica: o <b>botão direito do mouse</b> apaga a qualquer momento!).</li>
+ <li><b>🪣 Balde (Tecla T) e 🔀 Substituir (Tecla R):</b> Preenche áreas inteiras ou troca uma cor no desenho todo.</li>
+ </ul>
+ `,
+ tip: '🎨 <b>Paleta & Cores Personalizadas:</b> Escolha uma das 16 cores básicas ou clique no botão <b>[+]</b> para criar qualquer tom.',
+ panel: 'colorPanel',
+ highlightIds: ['colorPanelBtn', 'brushBtn', 'eraserBtn', 'bucketBtn'],
+ tryLabel: '🖌️ Ativar o Pincel para desenhar ao sair',
+ onTry: () => {
+ setToolMode('brush');
+ showToast('Pincel ativado! Ao fechar o tutorial, clique na grade para pintar.');
+ }
+ },
+ {
+ icon: '🖐🏽',
+ title: '4. Navegando pelo Canvas Infinito',
+ sub: 'Mão, Zoom, Enquadramento e Estilo 2D/3D',
+ body: `
+ <p style="margin:0 0 6px 0;">Sua folha de desenho não tem fim! No <b>Painel de Visualização (👁️)</b> você controla a câmera:</p>
+ <ul>
+ <li><b>🖐🏽 Mão (Tecla M ou segure Espaço):</b> Arrasta a tela sem risco de pintar por engano.</li>
+ <li><b>➕ / ➖ Zoom:</b> Aproxime ou afaste usando a roda do mouse ou o gesto de pinça com 2 dedos no celular.</li>
+ <li><b>2D / 3D (Tecla D):</b> Alterna as miçangas entre quadradinhos chapados (2D) e esferas com brilho (3D).</li>
+ </ul>
+ `,
+ tip: '🧭 <b>Se perder no espaço?</b> Clique em <b>⤢ Ajustar à Tela (Tecla A)</b> para centralizar seu desenho imediatamente.',
+ panel: 'viewPanel',
+ highlightIds: ['viewPanelBtn', 'handBtn', 'fitScreenBtn', 'renderToggleBtn'],
+ tryLabel: '✨ Alternar estilo das miçangas (2D ↔ 3D)',
+ onTry: () => {
+ renderToggleBtn.click();
+ showToast(`Estilo de visualização alterado para ${renderStyle.toUpperCase()}!`);
+ }
+ },
+ {
+ icon: '⬚',
+ title: '5. Selecionar, Copiar e Multiplicar',
+ sub: 'Ganhe tempo repetindo motivos geométricos',
+ body: `
+ <p style="margin:0 0 6px 0;">Na tradição do Xequerê, muitos desenhos se repetem ao redor da cabaça. Use o <b>Painel de Seleção (⬚)</b> para não precisar redesenhar tudo:</p>
+ <ul>
+ <li>Arraste um retângulo sobre a área desejada e clique em <b>📄 Copiar (Ctrl+C)</b>.</li>
+ <li>Clique em <b>📋 Colar (Ctrl+V)</b>: uma <b>Estampa Flutuante</b> seguirá seu mouse!</li>
+ <li>Antes de clicar para carimbar, você pode <b>🔄 Girar 90° (G)</b> ou <b>↔️ Espelhar (H/V)</b>.</li>
+ </ul>
+ `,
+ tip: '📌 <b>Seleção Múltipla:</b> Ative o alfinete <b>📌 (Tecla F)</b> se quiser selecionar miçangas específicas clicando uma por uma.',
+ panel: 'selectPanel',
+ highlightIds: ['selectPanelBtn', 'pinSelectBtn', 'copyBtn', 'pasteBtn'],
+ tryLabel: null,
+ onTry: null
+ },
+ {
+ icon: '🖼️',
+ title: '6. Transformando Fotos em Trama',
+ sub: 'Conversor Matricial de Imagens (Atalho: Alt+I)',
+ body: `
+ <p style="margin:0 0 6px 0;">Quer trazer um símbolo, logotipo ou fotografia para as miçangas?</p>
+ <ul>
+ <li>Clique em <b>🖼️ Converter Imagem</b> e envie qualquer foto do seu aparelho.</li>
+ <li>Defina quantas colunas ela terá e o modo de cores (Paleta de 16 cores, Cores Predominantes ou Preto & Branco).</li>
+ <li>A imagem vira uma <b>Estampa Flutuante</b> pronta para você posicionar e colar na grade!</li>
+ </ul>
+ `,
+ tip: '💡 <b>Dica:</b> Imagens com bom contraste e formas marcantes ficam incríveis na malha de miçangas.',
+ panel: 'colorPanel',
+ highlightIds: ['imageModalBtn'],
+ tryLabel: '🖼️ Abrir o Conversor de Imagem',
+ onTry: () => {
+ handleModalClose(tutorialModal);
+ document.getElementById('imageModalBtn').click();
+ }
+ },
+ {
+ icon: '🌐',
+ title: '7. Testando na Cabaça 3D Virtual',
+ sub: 'Visualizador Esférico Trama 3D (Atalho: Alt+3)',
+ body: `
+ <p style="margin:0 0 6px 0;">Com a Moldura Guia definida e suas miçangas pintadas, clique em <b>🌐 Trama 3D</b> para ver como a saia ficará vestida na cabaça:</p>
+ <ul>
+ <li><b>📍 Linha de Emenda:</b> Mostra exatamente onde o lado esquerdo encontra o lado direito da trama para você conferir o encaixe.</li>
+ <li><b>⭕ Transparência e 🔄 Giro Automático:</b> Deixe a cabaça invisível, gire em 3 velocidades e tire fotos ou grave vídeos de 15s!</li>
+ </ul>
+ `,
+ tip: '🔄 Sempre que pintar novas miçangas, basta abrir o painel 🌐 3D ou clicar em <b>🔁 Atualizar</b>.',
+ panel: 'colorPanel',
+ highlightIds: ['trama3dModalBtn'],
+ tryLabel: null,
+ onTry: null
+ },
+ {
+ icon: '📦',
+ title: '8. Lista de Compras e PDF para Oficina',
+ sub: 'Contagem de Peso (📦) e Ficha Técnica A4 (📁)',
+ body: `
+ <p style="margin:0 0 6px 0;">Seu desenho está pronto para ir para a bancada! Veja como finalizar:</p>
+ <ul>
+ <li><b>📦 Contagem & Dimensões:</b> Soma quantas miçangas de cada cor você usou e calcula o <b>peso estimado em gramas</b> para sua compra.</li>
+ <li><b>📁 Arquivo & Exportação:</b> Baixe a <b>📄 Ficha Técnica em PDF (2 páginas)</b> com os 4 ângulos 3D da cabaça, a lista de cores e o mapa ampliado para imprimir!</li>
+ </ul>
+ `,
+ tip: '✓ <b>Salvamento Automático:</b> Seu trabalho é salvo continuamente no navegador (veja o selo verde <b>✓ Salvo</b> na barra). Boas criações!',
+ panel: 'colorPanel',
+ highlightIds: ['countModalBtn', 'fileModalBtn', 'saveBadge'],
+ tryLabel: '📦 Ver Contagem e Peso agora',
+ onTry: () => {
+ handleModalClose(tutorialModal);
+ document.getElementById('countModalBtn').click();
+ }
+ }
+ ];
+
+ function clearTourHighlights() {
+ document.querySelectorAll('.tour-highlight-btn').forEach(el => {
+ el.classList.remove('tour-highlight-btn');
+ });
+ }
+
+ function renderTutorialStep(index) {
+ currentTutorialStep = Math.max(0, Math.min(TUTORIAL_STEPS.length - 1, index));
+ const step = TUTORIAL_STEPS[currentTutorialStep];
+ const total = TUTORIAL_STEPS.length;
+
+ tutorialStepBadge.textContent = `Passo ${currentTutorialStep + 1} de ${total}`;
+ tutorialProgressFill.style.width = `${((currentTutorialStep + 1) / total) * 100}%`;
+ tutorialHeroIcon.textContent = step.icon;
+ tutorialStepTitle.textContent = step.title;
+ tutorialStepSub.textContent = step.sub;
+ tutorialStepBody.innerHTML = step.body;
+ tutorialStepTip.innerHTML = step.tip;
+
+ if (step.panel) {
+ switchPanel(step.panel, false);
+ }
+
+ clearTourHighlights();
+ if (Array.isArray(step.highlightIds)) {
+ step.highlightIds.forEach(id => {
+ const el = document.getElementById(id);
+ if (el) el.classList.add('tour-highlight-btn');
+ });
+ }
+
+ if (step.tryLabel && typeof step.onTry === 'function') {
+ tutorialTryBtn.style.display = 'inline-flex';
+ tutorialTryBtn.textContent = step.tryLabel;
+ tutorialTryBtn.onclick = step.onTry;
+ } else {
+ tutorialTryBtn.style.display = 'none';
+ tutorialTryBtn.onclick = null;
+ }
+
+ tutorialDots.innerHTML = '';
+ for (let i = 0; i < total; i++) {
+ const dot = document.createElement('button');
+ dot.type = 'button';
+ dot.className = 'tutorial-dot' + (i === currentTutorialStep ? ' active' : '');
+ dot.title = `Ir para o Passo ${i + 1}`;
+ dot.addEventListener('click', () => renderTutorialStep(i));
+ tutorialDots.appendChild(dot);
+ }
+
+ tutorialPrevBtn.disabled = currentTutorialStep === 0;
+ if (currentTutorialStep === total - 1) {
+ tutorialNextBtn.textContent = '🎉 Começar a Desenhar!';
+ } else {
+ tutorialNextBtn.textContent = 'Próximo →';
+ }
+ }
+
+ function openTutorialModal(startIndex = 0) {
+ try {
+ tutorialDontShowAgain.checked = localStorage.getItem('tt_hide_tutorial') === '1';
+ } catch (e) {}
+ renderTutorialStep(startIndex);
+ tutorialModal.classList.add('active');
+ }
+
+ document.getElementById('tutorialBtn').addEventListener('click', () => openTutorialModal(0));
+
+ tutorialPrevBtn.addEventListener('click', () => {
+ if (currentTutorialStep > 0) renderTutorialStep(currentTutorialStep - 1);
+ });
+
+ tutorialNextBtn.addEventListener('click', () => {
+ if (currentTutorialStep < TUTORIAL_STEPS.length - 1) {
+ renderTutorialStep(currentTutorialStep + 1);
+ } else {
+ handleModalClose(tutorialModal);
+ setToolMode('brush');
+ showToast('Bom trabalho! Escolha uma cor e clique na grade para pintar.');
+ }
+ });
+
+ tutorialDontShowAgain.addEventListener('change', (e) => {
+ try {
+ if (e.target.checked) localStorage.setItem('tt_hide_tutorial', '1');
+ else localStorage.removeItem('tt_hide_tutorial');
+ } catch (err) {}
+ });
 
  const accordionItems = document.querySelectorAll('.help-accordion-item');
  accordionItems.forEach(item => {
@@ -2160,7 +2650,7 @@
  }
  }
 
- // Sprite Cache para miçanga 3D (evita recriar radialGradient milhares de vezes por frame)
+ // Sprite Cache para miçanga 3D
  function getBeadSprite(colorHex) {
  const key = colorHex.toLowerCase();
  if (beadSpriteCache.has(key)) return beadSpriteCache.get(key);
@@ -2215,7 +2705,7 @@
  function logicalToCell(lx, ly) { return { r: Math.floor(ly/baseCellSize), c: Math.floor(lx/baseCellSize) }; }
  function screenToCell(sx, sy) { const l = screenToLogical(sx,sy); return logicalToCell(l.x, l.y); }
 
- // Algoritmo de Bresenham para interpolar células entre dois pontos (evita buracos em traços rápidos)
+ // Algoritmo de Bresenham para interpolar células entre dois pontos
  function getCellsBetween(c0, r0, c1, r1) {
  const cells = [];
  let x0 = c0, y0 = r0, x1 = c1, y1 = r1;
@@ -2281,7 +2771,6 @@
  const targetW = Math.round(rect.width * dpr);
  const targetH = Math.round(rect.height * dpr);
 
- // Só realoca o buffer da GPU quando as dimensões da janela realmente mudam
  if (canvas.width !== targetW || canvas.height !== targetH) {
  canvas.width = targetW;
  canvas.height = targetH;
@@ -2307,7 +2796,7 @@
  const strokeColor = (backgroundColor.toLowerCase() === '#ffffff') ? '#d6d3d1' : 'rgba(0,0,0,0.15)';
  ctx.lineWidth = Math.max(0.4, 0.5/zoom);
 
- // Renderização otimizada da grade: 1 único Path para todas as linhas horizontais e verticais
+ // Renderização otimizada da grade: 1 único Path
  if (gridVisible && (cMax - cMin) * (rMax - rMin) <= 90000) {
  ctx.strokeStyle = strokeColor;
  ctx.beginPath();
@@ -2351,7 +2840,7 @@
  ctx.restore();
  }
 
- // Miçangas pintadas (percorre apenas o que está visível ou o Map se for menor)
+ // Miçangas pintadas
  const visibleArea = (rMax - rMin + 1) * (cMax - cMin + 1);
  if (painted.size < visibleArea) {
  for (const [key, color] of painted.entries()) {
@@ -2463,7 +2952,7 @@
 
  let undoStack=[], redoStack=[];
  const UNDO_CAP = 200;
- let activeStrokeChanges = null; // Acumula alterações do mesmo traço contínuo
+ let activeStrokeChanges = null;
 
  function pushUndo(entry) {
  undoStack.push(entry);
@@ -2571,7 +3060,6 @@
  }
  }
 
- // Flood fill otimizado com fila por índice (O(1) dequeue em vez de shift/pop)
  function performBucketFill(startCell, newColor) {
  const hasSel = selectedCells.size > 0;
  const changes = [];
@@ -2938,7 +3426,7 @@
  }
 
  if (!pointerDownInfo) {
- scheduleDraw(); // Atualiza hover preview
+ scheduleDraw();
  return;
  }
  const res = applyPaintAt(px, py, pointerDownInfo.type==='erase' ? null : colorPicker.value, pointerDownInfo.type==='erase', pointerDownInfo.lastCell);
@@ -3278,7 +3766,7 @@
  let autosaveTimer = null;
  function buildData(name) {
  return { 
- app:'TramaTrama', version:'0.9.28', name, author:document.getElementById('tramaAuthor').value,
+ app:'TramaTrama', version:'0.9.29', name, author:document.getElementById('tramaAuthor').value,
  savedAt:new Date().toISOString(), bg:backgroundColor, grid:gridVisible, style:renderStyle,
  recRows: recommendedRows, recCols: recommendedCols,
  savedHeight: savedTramaHeight, savedCircum: savedTramaCircum,
@@ -3661,7 +4149,7 @@
  pdf.setFontSize(8);
  pdf.setTextColor(150);
  pdf.setFont('helvetica', 'normal');
- pdf.text('Trama Trama v0.9.28 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 6);
+ pdf.text('Trama Trama v0.9.29 — Trama Xequerê de Rodrig Melo', marginMm, pageH - 6);
  pdf.text('Consulte o Mapa da Trama em tamanho ampliado na Página 2 →', pageW - marginMm, pageH - 6, { align: 'right' });
 
  pdf.addPage('a4', 'portrait');
@@ -3711,7 +4199,7 @@
 
  pdf.setFontSize(8);
  pdf.setTextColor(160);
- pdf.text(`Trama Trama v0.9.28 — ${author} — ${dataStr}`, p2Margin, pageH - 5);
+ pdf.text(`Trama Trama v0.9.29 — ${author} — ${dataStr}`, p2Margin, pageH - 5);
  }
 
  const sanitizedName = (rawName || 'Trama').replace(/[^\w\-]+/g, '_');
@@ -3803,17 +4291,15 @@
  return bestHex;
  }
 
- // K-Means++ com semeadura determinística por distância máxima (resultados consistentes e cores fiéis)
+ // K-Means++ com semeadura determinística por distância máxima
  function kMeansQuantize(pixels, k, maxIters = 10) {
  if (pixels.length === 0) return {};
  if (k > pixels.length) k = pixels.length;
 
  const centroids = [];
- // 1º centroide: pixel no centro da amostra
  const first = pixels[Math.floor(pixels.length / 2)];
  centroids.push({ r: first.r, g: first.g, b: first.b });
 
- // Demais centroides: escolhe sempre o pixel mais distante dos centroides já escolhidos (K-Means++ determinístico)
  const minDistSq = new Float32Array(pixels.length).fill(Infinity);
  for (let cIdx = 1; cIdx < k; cIdx++) {
  const lastC = centroids[cIdx - 1];
@@ -3975,6 +4461,7 @@
  
  if (e.altKey && !e.ctrlKey && !e.metaKey) {
  const altKey = e.key.toLowerCase();
+ if (altKey === 't') { e.preventDefault(); openTutorialModal(0); return; }
  if (altKey === 'd') { e.preventDefault(); openDimModal(); return; }
  if (altKey === 'i') { e.preventDefault(); document.getElementById('imageModalBtn').click(); return; }
  if (altKey === 'a') { e.preventDefault(); document.getElementById('fileModalBtn').click(); return; }
@@ -4111,9 +4598,26 @@
 
  // Inicialização
  buildColorPalette(); renderRecentColors(); refreshSaves(); updateSelectionState();
- try { const raw=localStorage.getItem('tt_autosave'); if(raw){ const d=JSON.parse(raw); if(isValidTramaData(d)) loadData(d); } } catch(e){}
+ let hasSavedState = false;
+ try {
+ const raw = localStorage.getItem('tt_autosave');
+ if (raw) {
+ const d = JSON.parse(raw);
+ if (isValidTramaData(d)) {
+ loadData(d);
+ if (d.painted && d.painted.length > 0) hasSavedState = true;
+ }
+ }
+ } catch(e){}
  window.addEventListener('resize', scheduleDraw);
  fitScreenBtn.click();
+
+ // Abre o Tutorial automaticamente na primeira visita se não estiver desativado
+ try {
+ if (!hasSavedState && localStorage.getItem('tt_hide_tutorial') !== '1') {
+ setTimeout(() => openTutorialModal(0), 400);
+ }
+ } catch(e){}
 })();
 </script>
 </body>
